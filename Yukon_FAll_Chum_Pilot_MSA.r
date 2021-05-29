@@ -45,6 +45,50 @@
 # 23 (P) Lower Summer+UpperKoy+Mai (2004-2007) moved from 4 
 #		 (2008+present)  4 Lower Summer +7 UpperKoy+Mai  
 ################################################################################
+# Output Strata
+# 1 - 10: Survey Sample strata
+# Strata 100 both summer and fall seasons (beware of stratum date differences in early years 1999-2007)
+# Strata 101 summer season only (thru July 18, data complete 2008 on)
+# Strata 102 fall season only (July 19 to end, data complete 2004 on)
+
+# Strata 103 proportions of only summer stocks in both seasons (Total summer stock passage/total passage)
+# Strata 103 would be strata 100   
+# 1) grpID=4 for Lower summer divided into grpID=2 Total Summer.
+# 2) grpID=8 for Tanana summer divided into grpID=2 Total Summer.
+# 3) grpID=5 for Middle divided into grpID=2 Total Summer.
+
+# Strata 104 proportions of only summer in summer season  (Total summer passage/total passage)
+# Strata 104 would be strata 101
+# 1) grpID=4 for Lower summer divided into grpID=2 Total Summer.
+# 2) grpID=8 for Tanana summer divided into grpID=2 Total Summer.
+# 3) grpID=5 for Middle divided into grpID=2 Total Summer.
+
+# Strata 105 proportions of only summer in fall season  (summer stock passage in fall season/total fall passage)
+# Strata 105 would be strata 102
+# 1) grpID=4 for Lower summer divided into grpID=2 Total Summer.
+# 2) grpID=8 for Tanana summer divided into grpID=2 Total Summer.
+# 3) grpID=5 for Middle divided into grpID=2 Total Summer.
+
+# Strata 106 proportions of only fall stocks in both seasons
+# Strata 106 would be strata 100
+# 1) grpID=10 for Tanana fall divided into grpID=9 Total Fall.
+# 2) grpID=11 for BorderUS divided into grpID=9 Total Fall.
+# 3) grpID=19 for Canada divided into grpID=9 Total Fall.
+
+# Strata 107 proportion of only fall in summer season
+# Strata 107 would be strata 101
+# 1) grpID=10 for Tanana fall divided into grpID=9 Total Fall.
+# 2) grpID=11 for BorderUS divided into grpID=9 Total Fall.
+# 3) grpID=19 for Canada divided into grpID=9 Total Fall.
+
+# Strata 108 proportion of only fall in fall season
+# Strata 108 would be strata 102
+# 1) grpID=10 for Tanana fall divided into grpID=9 Total Fall.
+# 2) grpID=11 for BorderUS divided into grpID=9 Total Fall.
+# 3) grpID=16 for Mainstem+Upper CA divided into grpID=9 Total Fall.
+# 4) grpID=13 for Porcupine divided into grpID=9 Total Fall.
+# 5) grpID=19 for Canada divided into grpID=9 Total Fall.
+################################################################################
 ################################################################################
 #  Changes in Primary stock groups
 #  1999 - 2002: 3, 4, 5, 6. 20, 21, 22
@@ -134,7 +178,6 @@ stgrpIDn <- as.character(stgrpID)
 # Standard Output Stock figures 
 ststockID <- c(2,7,8,10,11,19)
 ststocks <- as.character(ststockID)
-
 
 #-------------------------------------------------------------------------------
 #  1.3: Specify Simulation and outputs 
@@ -588,7 +631,7 @@ names(mlist) <- years
 #-------------------------------------------------------------------------------
 write.xlsx(mlist,sumxlsx,rowNames=FALSE) 
 #-------------------------------------------------------------------------------
-#  EXCEL table output
+#  Pilot CSV output
 #-------------------------------------------------------------------------------
 for(i in 1:ny){
   write.csv(mlist[[i]],paste0(wd_Sum,'Pilot_MSA_Sum_',years[i],'.csv'),na='',row.names=FALSE)
@@ -604,6 +647,17 @@ for(i in 1:ny){
 #=------------------------------------------------------------------------------ 
 if(fig1==TRUE){
 windows(record=TRUE)
+  if(gg==TRUE){
+    ## ggplot version 
+    ggplot() + theme_simple() + 
+      facet_wrap( ~factor(Year),scale='free') + 
+      theme(axis.text.x = element_text(size=10))+
+      labs(title = "Summer vs. Fall\n")+  xlab("Season Strata") +
+      geom_line(data = Pilot, aes( x=Date,y=Run) ) +
+      geom_vline(xintercept = rstr$Strata_Start_Date,color=4)+
+      geom_vline(xintercept =(rstr$Strata_End_Date),color=2)
+  }else{
+# Base plot 
 par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
 for(i in 1:ny){
   temp <- Pilot[Pilot$Year==years[i],]
@@ -614,20 +668,11 @@ abline(v=c(rstr.y$Strata_Start_Date,max(rstr.y$Strata_End_Date)),col=4,lwd=2)
 mtext(paste("Sampling Strata "), side = 3, line = 0, outer = TRUE,cex=1.5)
 mtext('Run', side = 2, line = 1, outer = TRUE,cex=1.5)
 mtext("Dates ", side = 1, line = 1, outer = TRUE,cex=1.5)
-if(gg==TRUE){
-## ggplot version 
-   ggplot() + theme_simple() + 
-   facet_wrap( ~factor(Year),scale='free') + 
-   theme(axis.text.x = element_text(size=10))+
-   labs(title = "Summer vs. Fall\n")+  xlab("Season Strata") +
-   geom_line(data = Pilot, aes( x=Date,y=Run) ) +
-   geom_vline(xintercept = rstr$Strata_Start_Date,color=4)+
-   geom_vline(xintercept =(rstr$Strata_End_Date),color=2)
-   }
+ }
 }
 
 #-------------------------------------------------------------------------------
-#  Plot stock propotion by Strata 
+#  Plot stock proportion by Strata 
 #-------------------------------------------------------------------------------
 if(fig2==TRUE){
 Pilot.stp <- Pilot.m[,c('Year','Strata','Run', ststocks)]
@@ -736,44 +781,3 @@ for(i in 1:ny){
 
 }
 
-#-------------------------------------------------------------------------------
-#  Summer vs. Fall
-#=------------------------------------------------------------------------------ 
-if(fig4==TRUE){
-windows(record=TRUE)
-# Base plot 
-par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
-for(i in 1:ny){
-temp <- with(Pilot.sft, Pilot.sft[Year==years[i],])
-plot(Summer~stbreak, type ='o',col=4, xlim=c(1,9),ylim=c(0,100), 
-     yaxt='n',xaxt='n',lwd = 2, data=temp,main=years[i])
-lines(Fall~stbreak,type ='o',col=2,lwd = 2, data=temp)
-axis(2, seq(0,100,20),las=2, labels=NA)
-if (years[i] %in% c(1999,2005, 2010,2015, 2020)) axis(2, seq(0,100,20),las=2, font=2)
-axis(1, seq(1,9,1),labels = NA,cex.axis = 0.9)
-if (years[i] > 2015) axis(1, seq(1,9,1), labels = stbl,cex.axis = 0.9)
-}
-mtext(paste("Summer vs. Fall "), side = 3, line = 0, outer = TRUE,cex=1.5)
-mtext('Stock %', side = 2, line = 1, outer = TRUE,cex=1.5)
-mtext("Dates ", side = 1, line = 1, outer = TRUE,cex=1.5)
-
-if(gg=TRUE){
-# ggplot2 	
-#  Create long data 
-   Pilot.sfl <- melt(Pilot.sft,id.vars=c('Year','stbreak'), 
-   measure.vars=c("Summer", "Fall"),
-   variable.name='SF', value.name='percent')
-   Pilot.sfl2 <- dcast(Pilot.sfl,Year+SF ~ stbreak)
-   Pilot.sfl3 <- melt(Pilot.sfl2,id.vars=c('Year','SF'), 
-   variable.name='stbreak', value.name='percent')
-# ggplot
-   ggplot() + theme_simple() + 
-   facet_rep_wrap( ~factor(Year)) +
-#   facet_wrap( ~factor(Year),scale='free') + 
-   scale_x_continuous( breaks=c( 1:9 ),labels=stbl) + ylim(0, 100)+
-   theme(axis.text.x = element_text(size=10))+
-   labs(title = "Summer vs. Fall\n")+  xlab("Season Strata") +
-   geom_line(data = Pilot.sfl3, aes( x=as.numeric(stbreak),y=percent,color=SF ) )+
-   geom_point(data = Pilot.sfl3, aes( x=as.numeric(stbreak),y=percent,color=SF ),size=2)
-}
-}
