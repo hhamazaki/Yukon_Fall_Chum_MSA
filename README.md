@@ -5,8 +5,8 @@ This estimates Yukon River Fall Chum salmmon passage at Pilot Statop.
    GSI
 1. Upper Canada (1999-present): 3 White + 6 Teslin
 2. Total Summer (1999-present): 
-		(1999-2002)  4 Lower Summer + 5 Middle Summer  
-		(2004-2007)  23 Lower Summer+UpperKoy+Main + 8 Tanana Summer  
+	(1999-2002)  4 Lower Summer + 5 Middle Summer  
+	(2004-2007)  23 Lower Summer+UpperKoy+Main + 8 Tanana Summer  
   	(2007-present)  4 Lower Summer + 5 Middle Summer  
 3. (P) White UC (1999-present): 	 
 4. (P) Lower Summer (1999-2002, 2008-present)
@@ -40,7 +40,50 @@ This estimates Yukon River Fall Chum salmmon passage at Pilot Statop.
 		 (2008+present)  4 Lower Summer +7 UpperKoy+Mai  
 
 ####  Changes in Primary stock groups
-1999 - 2002: 3, 4, 5, 6. 20, 21, 22
-2004 - 2007: 3, 4, 6, 8, 10, 11, 13, 14
-2008 - present: 3, 4, 6, 7, 8, 10, 11, 13, 14
+* 1999 - 2002: 3, 4, 5, 6. 20, 21, 22
+* 2004 - 2007: 3, 4, 6, 8, 10, 11, 13, 14
+* 2008 - present: 3, 4, 6, 7, 8, 10, 11, 13, 14
 
+## Strata Description 
+####  Changes in Primary stock groups
+* Strata 100 both summer and fall seasons (beware of stratum date differences in early years 1999-2007)
+* Strata 101 summer season only (thru July 18, data complete 2008 on)
+* Strata 102 fall season only (July 19 to end, data complete 2004 on)
+
+* Strata 103 proportions of only summer stocks in both seasons (Total summer stock passage/total passage)
+* Strata 103 would be strata 100   
+	* 1) grpID=4 for Lower summer divided into grpID=2 Total Summer.
+	* 2) grpID=8 for Tanana summer divided into grpID=2 Total Summer.
+	* 3) grpID=5 for Middle divided into grpID=2 Total Summer.
+
+* Strata 104 proportions of only summer in summer season  (Total summer passage/total passage)
+* Strata 104 would be strata 101
+	* 1) grpID=4 for Lower summer divided into grpID=2 Total Summer.
+	* 2) grpID=8 for Tanana summer divided into grpID=2 Total Summer.
+	* 3) grpID=5 for Middle divided into grpID=2 Total Summer.
+
+* Strata 105 proportions of only summer in fall season  (summer stock passage in fall season/total fall passage)
+* Strata 105 would be strata 102
+	* 1) grpID=4 for Lower summer divided into grpID=2 Total Summer.
+	* 2) grpID=8 for Tanana summer divided into grpID=2 Total Summer.
+	* 3) grpID=5 for Middle divided into grpID=2 Total Summer.
+
+* Strata 106 proportions of only fall stocks in both seasons
+* Strata 106 would be strata 100
+	* 1) grpID=10 for Tanana fall divided into grpID=9 Total Fall.
+	* 2) grpID=11 for BorderUS divided into grpID=9 Total Fall.
+	* 3) grpID=19 for Canada divided into grpID=9 Total Fall.
+
+* Strata 107 proportion of only fall in summer season
+* Strata 107 would be strata 101
+	* 1) grpID=10 for Tanana fall divided into grpID=9 Total Fall.
+	* 2) grpID=11 for BorderUS divided into grpID=9 Total Fall.
+	* 3) grpID=19 for Canada divided into grpID=9 Total Fall.
+
+* Strata 108 proportion of only fall in fall season
+* Strata 108 would be strata 102
+	* 1) grpID=10 for Tanana fall divided into grpID=9 Total Fall.
+	* 2) grpID=11 for BorderUS divided into grpID=9 Total Fall.
+	* 3) grpID=16 for Mainstem+Upper CA divided into grpID=9 Total Fall.
+	* 4) grpID=13 for Porcupine divided into grpID=9 Total Fall.
+	* 5) grpID=19 for Canada divided into grpID=9 Total Fall.
