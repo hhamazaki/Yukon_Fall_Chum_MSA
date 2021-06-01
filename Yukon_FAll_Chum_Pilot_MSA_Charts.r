@@ -119,6 +119,7 @@ options(scipen=999)   # Prevent R using scientific notation xxx e-yyy
 # wd_MSA <- paste0(Main,'data/MSA_data/') # MSA data
 # wd_Plt <- paste0(Main,'/data/Pilot_data/') #Pilot data
 # wd_Sum <- paste0(Main,'/data/Summary_data/') #Summary data used for figures
+# wd_Obs <- paste0(Main,'/data/Obs_data/') #data used for figures comparison 
 #-------------------------------------------------------------------------------
 # Rprojects 
 #-------------------------------------------------------------------------------
@@ -126,6 +127,7 @@ fdr <- './R_functions/'
 wd_MSA <- './data/MSA_data/'
 wd_Plt <- './data/Pilot_data/'
 wd_Sum <- './data/Summary_data/'
+wd_Obs <- './data/Obs_data/'
 #-------------------------------------------------------------------------------
 # Import Source files 
 #-------------------------------------------------------------------------------
@@ -158,14 +160,84 @@ Pilot.all <- as.data.frame(do.call(rbind, mlist))
 Pilot.total <- Pilot.all[Pilot.all$Strata==100,]
 Pilot.summer <- Pilot.all[Pilot.all$Strata==101,]
 Pilot.fall <- Pilot.all[Pilot.all$Strata==102,]
-plot(mean~Year,type='o',data=Pilot.fall[Pilot.fall$grpID=10,])
 
 
 windows(record=TRUE)
 #-------------------------------------------------------------------------------
-#  Annual Trends 
-#=------------------------------------------------------------------------------ 
+#  Annual Trends Comparison with Obs data 
+#  grpID 10 = Tanana
+#  grpID 11 = Border US
+#  grpID 13 = Porcupine-Fishing Branch
+#  grpID 16 = Eagle
+#------------------------------------------------------------------------------- 
+# Read Obs_data
+obs <- read.csv(paste0(wd_Obs,'Fall_Chum_esc.csv'),stringsAsFactors = FALSE)
+error.bar <- function(x, upper, lower, length=0,...){
+  arrows(x,upper, x, lower, angle=90, code=3, length=length, ...)
+}
 
+
+
+
+
+
+# Extract only data needed 
+windows(record = TRUE)
+par(mfrow=c(4, 1), mar=c(4, 3, 3, 8))
+grp <- c(10,11,13,16)
+grp.n <- c('Tanana','Border US','Porcupine','Eagle')
+for(i in 1:4){
+msa <- Pilot.fall[Pilot.fall$grpID==grp[i],c('Year','mean','UCI.m','LCI.m')]
+msa <- merge(obs[,c(1,i+1)],msa,by='Year')
+names(msa) <- c('Year','Observed','MSA','UCI','LCI')
+# transpose
+temp <- t(msa)
+bars <-barplot(temp[c(2,3),],names.arg=temp[1,],beside=TRUE, axis.lty=1,
+        ylim =c(0,max(temp[c(2:5),],na.rm=TRUE)),       
+        main=grp.n[i],legend.text=TRUE,args.legend=list(x='topright',inset=c(-0.15,0)))
+temp1 <- temp[c(3,4,5),]
+temp1[1,]<-NA
+error.bar(bars,temp1[c(1,2),],temp1[c(1,3),])
+}
+
+
+if(gg==TRUE){
+  for(i in 1:4){
+    msa <- Pilot.fall[Pilot.fall$grpID==grp[i],c('Year','mean','UCI.m','LCI.m')]
+    msa <- merge(obs[,c(1,i+1)],msa,by='Year')
+    names(msa) <- c('Year','Observed','MSA','UCI','LCI')
+    # transpose
+    df <- melt(msa[,c(1:3)],id='Year')
+    temp <- msa[,c('Year','UCI','LCI')]
+    temp$variable <- 'MSA'
+    df <- merge(df,temp,by=c('Year','variable'),all=TRUE)
+    ggplot() + theme_simple() +
+    geom_bar(data=df,aes(fill=variable,x=Year,y=value),position=position_dodge(),stat='identity')
+    geom_errorbar(data=df,aes(x=Year,ymin=LCI,ymax=UCI),width=.2,na.rm=TRUE,
+                  position=position_dodge(.9))
+    
+  }
+  
+  # ggplot2 	
+  #  Create long data 
+  Pilot.sfl <- melt(Pilot.sft,id.vars=c('Year','stbreak'), 
+                    measure.vars=c("Summer", "Fall"),
+                    variable.name='SF', value.name='percent')
+  Pilot.sfl2 <- dcast(Pilot.sfl,Year+SF ~ stbreak)
+  Pilot.sfl3 <- melt(Pilot.sfl2,id.vars=c('Year','SF'), 
+                     variable.name='stbreak', value.name='percent')
+  # ggplot
+  ggplot() + theme_simple() + 
+    facet_rep_wrap( ~factor(Year)) +
+    #   facet_wrap( ~factor(Year),scale='free') + 
+    scale_x_continuous( breaks=c( 1:9 ),labels=stbl) + ylim(0, 100)+
+    theme(axis.text.x = element_text(size=10))+
+    labs(title = "Summer vs. Fall\n")+  xlab("Season Strata") +
+    geom_line(data = Pilot.sfl3, aes( x=as.numeric(stbreak),y=percent,color=SF ) )+
+    geom_point(data = Pilot.sfl3, aes( x=as.numeric(stbreak),y=percent,color=SF ),size=2)
+} else {  
+  
+  
 
 
 

@@ -27,7 +27,7 @@ This estimates Yukon River Fall Chum salmmon passage at Pilot Statop.
 14.  (P) Mainstem CA (2004- present) 
 15.  Fall US (2004-present)
 	 (2004- present): 10 Tanana Fall + 11 Border US
-16.  Mainstem+Upper CA (2004-present): 1 Upper Canada + 14 Mainsten CA
+16.  Mainstem+Upper CA (2004-present): 1 Upper Canada + 14 Mainstem CA
 17.  Border US+Canada (1999-present): 
 		 (1999-2002) 1 Upper Canada + 22 Border US&CA 
 		 (2004-present) 11 Border US + 19 Total Canada
