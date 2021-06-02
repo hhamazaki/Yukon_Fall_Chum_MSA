@@ -188,7 +188,7 @@ Sim <- TRUE
 nrep <- 10000
 # % CI range
 ci <- 90
-# Do you want to produce output EXCEL File?
+# Do you want to produce output Files?
 output <- TRUE
 # Do you want to produce figures?
 # Annual Pilot Station Run & Sampling Strata 
@@ -241,7 +241,7 @@ MSAL <- merge(MSAL,rstr[,c('Year','Strata','Sample_Size')],by=c('Year','Strata')
 
 #-------------------------------------------------------------------------------
 #  2.3: Read Pilot Station Run, var, and stratum Info : 
-#       This creates Daily Pilot run and var with stratata info
+#       This creates Daily Pilot run and var with strata info
 #-------------------------------------------------------------------------------
 # Create a list file
 Pilot.list <- list()
@@ -347,8 +347,11 @@ Pilot.sf  <- add.sum(Pilot.sf)
 #------ Mean Proportion --------------------------------------------------------
 Pilot.sfp <- Pilot.sf
 Pilot.sfp[,-c(1:2)] <- Pilot.sfp[,-c(1:2)]/Pilot.sf$Run
+
 #------ File output ------------------------------------------------------------
+if(output==TRUE){
 write.csv(Pilot.sfp,paste0(wd_Sum,'Pilot_sfp.csv'),na='',row.names=FALSE)
+}
 
 #-------------------------------------------------------------------------------
 #  Estimate stock proportion by Summer and Fall  
@@ -387,8 +390,11 @@ Pilot.d.min.max <- aggregate(percent~group+stbreak, FUN=function(x) c(min=min(x)
 Pilot.d.min.max <- do.call(data.frame,Pilot.d.min.max)
 # Rename Column
 names(Pilot.d.min.max)[3:4] <- c('Min','Max')
+
 #------ File output ------------------------------------------------------------
+if(output==TRUE){
 write.csv(Pilot.d.min.max,paste0(wd_Sum,'Pilot_d_min_max.csv'),na='',row.names=FALSE)
+}
 
 #===============================================================================
 #  Summer and Fall  stock proportion by standard strata       
@@ -400,12 +406,14 @@ Pilot.sft <- aggregate(.~Year+stbreak, FUN=sum,data=temp[,c('Year','stbreak','Ru
 names(Pilot.sft) <- c('Year','stbreak','Run','Summer','Fall')
 # Calculate stock proporion by standard strat
 Pilot.sft[,c('Summer','Fall')]  <- 100*Pilot.sft[,c('Summer','Fall')] /Pilot.sft$Run 
-#------ File output ------------------------------------------------------------
-write.csv(Pilot.sft,paste0(wd_Sum,'Pilot_sft.csv'),na='',row.names=FALSE)
 
+#------ File output ------------------------------------------------------------
+if(output==TRUE){
+write.csv(Pilot.sft,paste0(wd_Sum,'Pilot_sft.csv'),na='',row.names=FALSE)
+}
 
 #===============================================================================
-#  Output Calculate CI Range of passage and propotion by stock group and strata 
+#  Calculate CI Range of passage and propotion by stock group and strata 
 #===============================================================================
 if(Sim==TRUE){
 # Create temporal  list file 
@@ -507,7 +515,7 @@ if(dim(f)[1]>0){
   temp2$Strata <- i
 # Save to list file 
   pilot.st.sim[[i]] <- temp2
-  }  # End Strata CI calculaiton for each year 
+  }  # End Strata CI calculation for each year 
 
 #-------------------------------------------------------------------------------
 #  Summarize for each Year  
@@ -556,7 +564,7 @@ if(sum(ft.sim)>0) {ft.sim.p  <- ft.sim/rowSums(ft.sim)} else ft.sim.p <- ft.sim
   temp.st$Strata <- 101
 # For Fall 
   temp.ft$Strata <- 102
-# Proption by summer / Fall   
+# Proportion by summer / Fall   
   temp.103$Strata <- 103 
   temp.104$Strata <- 104 
   temp.105$Strata <- 105 
@@ -568,7 +576,6 @@ if(sum(ft.sim)>0) {ft.sim.p  <- ft.sim/rowSums(ft.sim)} else ft.sim.p <- ft.sim
   temp.ci[[j]] <- rbind(do.call(rbind, lapply(pilot.st.sim, as.data.frame)),temp.t,temp.st,temp.ft,
   temp.103,temp.104,temp.105,temp.106,temp.107,temp.108) 
 } # End for Year 
-} # End of SIM
 
 #===============================================================================
 #  4.0: Data Output  
@@ -638,6 +645,7 @@ for(i in 1:ny){
 }
 }
 #-------------------------------------------------------------------------------
+} # End of SIM
 
 #===============================================================================
 #  Graphics 
@@ -712,7 +720,7 @@ if(gg=TRUE){
 }
 
 #===============================================================================
-#  Stock run proption by standard Strata       
+#  Stock run proportion by standard Strata       
 #===============================================================================
 if(fig3==TRUE){
 windows(record=TRUE)
@@ -781,3 +789,45 @@ for(i in 1:ny){
 
 }
 
+#-------------------------------------------------------------------------------
+#  3.2 Summer vs. Fall
+#=------------------------------------------------------------------------------ 
+if(fig4==TRUE){
+  windows(record=TRUE)
+if(gg==TRUE){
+  # ggplot2 	
+  #  Create long data 
+  Pilot.sfl <- melt(Pilot.sft,id.vars=c('Year','stbreak'), 
+                    measure.vars=c("Summer", "Fall"),
+                    variable.name='SF', value.name='percent')
+  Pilot.sfl2 <- dcast(Pilot.sfl,Year+SF ~ stbreak)
+  Pilot.sfl3 <- melt(Pilot.sfl2,id.vars=c('Year','SF'), 
+                     variable.name='stbreak', value.name='percent')
+  # ggplot
+  ggplot() + theme_simple() + 
+    facet_rep_wrap( ~factor(Year)) +
+    #   facet_wrap( ~factor(Year),scale='free') + 
+    scale_x_continuous( breaks=c( 1:9 ),labels=stbl) + ylim(0, 100)+
+    theme(axis.text.x = element_text(size=10))+
+    labs(title = "Summer vs. Fall\n")+  xlab("Season Strata") +
+    geom_line(data = Pilot.sfl3, aes( x=as.numeric(stbreak),y=percent,color=SF ) )+
+    geom_point(data = Pilot.sfl3, aes( x=as.numeric(stbreak),y=percent,color=SF ),size=2)
+} else {  
+  
+  # Base plot 
+  par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
+  for(i in 1:ny){
+    temp <- with(Pilot.sft, Pilot.sft[Year==years[i],])
+    plot(Summer~stbreak, type ='o',col=4, xlim=c(1,9),ylim=c(0,100), 
+         yaxt='n',xaxt='n',lwd = 2, data=temp,main=years[i])
+    lines(Fall~stbreak,type ='o',col=2,lwd = 2, data=temp)
+    axis(2, seq(0,100,20),las=2, labels=NA)
+    if (years[i] %in% c(1999,2005, 2010,2015, 2020)) axis(2, seq(0,100,20),las=2, font=2)
+    axis(1, seq(1,9,1),labels = NA,cex.axis = 0.9)
+    if (years[i] > 2015) axis(1, seq(1,9,1), labels = stbl,cex.axis = 0.9)
+  }
+  mtext(paste("Summer vs. Fall "), side = 3, line = 0, outer = TRUE,cex=1.5)
+  mtext('Stock %', side = 2, line = 1, outer = TRUE,cex=1.5)
+  mtext("Dates ", side = 1, line = 1, outer = TRUE,cex=1.5)
+}
+}
