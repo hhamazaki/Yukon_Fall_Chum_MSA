@@ -1,6 +1,6 @@
 # Yukon_Fall_Chum_MSA
 
-This estimates Yukon River Fall Chum salmmon passage at Pilot Statop. 
+This estimates Yukon River Fall Chum salmmon passage at Pilot Staton. 
    Group ID and description (P) indicates Primary group directly identified by 
    GSI
 1. Upper Canada (1999-present): 3 White + 6 Teslin

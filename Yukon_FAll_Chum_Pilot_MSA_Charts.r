@@ -129,6 +129,11 @@ wd_Plt <- './data/Pilot_data/'
 wd_Sum <- './data/Summary_data/'
 wd_Obs <- './data/Obs_data/'
 #-------------------------------------------------------------------------------
+# Graphic control 
+#-------------------------------------------------------------------------------
+# Use ggplot? (TRUE or FALSE)
+gg <- FALSE
+#-------------------------------------------------------------------------------
 # Import Source files 
 #-------------------------------------------------------------------------------
 source(paste0(fdr,'Yukon_Chum_MSA_functions.R'))  # Function sets used for MSA analyses
@@ -148,7 +153,7 @@ years <- years[order(years)]
 ny <- length(years)
 
 #-------------------------------------------------------------------------------
-# 2.2: Read Pilot CSV data 
+# 2.2: Read Pilot summary CSV data 
 #-------------------------------------------------------------------------------
 mlist <- list()
 for(i in 1:ny){
@@ -162,7 +167,13 @@ Pilot.summer <- Pilot.all[Pilot.all$Strata==101,]
 Pilot.fall <- Pilot.all[Pilot.all$Strata==102,]
 
 
+#===============================================================================
+# 3.0: Figures 
+#===============================================================================
 windows(record=TRUE)
+#-------------------------------------------------------------------------------
+#  3.1: Create Annual passage estimate for selected groups
+#-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 #  Annual Trends Comparison with Obs data 
 #  grpID 10 = Tanana
@@ -175,12 +186,6 @@ obs <- read.csv(paste0(wd_Obs,'Fall_Chum_esc.csv'),stringsAsFactors = FALSE)
 error.bar <- function(x, upper, lower, length=0,...){
   arrows(x,upper, x, lower, angle=90, code=3, length=length, ...)
 }
-
-
-
-
-
-
 # Extract only data needed 
 windows(record = TRUE)
 par(mfrow=c(4, 1), mar=c(4, 3, 3, 8))
@@ -217,35 +222,11 @@ if(gg==TRUE){
                   position=position_dodge(.9))
     
   }
-  
-  # ggplot2 	
-  #  Create long data 
-  Pilot.sfl <- melt(Pilot.sft,id.vars=c('Year','stbreak'), 
-                    measure.vars=c("Summer", "Fall"),
-                    variable.name='SF', value.name='percent')
-  Pilot.sfl2 <- dcast(Pilot.sfl,Year+SF ~ stbreak)
-  Pilot.sfl3 <- melt(Pilot.sfl2,id.vars=c('Year','SF'), 
-                     variable.name='stbreak', value.name='percent')
-  # ggplot
-  ggplot() + theme_simple() + 
-    facet_rep_wrap( ~factor(Year)) +
-    #   facet_wrap( ~factor(Year),scale='free') + 
-    scale_x_continuous( breaks=c( 1:9 ),labels=stbl) + ylim(0, 100)+
-    theme(axis.text.x = element_text(size=10))+
-    labs(title = "Summer vs. Fall\n")+  xlab("Season Strata") +
-    geom_line(data = Pilot.sfl3, aes( x=as.numeric(stbreak),y=percent,color=SF ) )+
-    geom_point(data = Pilot.sfl3, aes( x=as.numeric(stbreak),y=percent,color=SF ),size=2)
-} else {  
-  
-  
-
-
-
+} 
+ 
 #-------------------------------------------------------------------------------
-#  Summer vs. Fall
+#  3.2 Summer vs. Fall
 #=------------------------------------------------------------------------------ 
-if(fig4==TRUE){
-
   if(gg==TRUE){
     # ggplot2 	
     #  Create long data 
@@ -283,5 +264,3 @@ if(fig4==TRUE){
   mtext("Dates ", side = 1, line = 1, outer = TRUE,cex=1.5)
   }
 
-
-}
