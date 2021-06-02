@@ -385,11 +385,11 @@ Pilot.sd <- melt(Pilot.sd[,c('Year','stbreak',ststocks)],
             id.vars = c('Year','stbreak'), variable.name = "group", value.name = "percent")
 # Change 0 percent to NA
 Pilot.sd$percent[Pilot.sd$percent==0]<-NA
-Pilot.d.min.max <- aggregate(percent~group+stbreak, FUN=function(x) c(min=min(x),max=max(x).mean=mean(x)),data=Pilot.sd) 
+Pilot.d.min.max <- aggregate(percent~group+stbreak, FUN=function(x) c(min=min(x),max=max(x),mean=mean(x)),data=Pilot.sd) 
 # Change to dataframe
 Pilot.d.min.max <- do.call(data.frame,Pilot.d.min.max)
 # Rename Column
-names(Pilot.d.min.max)[3:4] <- c('Min','Max')
+names(Pilot.d.min.max)[3:4] <- c('Min','Max','Mean')
 
 #------ File output ------------------------------------------------------------
 if(output==TRUE){
