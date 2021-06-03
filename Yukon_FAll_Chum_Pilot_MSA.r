@@ -399,7 +399,7 @@ write.csv(Pilot.d.min.max,paste0(wd_Sum,'Pilot_d_min_max.csv'),na='',row.names=F
 #===============================================================================
 #  Summer and Fall  stock proportion by standard strata       
 #===============================================================================
-# Summerize stock run by standard strata
+# Summarize stock run by standard strata
 temp <- add.sum(Pilot.d)
 temp[is.na(temp)] <- 0
 Pilot.sft <- aggregate(.~Year+stbreak, FUN=sum,data=temp[,c('Year','stbreak','Run','2','9')]) 
@@ -810,15 +810,15 @@ if(gg==TRUE){
     scale_x_continuous( breaks=c( 1:9 ),labels=stbl) + ylim(0, 100)+
     theme(axis.text.x = element_text(size=10))+
     labs(title = "Summer vs. Fall\n")+  xlab("Season Strata") +
-    geom_line(data = Pilot.sfl3, aes( x=as.numeric(stbreak),y=percent,color=SF ) )+
-    geom_point(data = Pilot.sfl3, aes( x=as.numeric(stbreak),y=percent,color=SF ),size=2)
+    geom_line(data = Pilot.sfl3[Pilot.sfl3$stbreak %in% c(3,4,5),], aes( x=as.numeric(stbreak),y=percent,color=SF ) )+
+    geom_point(data = Pilot.sfl3[Pilot.sfl3$stbreak %in% c(3,4,5),], aes( x=as.numeric(stbreak),y=percent,color=SF ),size=2)
 } else {  
   
   # Base plot 
   par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
   for(i in 1:ny){
-    temp <- with(Pilot.sft, Pilot.sft[Year==years[i],])
-    plot(Summer~stbreak, type ='o',col=4, xlim=c(1,9),ylim=c(0,100), 
+    temp <- with(Pilot.sft, Pilot.sft[Year==years[i] & stbreak %in% c(4,5,6),])
+    plot(Summer~stbreak, type ='o',col=4, xlim=c(4,6),ylim=c(0,100), 
          yaxt='n',xaxt='n',lwd = 2, data=temp,main=years[i])
     lines(Fall~stbreak,type ='o',col=2,lwd = 2, data=temp)
     axis(2, seq(0,100,20),las=2, labels=NA)
