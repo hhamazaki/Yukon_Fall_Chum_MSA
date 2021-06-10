@@ -183,6 +183,7 @@ windows(record=TRUE)
 #------------------------------------------------------------------------------- 
 # Read Obs_data
 obs <- read.csv(paste0(wd_Obs,'Fall_Chum_esc.csv'),stringsAsFactors = FALSE)
+
 error.bar <- function(x, upper, lower, length=0,...){
   arrows(x,upper, x, lower, angle=90, code=3, length=length, ...)
 }
@@ -223,7 +224,21 @@ if(gg==TRUE){
     
   }
 } 
- 
+#-------------------------------------------------------------------------------
+#  3.2 Pie Chart 
+#=------------------------------------------------------------------------------ 
+temp <- Pilot.fall[Pilot.fall$Year ==2020 & Pilot.fall$grpID %in% c(4,7,8,10,11,13,16),]
+temp$pct <- with(temp, paste0(round(100*p),'%'))
+temp$lab.ypos = with(temp, cumsum(p) - 0.5*p)
+ggplot(temp,aes(x='',y=p,fill=as.character(o)))+ 
+geom_bar(width = 1, stat = "identity", color = "white")+
+coord_polar("y", start = 0)+
+geom_text(aes(y = lab.ypos, label = pct), color = "white")+
+theme_void()   
+
+pie(temp$p, labels = temp$GroupName, main="Stock Proportion")
+
+
 #-------------------------------------------------------------------------------
 #  3.2 Summer vs. Fall
 #=------------------------------------------------------------------------------ 
