@@ -120,7 +120,7 @@ library(lemon)      # Used for ggplot: better figures (facet_rep_wrap)
 options(scipen=999)   # Prevent R using scientific notation xxx e-yyy
 # Functions Source
 #-------------------------------------------------------------------------------
-# Setup file directories 
+# Setup directories 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Standard 
@@ -142,11 +142,10 @@ wd_Sum <- './data/Summary_data/'
 # Import Source files 
 #-------------------------------------------------------------------------------
 source(paste0(fdr,'Yukon_Chum_MSA_functions.R'))  # Function sets used for MSA analyses
-source(paste0(fdr,'Yukon_Chum_MSA_ReadData.R'))  # Function sets used for MSA analyses
 source(paste0(fdr,'ggplot_theme.R'))  # ggplot themes 
 
 #-------------------------------------------------------------------------------
-#  1.1: Set MSA and Pilot data file names 
+#  1.1: Set MSA data directory and file names 
 #-------------------------------------------------------------------------------
 # Strata info file name 
 strata_file <- 'MSA_Strata.csv'
@@ -154,11 +153,6 @@ strata_file <- 'MSA_Strata.csv'
 stock_prop_file <- 'MSA_prop.csv'
 # Stock ID file name 
 stock_id_file <- 'StockID.csv'
-# Pilot Station Run  
-Pilot_Run <- 'Daily_Passage_By_Species_'
-# Pilot Station Var  
-Pilot_Var <- 'Daily_Variance_By_Species_'
-
 # Output EXCEL file name 
 sumxlsx <- paste0('Yukon_Pilot_Chum_MSA','.xlsx')
 
@@ -186,8 +180,11 @@ ststocks <- as.character(ststockID)
 #-------------------------------------------------------------------------------
 #  1.3: Specify Simulation and outputs 
 #-------------------------------------------------------------------------------
+# Set up year 
+year <- 2020
+
 # Do you want to run simulation to get CI?  TRUE or FALSE 
-Sim <- TRUE
+Sim <- FALSE
 # Set the number of simulation replilcates: default 100000
 nrep <- 10000
 # % CI range
@@ -210,10 +207,6 @@ gg <- FALSE
 #  2.0: Data Read and summarize 
 #===============================================================================
 #-------------------------------------------------------------------------------
-# Read MSA data data : 
-#       This function reads Pilot data, combine with strata data 
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
 #  2.1: Read Strata Data: This creates file rstr
 #-------------------------------------------------------------------------------
 # Read MSA Strata data
@@ -230,7 +223,7 @@ ny <- length(years)
 
 #-------------------------------------------------------------------------------
 #  2.2: Read MSA Data: This creates file: MSAL 
-#       MSAL will be used for the rest of the analyses 
+#       MSAL will be used for the rest of analyses 
 #-------------------------------------------------------------------------------
 # Read MSA group ID table 
 stockID <-  read.csv(paste0(wd_MSA,stock_id_file),stringsAsFactors = FALSE)
@@ -242,27 +235,21 @@ MSAs <- MSA[MSA$grpID %in% stgrpID,]
 MSAL <- dcast(MSAs, Year+Strata~grpID, value.var='Mean')
 # Clean data  
 MSAL <-grpclean(MSAL)
-
 # Standardize MSA proportion, so that total will be 1.0  
 MSAL[,-c(1:2)] <- MSAL[,-c(1:2)]/rowSums(MSAL[,-c(1:2)],na.rm=TRUE)
+
 MSAL <- merge(MSAL,rstr[,c('Year','Strata','Sample_Size')],by=c('Year','Strata'))
 
 #-------------------------------------------------------------------------------
 #  2.3: Read Pilot Station Run, var, and stratum Info : 
 #       This creates Daily Pilot run and var with strata info
 #-------------------------------------------------------------------------------
-# Create a list file
-Pilot.list <- list()
-for(i in ny:ny){
-Pilot.list[[i]] <- read.Pilot.data(rstr,years[i])  
-}
-# Convert list file to to dataframe
-Pilot <- as.data.frame(do.call(rbind,Pilot.list))
+Pilot <- read.Pilot.data(rstr,year)
 
 #===============================================================================
 #  3.0: Data Preparation  
 #===============================================================================
-# Sum Pilot Passage by each designated staratum 
+# Sum Pilot Passage by each designated stratum 
 Pilot.st <- aggregate(cbind(Run, Var)~Year+Strata+stbreak+sf, FUN=sum,data=Pilot)
 #===============================================================================
 #  Create stock run proportion by standard strata       
@@ -271,11 +258,6 @@ Pilot.st <- aggregate(cbind(Run, Var)~Year+Strata+stbreak+sf, FUN=sum,data=Pilot
 Pilot.d <- merge(Pilot.st, MSAL,by = c('Year','Strata'))
 # Calculate daily run by stock 
 Pilot.d[,stgrpIDn] <-Pilot.d[,stgrpIDn]*Pilot.d$Run
-
-
-
-
-
 #-------------------------------------------------------------------------------
 #  Estimate total  stock passage and proportion by Year 
 #-------------------------------------------------------------------------------
@@ -285,13 +267,12 @@ Pilot.t <- aggregate(.~Year, FUN=function(x) sum(x,na.rm=TRUE),data=temp)
 Pilot.t <- grpclean(Pilot.t)
 # Add additional stock groups
 Pilot.t  <- add.sum(Pilot.t)
-
 #-------------------------------------------------------------------------------
 #  Estimate mean stock passage and proportion by Year sampling strata 
 #-------------------------------------------------------------------------------
 Pilot.tp <- Pilot.t
 Pilot.tp[,-c(1:2)] <- Pilot.tp[,-c(1:2)]/Pilot.t$Run
-# Calculate sum by sample starata 	
+# Calculate sum by sample strata 	
 temp <- Pilot.d[,c('Year','Strata','Run',stgrpIDn)]
 temp[is.na(temp)] <- 0
 #------ Mean Passage -----------------------------------------------------------
@@ -317,9 +298,10 @@ Pilot.sf  <- add.sum(Pilot.sf)
 #------ Mean Proportion --------------------------------------------------------
 Pilot.sfp <- Pilot.sf
 Pilot.sfp[,-c(1:2)] <- Pilot.sfp[,-c(1:2)]/Pilot.sf$Run
+
 #------ File output ------------------------------------------------------------
 if(output==TRUE){
-  write.csv(Pilot.sfp,paste0(wd_Sum,'Pilot_sfp.csv'),na='',row.names=FALSE)
+write.csv(Pilot.sfp,paste0(wd_Sum,'Pilot_sfp.csv'),na='',row.names=FALSE)
 }
 
 #-------------------------------------------------------------------------------
@@ -335,60 +317,8 @@ Pilot.tf <- fall.p(Pilot.t,1)
 Pilot.sff <- fall.p(Pilot.sf,2)
 
 
-#-------------------------------------------------------------------------------
-#  Estimate mean stock passage and proportion by standard strata break  
-#-------------------------------------------------------------------------------
-# Calculate sum by sample strata 	
-temp <- Pilot.d[,c('Year','stbreak','Run',stgrpIDn)]
-temp[is.na(temp)] <- 0
-#------ Mean Proportion --------------------------------------------------------
-Pilot.sd <- aggregate(.~Year+stbreak, FUN=sum,data=temp) 
-Pilot.sd <- grpclean(Pilot.sd)
-# Add additional stock groups
-Pilot.sd  <- add.sum(Pilot.sd)
-# Reduce data to standad stocks 
-Pilot.sd <- Pilot.sd[,c('Year','stbreak','Run',ststocks)]  
-# Calculate stock proportion by standard strata
-Pilot.sd[,ststocks]  <- 100*Pilot.sd[,ststocks] /Pilot.sd$Run 
-# Transpose from wide to long 
-Pilot.sd <- melt(Pilot.sd[,c('Year','stbreak',ststocks)], 
-                 id.vars = c('Year','stbreak'), variable.name = "group", value.name = "percent")
-# Change 0 percent to NA
-Pilot.sd$percent[Pilot.sd$percent==0]<-NA
-
-Pilot.d.min.max <- aggregate(percent~group+stbreak, FUN=function(x) c(min=min(x),max=max(x),mean=mean(x)),data=Pilot.sd) 
-# Change to dataframe
-Pilot.d.min.max <- do.call(data.frame,Pilot.d.min.max)
-# Rename Column
-names(Pilot.d.min.max)[3:5] <- c('Min','Max','Mean')
-Pilot.d.min.max<- merge(Pilot.d.min.max,stockID, by.x = 'group', by.y = 'grpID')
-#------ File output ------------------------------------------------------------
-if(output==TRUE){
-  write.csv(Pilot.d.min.max,paste0(wd_Sum,'Pilot_d_min_max.csv'),na='',row.names=FALSE)
-}
-
 #===============================================================================
-#  Summer and Fall  stock proportion by standard strata       
-#===============================================================================
-# Summarize stock run by standard strata
-temp <- add.sum(Pilot.d)
-temp[is.na(temp)] <- 0
-Pilot.sft <- aggregate(.~Year+stbreak, FUN=sum,data=temp[,c('Year','stbreak','Run','2','9')]) 
-names(Pilot.sft) <- c('Year','stbreak','Run','Summer','Fall')
-# Calculate stock proportion by standard strata
-Pilot.sft[,c('Summer','Fall')]  <- 100*Pilot.sft[,c('Summer','Fall')] /Pilot.sft$Run 
-
-#------ File output ------------------------------------------------------------
-if(output==TRUE){
-write.csv(Pilot.sft,paste0(wd_Sum,'Pilot_sft.csv'),na='',row.names=FALSE)
-}
-
-#===============================================================================
-#  Calculate CI Range of passage and proportion by stock group and strata 
-#  Data used: MSAL, 
-#             Pilot.st
-#             stgrpIDn
-#  Functions Used: grpclean, add.sum, ciout
+#  Calculate CI Range of passage and propotion by stock group and strata 
 #===============================================================================
 if(Sim==TRUE){
 # Create temporal  list file 
@@ -410,7 +340,6 @@ ciout <- function(datM,ci,year=NA,season=NA){
   temp$grpID <- as.numeric(rownames(temp))
   return(temp)
   }
-
 #-------------------------------------------------------------------------------
 #  Bootstrap Simulation by year and strata 
 #-------------------------------------------------------------------------------
@@ -420,7 +349,7 @@ for(j in 1:ny){
 MSA.y <- MSAL[MSAL$Year==years[j],]
 # Pilot st 
 Temp.st <- Pilot.st[Pilot.st$Year==years[j],]
-# summarize data by: 
+# summarixe data by: 
 # Sampling strata
 Pilot.st.y <-  aggregate(cbind(Run,Var) ~ Strata, FUN=sum,data=Temp.st)
 # Summer vs. fall
@@ -487,7 +416,7 @@ if(dim(f)[1]>0){
   temp2$grpID <- as.numeric(rownames(temp2))
 # Combine the run and prop by gropID
   temp2 <- merge(temp2,temp2p,by=c('grpID'))
-# Add strata number
+# Add starata number
   temp2$Strata <- i
 # Save to list file 
   pilot.st.sim[[i]] <- temp2
@@ -547,6 +476,7 @@ if(sum(ft.sim)>0) {ft.sim.p  <- ft.sim/rowSums(ft.sim)} else ft.sim.p <- ft.sim
   temp.106$Strata <- 106 
   temp.107$Strata <- 107 
   temp.108$Strata <- 108 
+
   # Save CI by Strata for each year 
   temp.ci[[j]] <- rbind(do.call(rbind, lapply(pilot.st.sim, as.data.frame)),temp.t,temp.st,temp.ft,
   temp.103,temp.104,temp.105,temp.106,temp.107,temp.108) 
@@ -560,7 +490,7 @@ if(sum(ft.sim)>0) {ft.sim.p  <- ft.sim/rowSums(ft.sim)} else ft.sim.p <- ft.sim
 #-------------------------------------------------------------------------------
 if(output==TRUE){
 mlist <- list()
-# Extract mean passage and proportion and combine with CI 
+# Extract mean passage and proporion and combine with CI 
 temp.m <- melt(Pilot.m[,-3],id.vars = c('Year','Strata'), variable.name = "grpID", value.name = "mean")
 temp.mp <- melt(Pilot.mp[,-3],id.vars = c('Year','Strata'), variable.name = "grpID", value.name = "p")
 temp.m <- merge(temp.m,temp.mp,by=c('Year','Strata','grpID'))
@@ -609,17 +539,16 @@ mlist[[i]] <- temp
 }
 names(mlist) <- years
 #-------------------------------------------------------------------------------
+#  EXCEL table output
+#-------------------------------------------------------------------------------
+write.xlsx(mlist,sumxlsx,rowNames=FALSE) 
+#-------------------------------------------------------------------------------
 #  Pilot CSV output
 #-------------------------------------------------------------------------------
 for(i in 1:ny){
   write.csv(mlist[[i]],paste0(wd_Sum,'Pilot_MSA_Sum_',years[i],'.csv'),na='',row.names=FALSE)
 }
-#-------------------------------------------------------------------------------
-#  EXCEL table output
-#-------------------------------------------------------------------------------
-write.xlsx(mlist,sumxlsx,rowNames=FALSE) 
 }
-
 #-------------------------------------------------------------------------------
 } # End of SIM
 
@@ -634,25 +563,23 @@ windows(record=TRUE)
   if(gg==TRUE){
     ## ggplot version 
     ggplot() + theme_simple() + 
-      facet_wrap( ~factor(Year),scale='free') + 
       theme(axis.text.x = element_text(size=10))+
-      labs(title = "Summer vs. Fall\n")+  xlab("Season Strata") +
-      geom_line(data = Pilot, aes( x=Date,y=Run) ) +
-      geom_vline(xintercept = rstr$Strata_Start_Date,color=4)+
-      geom_vline(xintercept =(rstr$Strata_End_Date),color=2)
+      labs(title = "Pilot Station Sampling Strata",x= "Date", y="Passage") +
+      geom_bar(data = Pilot, aes(x=Date,y=Run)) +
+      geom_vline(xintercept = rstr$Strata_Start_Date,color=4)
   }else{
-# Base plot 
-par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
-for(i in 1:ny){
-  temp <- Pilot[Pilot$Year==years[i],]
-  rstr.y <- rstr[rstr$Year==years[i],]
-  plot(Run~Date, type='l',data=temp,main=years[i])
-abline(v=c(rstr.y$Strata_Start_Date,max(rstr.y$Strata_End_Date)),col=4,lwd=2)
-}
-mtext(paste("Sampling Strata "), side = 3, line = 0, outer = TRUE,cex=1.5)
-mtext('Run', side = 2, line = 1, outer = TRUE,cex=1.5)
-mtext("Dates ", side = 1, line = 1, outer = TRUE,cex=1.5)
- }
+# Base plot  
+par(mfrow=c(1,1),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l',las=1)
+  temp <- Pilot
+  rstr.y <- rstr[rstr$Year==year,]
+  xlims<-c(min(stbreak),max(stbreak))
+  plot(Run~Date, type='h',lwd=4,col='gray',data=temp,xlim=xlims)
+  axis.Date(1, at = stbreak,format= "%b%d",cex=0.6)
+  abline(v=c(rstr.y$Strata_Start_Date),col=4,lwd=2)
+mtext(paste("Sampling Strata"), side = 3, line = 0, outer = TRUE,cex=1.5)
+mtext('Pilot Station Run', side = 2, line = 1.5, las=0, outer = TRUE,cex=1.5)
+mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
+ 
 }
 
 #-------------------------------------------------------------------------------
@@ -694,14 +621,11 @@ if(gg=TRUE){
 }
 
 #-------------------------------------------------------------------------------
-#  Plot mean stock proportion by standard strata 
+#  Plot mean stock proportion by standard trata 
 #-------------------------------------------------------------------------------
 if(fig2==TRUE){
-# Extract data with standard strata 
   Pilot.stp <- Pilot.m[,c('Year','Strata','Run', ststocks)]
-# Convert numbers to % proportion  
   Pilot.stp[,ststocks] <- 100*Pilot.stp[,ststocks] /Pilot.stp$Run
-# Change Wide to Long format.   
   Pilot.stpl <- melt(Pilot.stp[,c('Year','Strata',ststocks)], 
                      id.vars = c('Year','Strata'), variable.name = "group", value.name = "percent") 
   Pilot.stpl <- Pilot.stpl[order(Pilot.stpl$Year,Pilot.stpl$Strata),]
