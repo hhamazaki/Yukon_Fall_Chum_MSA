@@ -387,6 +387,15 @@ write.csv(Pilot.sft,paste0(wd_Sum,'Pilot_sft.csv'),na='',row.names=FALSE)
 #  Calculate CI Range of passage and proportion by stock group and strata 
 #  Data used: MSAL, 
 #             Pilot.st
+#             Pilot.m Pilot.mp
+#             Pilot.t Pilot.tp
+#             Pilot.sf Pilot.sfp
+#             Pilot.ts 
+#             Pilot.sfs
+#             Pilot.tf
+#             Pilot.tff
+#             Pilot. 
+#             Pilot.sfs
 #             stgrpIDn
 #  Functions Used: grpclean, add.sum, ciout
 #===============================================================================
@@ -564,19 +573,24 @@ mlist <- list()
 temp.m <- melt(Pilot.m[,-3],id.vars = c('Year','Strata'), variable.name = "grpID", value.name = "mean")
 temp.mp <- melt(Pilot.mp[,-3],id.vars = c('Year','Strata'), variable.name = "grpID", value.name = "p")
 temp.m <- merge(temp.m,temp.mp,by=c('Year','Strata','grpID'))
+
+# Extract total mean passage and proportion and combine with CI 
 temp.t <- melt(Pilot.t[,-2],id.vars = c('Year'), variable.name = "grpID", value.name = "mean")
 temp.tp <- melt(Pilot.tp[,-2],id.vars = c('Year'), variable.name = "grpID", value.name = "p")
 temp.t <- merge(temp.t,temp.tp,by=c('Year','grpID'))
+
 temp.t$Strata <- 100
 temp.sf <- melt(Pilot.sf[,-3],id.vars = c('Year','sf'), variable.name = "grpID", value.name = "mean")
 temp.sfp <- melt(Pilot.sfp[,-3],id.vars = c('Year','sf'), variable.name = "grpID", value.name = "p")
 temp.sf <- merge(temp.sf,temp.sfp,by=c('Year','sf','grpID'))
 temp.sf$sf <- temp.sf$sf+100
 names(temp.sf)[2] <- 'Strata'
+
 # Strata 103
 temp.ts <- melt(Pilot.ts,id.vars = c('Year'), variable.name = "grpID", value.name = "p")
 temp.ts$mean <- NA
 temp.ts$Strata <- 103
+
 # Strata 104 105
 temp.sfs <- melt(Pilot.sfs,id.vars = c('Year','sf'), variable.name = "grpID", value.name = "p")
 temp.sfs$mean <- NA
@@ -622,6 +636,10 @@ write.xlsx(mlist,sumxlsx,rowNames=FALSE)
 
 #-------------------------------------------------------------------------------
 } # End of SIM
+
+
+
+
 
 #===============================================================================
 #  Graphics 
