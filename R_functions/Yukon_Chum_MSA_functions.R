@@ -6,7 +6,7 @@
 #-------------------------------------------------------------------------------
 # Set standard strata dates 
 stb <- function(year){
-  stdates <- c('05/15/','06/22/','06/29/','07/10/','07/19/','07/28/','08/06/','08/15/','08/25/','09/15/')
+  stdates <- c('06/01/','06/22/','06/29/','07/10/','07/19/','07/28/','08/06/','08/15/','08/25/','09/15/')
   stdates <- paste0(stdates,year)
   stdates <- as.Date(stdates,'%m/%d/%Y')
   return(stdates) 
@@ -21,7 +21,7 @@ stbl <- c('6/1','6/22','6/29','7/10','7/19','7/28','8/6','8/15','8/25')
 #-------------------------------------------------------------------------------
 # Standard Summer vs. fall date: July 19 is the standard summer/fall separate date
 stsf <- function(year){
-  stdates <- paste0(c('05/15/','07/19/','9/30/'),year)
+  stdates <- paste0(c('06/01/','07/19/','9/30/'),year)
   stdates <- as.Date(stdates,'%m/%d/%Y')
   return(stdates) 
 } 
@@ -202,4 +202,146 @@ s.functions <- function(datamatrix,ci){
   colnames(m) <- c('LCI','UCI')   
   return(m)  
 }
+
+#-------------------------------------------------------------------------------
+#  sim.ci:  This function calculate ci
+#  MSA.y: Strata 
+#  Temp.st: Pilot Station strata run and var
+#  sgrpIDn: primary stock group
+#  nrep: number of replication
+#  ci: Confidence interval percentage
+#  this.year: Year of data 
+#-------------------------------------------------------------------------------
+sim.ci <- function(MSA.y,Temp.st,sgrpIDn,nrep,ci,this.year) {
+#-------------------------------------------------------------------------------
+# 1.0  Create Empty Matrix by strata by PRIMARY GROUP
+#-------------------------------------------------------------------------------
+# season total
+  t.sim <- matrix(0,nrow =nrep,ncol=length(stgrpIDn))
+  colnames(t.sim) <- stgrpIDn
+# by summer season  
+  st.sim <- matrix(0,nrow =nrep,ncol=length(stgrpIDn))
+  colnames(st.sim) <- stgrpIDn
+# fall season
+  ft.sim <- matrix(0, nrow =nrep,ncol=length(stgrpIDn))
+  colnames(ft.sim) <- stgrpIDn
+#-------------------------------------------------------------------------------
+# 1.2 Bootstrap Simulation by strata for each Year  
+#-------------------------------------------------------------------------------
+# Create list data to store strata info 
+  pilot.st.sim <- list()
+# Extract the number of sampling strata 
+  nst <- min(max(Temp.st$Strata),max(MSA.y$Strata))
+# Simulation by strata   
+  for(i in 1:nst){
+# Calculate sample size: 1/2 of actual sample size to incorporate GSI stock ID Error  
+    sn <- MSA.y[MSA.y$Strata==i,'Sample_Size']/2
+# Extract primary stock proportion 
+    p <-  MSA.y[MSA.y$Strata==i,stgrpIDn]
+# change NA to zero  
+    p[is.na(p)] <- 0
+# Simulate stock proportion as multinomial distribution   
+    p.sim <- t(rmultinom(nrep, sn, p)/sn)
+# Extract Pilot number of a stratum
+    st <- Temp.st[Temp.st$Strata==i,]
+# Simulate run based on normal distribution 
+    r.sim <- with(st,rnorm(nrep,Run,sqrt(Var)))
+# Multiply simulated Run with simulated stock proportion to get simulated run by stock 
+    r.sim <- p.sim*r.sim
+#-------------------------------------------------------------------------------
+# 1.2.1 ADD PRIMARY GROUP SIM to TOTAL   
+#-------------------------------------------------------------------------------
+# Add matrix to crate total 
+    t.sim <- t.sim+r.sim    
+# Add matrix to summer or fall strata   
+    if(st$sf==1){
+      st.sim <- st.sim+r.sim 
+    } else if (st$sf==2){
+      ft.sim <- ft.sim+r.sim 
+    }  
+#-------------------------------------------------------------------------------
+# 1.2.2  Clean data and calculate SECONDARY GROUPS 
+#-------------------------------------------------------------------------------
+# clean data and calculate secondary stock groups for proportion and run 
+    p.sim <- grpclean(p.sim,this.year)
+    p.sim <- add.sum(p.sim,this.year)
+    r.sim <- grpclean(r.sim,this.year)
+    r.sim <- add.sum(r.sim,this.year)
+# Calculate CI range 
+    r.sim.ci <-  data.frame(s.functions(r.sim,ci))
+    p.sim.ci <-  data.frame(s.functions(p.sim,ci))
+# Add grpIsD name 
+    r.sim.ci$grpID <- as.numeric(rownames(r.sim.ci))
+    p.sim.ci$grpID <- as.numeric(rownames(p.sim.ci))
+# Combine the run and prop by gropID
+    temp <- merge(r.sim.ci,p.sim.ci,by=c('grpID'))
+# Add strata number
+    temp$Strata <- i
+# Save to list file 
+    pilot.st.sim[[i]] <- temp
+  }  # End Strata CI calculation 
+  
+#-------------------------------------------------------------------------------
+# 1.3 Summarize for each Year  
+#  t.sim: total passage by stock 
+#  st.sim: total passage by stock: summer 
+#  ft.sim: total passage by stock: fall
+#-------------------------------------------------------------------------------
+# Calculate total stock proportion
+  t.sim.p  <- t.sim/rowSums(t.sim)
+# Summer season
+  if(sum(st.sim)>0) {st.sim.p  <- st.sim/rowSums(st.sim)} else st.sim.p <- st.sim
+# Fall season
+  if(sum(ft.sim)>0) {ft.sim.p  <- ft.sim/rowSums(ft.sim)} else ft.sim.p <- ft.sim
+  
+# Calculate passage and proportion by stock CI 
+  temp.t <- ciout(t.sim,ci,this.year)
+  temp.tp <- ciout(t.sim.p,ci,this.year)
+  temp.st <- ciout(st.sim,ci,this.year)
+  temp.stp <- ciout(t.sim.p,ci,this.year)
+  temp.ft <- ciout(ft.sim,ci,this.year)
+  temp.ftp <- ciout(ft.sim.p,ci,this.year)
+  temp.103 <- ciout(t.sim,ci,this.year,'s')  
+  temp.104 <- ciout(st.sim,ci,this.year,'s')  
+  temp.105 <- ciout(ft.sim,ci,this.year,'s')  
+  temp.106 <- ciout(t.sim,ci,this.year,'f')  
+  temp.107 <- ciout(st.sim,ci,this.year,'f')  
+  temp.108 <- ciout(ft.sim,ci,this.year,'f')  
+  # Combine the run and prop by gropID
+  temp.t <- merge(temp.t,temp.tp,by=c('grpID'))  
+  temp.st <- merge(temp.st,temp.stp,by=c('grpID'))  
+  temp.ft <- merge(temp.ft,temp.ftp,by=c('grpID'))  
+  # Create dummy table with NA  for strata group 103-108  
+  temp.sna <-temp.103
+  temp.sna[,c('LCI','UCI')] <- NA
+  temp.fna <-temp.106
+  temp.fna[,c('LCI','UCI')] <- NA
+  temp.103 <- merge(temp.sna,temp.103,by=c('grpID'))  
+  temp.104 <- merge(temp.sna,temp.104,by=c('grpID'))  
+  temp.105 <- merge(temp.sna,temp.105,by=c('grpID'))  
+  temp.106 <- merge(temp.fna,temp.106,by=c('grpID'))  
+  temp.107 <- merge(temp.fna,temp.107,by=c('grpID'))  
+  temp.108 <- merge(temp.fna,temp.108,by=c('grpID'))  
+# Add strata number
+# Season Total 
+  temp.t$Strata <- 100
+# For Summer 
+  temp.st$Strata <- 101
+# For Fall 
+  temp.ft$Strata <- 102
+# Proportion by summer / Fall   
+  temp.103$Strata <- 103 
+  temp.104$Strata <- 104 
+  temp.105$Strata <- 105 
+  temp.106$Strata <- 106 
+  temp.107$Strata <- 107 
+  temp.108$Strata <- 108 
+# Save CI by Strata for each year 
+  #  temp.ci[[j]] <- rbind(do.call(rbind, lapply(pilot.st.sim, as.data.frame)),temp.t,temp.st,temp.ft,
+  #  temp.103,temp.104,temp.105,temp.106,temp.107,temp.108) 
+  out <- rbind(do.call(rbind, lapply(pilot.st.sim, as.data.frame)),temp.t,temp.st,temp.ft,
+               temp.103,temp.104,temp.105,temp.106,temp.107,temp.108)
+  return(out)
+} # End of the function 
+
 
