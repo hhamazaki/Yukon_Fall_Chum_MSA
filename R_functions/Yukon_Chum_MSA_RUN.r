@@ -514,12 +514,12 @@ Pilot.sd <- aggregate(.~Year+stbreak, FUN=sum,data=temp)
 Pilot.sd <- grpclean(Pilot.sd)
 # Add additional stock groups
 Pilot.sd  <- add.sum(Pilot.sd)
-# Reduce data to standad stocks 
-Pilot.sd <- Pilot.sd[,c('Year','stbreak','Run',ststocks)]  
+# Reduce data to standard stocks 
+#Pilot.sd <- Pilot.sd[,c('Year','stbreak','Run',ststocks)]  
 # Calculate stock proportion by standard strata
-Pilot.sd[,ststocks]  <- 100*Pilot.sd[,ststocks] /Pilot.sd$Run 
+Pilot.sd[,-c(1:3)]  <- 100*Pilot.sd[,-c(1:3)] /Pilot.sd$Run 
 # Transpose from wide to long 
-Pilot.sd <- melt(Pilot.sd[,c('Year','stbreak',ststocks)], 
+Pilot.sd <- melt(Pilot.sd[,-3], 
                  id.vars = c('Year','stbreak'), variable.name = "group", value.name = "percent")
 # Change 0 percent to NA
 Pilot.sd$percent[Pilot.sd$percent==0]<-NA

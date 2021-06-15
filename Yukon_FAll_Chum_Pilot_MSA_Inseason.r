@@ -64,9 +64,9 @@ Pilot.fall <- mlist[mlist$Strata==102,]
 Pilot.d.min.max <- read.csv(paste0(wd_Sum,'Pilot_d_min_max.csv'),stringsAsFactors = FALSE)
 
 # Read MSA Strata data
-Pilot.sft <- read.csv(paste0(wd_Sum,'Pilot_sft.csv'),stringsAsFactors = FALSE)
+Pilot.hsft <- read.csv(paste0(wd_Sum,'Pilot_sft.csv'),stringsAsFactors = FALSE)
 # Find the number of years in the data 
-years <- unique(Pilot.sft$Year)
+years <- unique(Pilot.hsft$Year)
 years <- years[order(years)]
 # number of years
 ny <- length(years)
@@ -140,19 +140,19 @@ mtext("Dates ", side = 1, line = 1, outer = TRUE)
 #  Plot stock proportion by standard Strata min-max
 #-------------------------------------------------------------------------------
 windows()
-par(mfrow=c(3,2),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l')
-gname <- stockID[stockID$grpID %in%ststockID,'GroupName']      
-for(j in 1:6){
-  temp1 <- with(Pilot.d.min.max, Pilot.d.min.max[group ==ststockID[j],])
+par(mfrow=c(3,3),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l')
+fig.stock.id <- c(4,8,11,7,10,19,16,3)
+for(j in 1:8){
+  temp1 <- with(Pilot.d.min.max, Pilot.d.min.max[group ==fig.stock.id[j],])
   temp1 <- temp1[order(temp1$stbreak),]
   plot(Mean~stbreak,data=temp1, type='n',xlim=c(1,9),ylim=c(0,100), 
-       yaxt='n',xaxt='n',main=gname[j])
+       yaxt='n',xaxt='n',main=unique(temp1$GroupName))
   axis(2, seq(0,100,20),las=2, label=FALSE)
-  if(j %in% c(1,3,5)) {axis(2, seq(0,100,20),las=2, font=2)}
+  if(j %in% c(1,4,7)) {axis(2, seq(0,100,20),las=2, font=2)}
   axis(1,seq(1,9,1), labels = FALSE,tick=1)
-  if(j %in% c(5,6)) {axis(1, seq(1,9,1), labels = stbl,tick=1)}
+  if(j %in% c(6:8)) {axis(1, seq(1,9,1), labels = stbl,tick=1)}
   with(temp1,polygon(c(stbreak,rev(stbreak)),c(Min,rev(Max)),col=tcol('gray',0),border=NA))
-  lines(percent~stbreak,lwd=2,col=2, data=Pilot.sd[Pilot.sd$ group ==ststockID[j],])
+  lines(percent~stbreak,lwd=2,col=2, data=Pilot.sd[Pilot.sd$group ==fig.stock.id[j],])
   }
 
 mtext(paste("Run stock proportion "), side = 3, line = 0, outer = TRUE)
@@ -165,7 +165,7 @@ mtext("Dates ", side = 1, line = 1, outer = TRUE)
   # Base plot 
   par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
   for(i in 1:ny){
-    temp <- with(Pilot.sft, Pilot.sft[Year==years[i],])
+    temp <- with(Pilot.hsft, Pilot.hsft[Year==years[i],])
     plot(Summer~stbreak, type ='o',col=4, xlim=c(1,9),ylim=c(0,100), 
          yaxt='n',xaxt='n',lwd = 2, data=temp,main=years[i])
     lines(Fall~stbreak,type ='o',col=2,lwd = 2, data=temp)
@@ -174,6 +174,13 @@ mtext("Dates ", side = 1, line = 1, outer = TRUE)
     axis(1, seq(1,9,1),labels = NA,cex.axis = 0.9)
     if (years[i] > 2015) axis(1, seq(1,9,1), labels = stbl,cex.axis = 0.9)
   }
+# This year 
+ plot(Summer~stbreak, type ='o',col=4, xlim=c(1,9),ylim=c(0,100), 
+     yaxt='n',xaxt='n',lwd = 2, data=Pilot.sft,main=this.year)
+ lines(Fall~stbreak,type ='o',col=2,lwd = 2, data=Pilot.sft)
+ axis(2, seq(0,100,20),las=2, font=2)
+ axis(1, seq(1,9,1), labels = stbl,cex.axis = 0.9)
+ 
   mtext(paste("Summer vs. Fall "), side = 3, line = 0, outer = TRUE,cex=1.5)
   mtext('Stock %', side = 2, line = 1, outer = TRUE,cex=1.5)
   mtext("Dates ", side = 1, line = 1, outer = TRUE,cex=1.5)
@@ -182,7 +189,7 @@ mtext("Dates ", side = 1, line = 1, outer = TRUE)
 # Just for around 7/19
   par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
     for(i in 1:ny){
-    temp <- with(Pilot.sft, Pilot.sft[Year==years[i],])
+    temp <- with(Pilot.hsft, Pilot.hsft[Year==years[i],])
     plot(Summer~stbreak, type ='o',col=4, xlim=c(4,6),ylim=c(0,100), 
          yaxt='n',xaxt='n',lwd = 2, data=temp,main=years[i])
     lines(Fall~stbreak,type ='o',col=2,lwd = 2, data=temp)
@@ -190,9 +197,16 @@ mtext("Dates ", side = 1, line = 1, outer = TRUE)
     if (years[i] %in% c(1999,2005, 2010,2015, 2020)) axis(2, seq(0,100,20),las=2, font=2)
     axis(1, seq(1,9,1),labels = NA,cex.axis = 0.9)
     if (years[i] > 2015) axis(1, seq(1,9,1), labels = stbl,cex.axis = 0.9)
-  }
+    }
+# This year 
+  plot(Summer~stbreak, type ='o',col=4, xlim=c(4,6),ylim=c(0,100), 
+       yaxt='n',xaxt='n',lwd = 2, data=Pilot.sft,main=this.year)
+  lines(Fall~stbreak,type ='o',col=2,lwd = 2, data=Pilot.sft)
+  axis(2, seq(0,100,20),las=2, font=2)
+  axis(1, seq(1,9,1), labels = stbl,cex.axis = 0.9)
+  
   mtext(paste("Summer vs. Fall "), side = 3, line = 0, outer = TRUE,cex=1.5)
-  mtext('Stock %', side = 2, line = 1, outer = TRUE,cex=1.5)
+  mtext('Stock %', side = 2, line = 1, las=0, outer = TRUE,cex=1.5)
   mtext("Dates ", side = 1, line = 1, outer = TRUE,cex=1.5)
   
 
