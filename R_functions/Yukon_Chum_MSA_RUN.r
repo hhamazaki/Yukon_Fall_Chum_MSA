@@ -190,7 +190,6 @@ Sim <- TRUE
 nrep <- 10000
 # % CI range
 ci <- 90
-
 #===============================================================================
 #  2.0: Data Read and summarize 
 #===============================================================================
@@ -234,17 +233,17 @@ MSAL <- merge(MSAL,rstr[,c('Year','Strata','Sample_Size')],by=c('Year','Strata')
 #  2.3: Read Pilot Station Run, var, and stratum Info : 
 #       This creates Daily Pilot run and var with strata info
 #-------------------------------------------------------------------------------
-# Create a list file if inSeason is FALSE
-if(inSeason==FALSE){ 
- Pilot.list <- list()
+#  inSeason is TRUE
+if(inSeason==TRUE){ 
+  Pilot <- read.Pilot.data(rstr,this.year) 
+#  inSeason is FALSE 
+ }else if(inSeason==FALSE){  
+   Pilot.list <- list()
   for(i in 1:ny){
     Pilot.list[[i]] <- read.Pilot.data(rstr,years[i])  
   }
   # Convert list file to to data.frame
   Pilot <- as.data.frame(do.call(rbind,Pilot.list))
-# Default is inSeason Analysis
-  }else{
-  Pilot <- read.Pilot.data(rstr,this.year) 
   }
 
 #===============================================================================
@@ -312,6 +311,7 @@ if(inSeason==FALSE){
 #-------------------------------------------------------------------------------
 # Summarize stock run by standard strata
 temp <- add.sum(Pilot.d)
+# Change NA to 0
 temp[is.na(temp)] <- 0
 Pilot.sft <- aggregate(.~Year+stbreak, FUN=sum,data=temp[,c('Year','stbreak','Run','2','9')]) 
 names(Pilot.sft) <- c('Year','stbreak','Run','Summer','Fall')
@@ -465,7 +465,7 @@ temp.m <- rbind(temp.m, temp.t,temp.sf,temp.ts,temp.sfs,temp.tf,temp.sff)
 temp.m$grpID <- as.numeric(as.character(temp.m$grpID))
 
 #-------------------------------------------------------------------------------
-# Save data into List Data 
+# Save Data 
 #-------------------------------------------------------------------------------
 sumdata <- function(tempm,tempci){
 # combine per strata and annual data per year 
@@ -480,27 +480,46 @@ tempm <- tempm[order(tempm$Strata,tempm$SortID),
 return(tempm)
 }
 
-if(inSeason==FALSE){
+#-------------------------------------------------------------------------------
+# Save Data inSeason only CSV
+#-------------------------------------------------------------------------------
+if(inSeason==TRUE){
+  mlist <- sumdata(temp.m,temp.ci)
+  write.csv(mlist,paste0(wd_Sum,'Pilot_MSA_Sum_',this.year,'.csv'),na='',row.names=FALSE)
+#-------------------------------------------------------------------------------
+# Save Data Postseason CSV, xlsx
+#-------------------------------------------------------------------------------  
+ } else if (inSeason == FALSE){
+# Save all into list file    
 mlist <- list()
 for(i in 1:ny){
 # Save to the list 
 mlist[[i]] <- sumdata(temp.m[temp.m$Year==year[i]],temp.ci[[i]])
 }
-# Put name 
+# Put name Years 
 names(mlist) <- years
 #-------------------------------------------------------------------------------
-#  Pilot CSV output
+#  Overwrite ALL CSV data 
 #-------------------------------------------------------------------------------
-for(i in 1:ny){
-  write.csv(mlist[[i]],paste0(wd_Sum,'Pilot_MSA_Sum_',years[i],'.csv'),na='',row.names=FALSE)
-}
+if (ciOverwrite == TRUE){
+# Save all   
+  for(i in 1:ny){
+    write.csv(mlist[[i]],paste0(wd_Sum,'Pilot_MSA_Sum_',years[i],'.csv'),na='',row.names=FALSE)
+  }
+#-------------------------------------------------------------------------------
+#  DO NOT Overwrite ALL CSV data 
+#-------------------------------------------------------------------------------
+  } else if (ciOverwrite == FALSE){
+# Read historical csv data except the current year     
+  for(i in 1:(ny-1)){
+      mlist[[i]] <- read.csv(paste0(wd_Sum,'Pilot_MSA_Sum_',years[i],'.csv'),stringsAsFactors = FALSE)
+      }    
+  write.csv(mlist[[ny]],paste0(wd_Sum,'Pilot_MSA_Sum_',years[ny],'.csv'),na='',row.names=FALSE)
+ }  
 #-------------------------------------------------------------------------------
 #  EXCEL table output
 #-------------------------------------------------------------------------------
 write.xlsx(mlist,sumxlsx,rowNames=FALSE) 
-} else {
- mlist <- sumdata(temp.m,temp.ci)
-# write.csv(mlist,paste0(wd_Sum,'Pilot_MSA_Sum_',this.year,'.csv'),na='',row.names=FALSE)
 }
 
 #-------------------------------------------------------------------------------

@@ -658,38 +658,6 @@ if(output==TRUE){
 
 
 
-#===============================================================================
-#  Graphics 
-#===============================================================================
-#-------------------------------------------------------------------------------
-#  Pilot Run vs Sampling Strata 
-#=------------------------------------------------------------------------------ 
-if(fig1==TRUE){
-windows(record=TRUE)
-  if(gg==TRUE){
-    ## ggplot version 
-    ggplot() + theme_simple() + 
-      facet_wrap( ~factor(Year),scale='free') + 
-      theme(axis.text.x = element_text(size=10))+
-      labs(title = "Summer vs. Fall\n")+  xlab("Season Strata") +
-      geom_line(data = Pilot, aes( x=Date,y=Run) ) +
-      geom_vline(xintercept = rstr$Strata_Start_Date,color=4)+
-      geom_vline(xintercept =(rstr$Strata_End_Date),color=2)
-  }else{
-# Base plot 
-par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
-for(i in 1:ny){
-  temp <- Pilot[Pilot$Year==years[i],]
-  rstr.y <- rstr[rstr$Year==years[i],]
-  plot(Run~Date, type='l',data=temp,main=years[i])
-abline(v=c(rstr.y$Strata_Start_Date,max(rstr.y$Strata_End_Date)),col=4,lwd=2)
-}
-mtext(paste("Sampling Strata "), side = 3, line = 0, outer = TRUE,cex=1.5)
-mtext('Run', side = 2, line = 1, outer = TRUE,cex=1.5)
-mtext("Dates ", side = 1, line = 1, outer = TRUE,cex=1.5)
- }
-}
-
 #-------------------------------------------------------------------------------
 #  Plot stock proportion by Strata 
 #-------------------------------------------------------------------------------
