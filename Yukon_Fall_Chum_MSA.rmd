@@ -31,7 +31,7 @@ fdr <- './R_functions/'
 #===============================================================================
 inSeason <- TRUE 
 # Set year 
-this.year <- 2020
+this.year <- 2021
 #-------------------------------------------------------------------------------
 #  1.1: Set MSA data directory and file names 
 #-------------------------------------------------------------------------------
@@ -206,13 +206,14 @@ Figure 5.  Crossover of summer and fall chum salmon based on genetic stock analy
 ```
 Figure 6.  Crossover of summer and fall chum salmon (3 periods) based on genetic stock analysis (standard sampling strata), Yukon Area, 1999-2002 using allozymes and 2004-2021 using microsatellites.
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
+if(dim(Pilot.fall)[1]>0){
   temp <- Pilot.fall[Pilot.fall$grpID %in% c(4,7,8,10,11,13,16),]
 temp$pct <- with(temp, paste0(round(100*p),'%'))
 par(mfrow=c(1,1),mar = c(2,2,2,7),oma = c(3,3,3,3))
 pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=c(2:8),main="Stock Proportion (July 19 to End of Season)")
 par(new=TRUE)
 pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))
-#pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion (July 19 to End of Season)")
-
+pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion (July 19 to End of Season)")
+}
 ```
 Figure 7. Contributions of chum salmon based on genetic analysis during the fall season (July 19 to end of season), sampled at the mainstem sonar operated near Pilot Station, Yukon Area, 2021.
