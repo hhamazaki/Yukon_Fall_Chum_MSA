@@ -41,6 +41,10 @@ stbreak <- stb(this.year)
 Pilot.total <- mlist[mlist$Strata==100,]
 Pilot.summer <-mlist[mlist$Strata==101,]
 Pilot.fall <- mlist[mlist$Strata==102,]
+
+# Set legend name and order 
+lgnames <- data.frame(t(stockID$GroupName))
+names(lgnames) <- stockID$grpID
 #-------------------------------------------------------------------------------
 #  1.1: Set MSA data directory and file names 
 #-------------------------------------------------------------------------------
@@ -81,6 +85,7 @@ mtext('Number of Salmon', side = 2, line = 1.5, las=0, outer = TRUE,cex=1.5)
 mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
 ```
 Figure 1.  Daily sonar counts attributed to chum salmon (bars) showing genetic sampling time frames (droplines), project operated near Pilot Station, Yukon Area, 2021.
+
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
 #  Plot mean stock proportion by sampling strata 
@@ -94,9 +99,9 @@ Pilot.stpl <- Pilot.stpl[order(Pilot.stpl$Year,Pilot.stpl$Strata),]
 gname <- stockID[stockID$grpID %in%ststockID,c('GroupName')]      
 names(gname) <- ststockID
 # Base plot 			
-par(mfrow=c(1,1),mar=c(5.1, 4.1, 4.1, 9.1),yaxs='i',bty='l',las=1) 
+par(mfrow=c(1,1),mar=c(5.1, 4.1, 4.1, 4.1),yaxs='i',bty='l',las=1) 
 temp1 <- Pilot.stpl[Pilot.stpl$group==ststockID[1],]
-plot(order(temp1$Strata),type='n', xlim=c(1,9),ylim=c(0,100), ylab='Stock Percent',xlab='Sample Strata Number')
+plot(order(temp1$Strata),type='n', xlim=c(1,5),ylim=c(0,100), ylab='Stock Percent',xlab='Sample Strata Number')
 for (i in 1:6){
   lines(percent~Strata, type ='o',lwd=2,col=i,pch=i,data=Pilot.stpl[Pilot.stpl$group==ststockID[i],])
 }
@@ -108,6 +113,23 @@ mtext("Sampling Strata", side = 1, line = 1, outer = TRUE)
 
 ```
 Figure 2.  Mean proportion of chum salmon stock groups by sampling strata, Yukon Area, 2021.
+
+```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
+Pilot.stn <- Pilot.m[,c('Year','Strata','Run', c('4','8','11','19','10'))]
+gname <- lgnames[c('4','8','11','19','10')]      
+
+par(mfrow=c(1,1),mar=c(4.1, 6.1, 4.1, 4.1),yaxs='i',bty='l',las=1) 
+barplot(t(Pilot.stn[,-c(1:3)]),beside=TRUE,col=c(2:6),
+        names.arg = rstr[which(rstr$Year==this.year), 'Time_Frames']
+        )
+title(main = this.year)
+legend('topright',legend = gname, fill = c(2:6),bty = 'n')
+mtext('Run size', side = 2, line = 4,las=0)
+mtext("Sampling Strata", side = 1, line = 2)
+```
+
+
+
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
 #  Plot mean stock proportion by Standard Strata
@@ -209,7 +231,7 @@ Figure 6.  Crossover of summer and fall chum salmon (3 periods) based on genetic
 if(dim(Pilot.fall)[1]>0){
   temp <- Pilot.fall[Pilot.fall$grpID %in% c(4,7,8,10,11,13,16),]
 temp$pct <- with(temp, paste0(round(100*p),'%'))
-par(mfrow=c(1,1),mar = c(2,2,2,7),oma = c(3,3,3,3))
+par(mfrow=c(1,1),mar = c(4,4,4,7),oma = c(3,3,3,3))
 pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=c(2:8),main="Stock Proportion (July 19 to End of Season)")
 par(new=TRUE)
 pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))

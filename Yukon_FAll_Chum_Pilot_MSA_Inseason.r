@@ -41,11 +41,10 @@ fdr <- './R_functions/'
 #===============================================================================
 inSeason <- TRUE 
 # Set year 
-this.year <- 2020
+this.year <- 2021
 #-------------------------------------------------------------------------------
 #  1.1: Set MSA data directory and file names 
 #-------------------------------------------------------------------------------
-
 source(paste0(fdr,'Yukon_Chum_MSA_RUN.R'))  
 stbreak <- stb(this.year)
 Pilot.total <- mlist[mlist$Strata==100,]
@@ -70,6 +69,10 @@ years <- unique(Pilot.hsft$Year)
 years <- years[order(years)]
 # number of years
 ny <- length(years)
+# Set legend name and order 
+lgnames <- data.frame(t(stockID$GroupName))
+names(lgnames) <- stockID$grpID
+
 #===============================================================================
 #  Graphics 
 #===============================================================================
@@ -111,6 +114,33 @@ title(main = this.year)
 legend('topright',legend = gname, col = c(1:6),  pch=c(1:6),lty=1,lwd=2, xpd = TRUE, cex = 1, seg.len=1, bty = 'n')
 mtext('Stock %', side = 2, line = 1,las=0, outer = TRUE)
 mtext("Sampling Strata", side = 1, line = 1, outer = TRUE)
+
+
+
+#-------------------------------------------------------------------------------
+#  Plot mean stock proportion by sampling strata 
+#-------------------------------------------------------------------------------
+Pilot.stn <- Pilot.m[,c('Year','Strata','Run', c('4','8','11','19','10'))]
+
+gname[c('4','8','11','19','10')]
+
+gname <- (stockID[stockID$grpID %in% c(4,8,11,19,10),c('grpID','GroupName')])      
+foo <- data.frame(t(gname$GroupName))
+names(foo) <- gname$grpID
+
+# Base plot 			
+windows()
+par(mfrow=c(1,1),mar=c(4.1, 6.1, 4.1, 4.1),yaxs='i',bty='l',las=1) 
+barplot(t(Pilot.stn[,-c(1:3)]),beside=TRUE,col=c(2:6),
+        names.arg = rstr[which(rstr$Year==this.year), 'Time_Frames']
+        )
+title(main = this.year)
+legend('topright',legend = gname, fill = c(2:6),bty = 'n')
+mtext('Run size', side = 2, line = 4,las=0)
+mtext("Sampling Strata", side = 1, line = 2)
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -220,3 +250,4 @@ pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=c(2:8),main="Stock Propo
 par(new=TRUE)
 pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))
 #pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion")
+
