@@ -52,6 +52,18 @@ gg <- FALSE
 #-------------------------------------------------------------------------------
 source(paste0(fdr,'Yukon_Chum_MSA_RUN.R'))  
 
+# Read MSA Strata data
+Pilot.d.min.max <- read.csv(paste0(wd_Sum,'Pilot_d_min_max.csv'),stringsAsFactors = FALSE)
+
+# Read MSA Strata data
+Pilot.hsft <- read.csv(paste0(wd_Sum,'Pilot_sft.csv'),stringsAsFactors = FALSE)
+# Find the number of years in the data 
+years <- unique(Pilot.hsft$Year)
+years <- years[order(years)]
+# number of years
+ny <- length(years)
+
+
 #===============================================================================
 #  Graphics 
 #===============================================================================
@@ -99,7 +111,7 @@ par(mfrow=c(1,1),mar=c(5.1, 4.1, 4.1, 9.1),yaxs='i',bty='l',las=1)
 temp1 <- Pilot.stpl[Pilot.stpl$group==ststockID[1],]
 plot(order(temp1$Strata),type='n', xlim=c(1,9),ylim=c(0,100), ylab='',xlab='')
 for (i in 1:6){
-  lines(percent~Strata, type ='o',lwd=2,col=i,pch=i,data=Pilot.stpl[Pilot.stpl$group==ststockID[i],])
+  lines(percent~Strata, type ='o',lwd=2,col=i,pch=i,data=Pilot.stpl[Pilot.stpl$group==ststockID[i]&Pilot.stpl$Year==this.year,])
 }
 title(main = this.year)
 legend('topright',legend = gname, col = c(1:6),  pch=c(1:6),lty=1,lwd=2, xpd = TRUE, cex = 1, seg.len=1, bty = 'n')
