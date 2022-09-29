@@ -1,0 +1,24 @@
+GroupName,grpID,SortID,Fed_SortID
+Upper Canada,1,9,12
+Total Summer,2,12,1
+     White,3,10,13
+Lower Summer,4,1,2
+Total Middle,5,13,3
+     Teslin,6,11,14
+UppKoy+Main,7,2,4
+Tanana Summer,8,3,5
+Total Fall,9,14,6
+Tanana Fall,10,4,7
+Border US,11,5,8
+Border CA,12,6,9
+Porcupine CA,13,7,10
+Mainstem CA,14,8,11
+Fall US,15,15,15
+CA Upper + Mainstem,16,16,16
+US Border + Canada,17,17,17
+Total USA,18,18,18
+Total Canada,19,19,19
+Toklat,20,20,
+Upper Tanana,21,21,
+Border US+Border CA,22,22,
+Lower Summer  + Koy-Main,23,23,
