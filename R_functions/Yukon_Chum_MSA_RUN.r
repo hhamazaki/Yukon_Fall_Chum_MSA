@@ -129,9 +129,9 @@ options(scipen=999)   # Prevent R using scientific notation xxx e-yyy
 # wd_Plt <- paste0(Main,'/data/Pilot_data/') #Pilot data
 # wd_Sum <- paste0(Main,'/data/Summary_data/') #Summary data used for figures
 #-------------------------------------------------------------------------------
-# Rprojects 
+# R projects folder setting
 #-------------------------------------------------------------------------------
-fdr <- './R_functions/'
+fdr <- './R_functions/'        
 wd_MSA <- './data/MSA_data/'
 wd_Plt <- './data/Pilot_data/'
 wd_Sum <- './data/Summary_data/'
@@ -179,7 +179,8 @@ stgrpIDn <- as.character(stgrpID)
 
 # Standard Output Stock figures 
 ststockID <- c(2,7,8,10,11,19)
-ststocks <- as.character(ststockID)
+# ststocks needed to read as
+#ststocks <- as.character(ststockID)
 
 #-------------------------------------------------------------------------------
 #  1.3: Specify Simulation and outputs 
@@ -227,6 +228,7 @@ MSAL <- dcast(MSAs, Year+Strata~grpID, value.var='Mean')
 MSAL <-grpclean(MSAL)
 # Standardize MSA proportion, so that total will be 1.0  
 MSAL[,-c(1:2)] <- MSAL[,-c(1:2)]/rowSums(MSAL[,-c(1:2)],na.rm=TRUE)
+# Merge the stock proportion with sanple size:  needed for simulation
 MSAL <- merge(MSAL,rstr[,c('Year','Strata','Sample_Size')],by=c('Year','Strata'))
 
 #-------------------------------------------------------------------------------
@@ -237,8 +239,9 @@ MSAL <- merge(MSAL,rstr[,c('Year','Strata','Sample_Size')],by=c('Year','Strata')
 if(inSeason==TRUE){ 
   Pilot <- read.Pilot.data(rstr,this.year) 
 #  inSeason is FALSE 
- }else if(inSeason==FALSE){  
-   Pilot.list <- list()
+ }else if(inSeason==FALSE){
+# Create list file
+   Pilot.list <- list()  
   for(i in 1:ny){
     Pilot.list[[i]] <- read.Pilot.data(rstr,years[i])  
   }

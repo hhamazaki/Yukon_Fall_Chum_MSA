@@ -26,7 +26,7 @@
 # Setup file directories 
 #-------------------------------------------------------------------------------
 # Clear up existing files 
-rm(list = ls(all = TRUE))
+rm(list = ls(all.names = TRUE))
 #-------------------------------------------------------------------------------
 # Standard 
 #-------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ fdr <- './R_functions/'
 #===============================================================================
 inSeason <- TRUE 
 # Set year 
-this.year <- 2021
+this.year <- 2022
 #-------------------------------------------------------------------------------
 #  1.1: Set MSA data directory and file names 
 #-------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ names(lgnames) <- stockID$grpID
 #-------------------------------------------------------------------------------
 #  Pilot Run vs Sampling Strata 
 #=------------------------------------------------------------------------------ 
-if(fig1==TRUE){
+
 windows(record=TRUE)
 par(mfrow=c(1,1),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l',las=1)
   rstr.y <- rstr[rstr$Year==this.year,]
@@ -90,11 +90,12 @@ par(mfrow=c(1,1),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l',las=1)
 mtext(paste("Sampling Strata"), side = 3, line = 0, outer = TRUE,cex=1.5)
 mtext('Pilot Station Run', side = 2, line = 1.5, las=0, outer = TRUE,cex=1.5)
 mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
-}
+
 
 #-------------------------------------------------------------------------------
 #  Plot mean stock proportion by sampling strata 
 #-------------------------------------------------------------------------------
+ststocks <- as.character(ststockID)
 Pilot.stp <- Pilot.m[,c('Year','Strata','Run', ststocks)]
 Pilot.stp[,ststocks] <- 100*Pilot.stp[,ststocks] /Pilot.stp$Run
 Pilot.stpl <- melt(Pilot.stp[,c('Year','Strata',ststocks)], 
@@ -122,7 +123,7 @@ mtext("Sampling Strata", side = 1, line = 1, outer = TRUE)
 #-------------------------------------------------------------------------------
 Pilot.stn <- Pilot.m[,c('Year','Strata','Run', c('4','8','11','19','10'))]
 
-gname[c('4','8','11','19','10')]
+#gname[c('4','8','11','19','10')]
 
 gname <- (stockID[stockID$grpID %in% c(4,8,11,19,10),c('grpID','GroupName')])      
 foo <- data.frame(t(gname$GroupName))
@@ -135,7 +136,7 @@ barplot(t(Pilot.stn[,-c(1:3)]),beside=TRUE,col=c(2:6),
         names.arg = rstr[which(rstr$Year==this.year), 'Time_Frames']
         )
 title(main = this.year)
-legend('topright',legend = gname, fill = c(2:6),bty = 'n')
+legend('topright',legend = gname$GroupName, fill = c(2:6),bty = 'n')
 mtext('Run size', side = 2, line = 4,las=0)
 mtext("Sampling Strata", side = 1, line = 2)
 

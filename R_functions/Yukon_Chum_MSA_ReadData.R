@@ -5,10 +5,10 @@
 #  This includes Data reading function sets 
 #===============================================================================
 
-
 #-------------------------------------------------------------------------------
+# function: read.Pilot.data 
 # Read Pilot Station Run, var data : 
-#       This function reads Pilot data, combine with strata data 
+#       This function reads Pilot data, combine with strata data (rstr)
 #       Pilot Station data should be named: 
 #       Daily_Passage_By_Species_year.csv
 #       Daily_Variance_By_Species_year.csv
