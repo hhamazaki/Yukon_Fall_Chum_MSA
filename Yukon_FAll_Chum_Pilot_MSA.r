@@ -125,13 +125,13 @@ options(scipen=999)   # Prevent R using scientific notation xxx e-yyy
 #-------------------------------------------------------------------------------
 # Standard 
 #-------------------------------------------------------------------------------
-# Main <- 'C:/Projects/Yukon_River/Fall_Chum/MSA/' 
-# fdr <- paste0(Main, 'R_functions/')  # R functions
-# wd_MSA <- paste0(Main,'data/MSA_data/') # MSA data
-# wd_Plt <- paste0(Main,'/data/Pilot_data/') #Pilot data
-# wd_Sum <- paste0(Main,'/data/Summary_data/') #Summary data used for figures
+# Main <- file.path('C:','Projects','Yukon_River',','Fall_Chum','MSA') 
+# fdr <- file.path(Main, 'R_functions')  # R functions
+# wd_MSA <- file.path(Main,'data','MSA_data') # MSA data
+# wd_Plt <- file.path(Main,'data','Pilot_data') #Pilot data
+# wd_Sum <- file.path(Main,'data','Summary_data') #Summary data used for figures
 #-------------------------------------------------------------------------------
-# Rprojects 
+# Projects 
 #-------------------------------------------------------------------------------
 fdr <- './R_functions/'
 wd_MSA <- './data/MSA_data/'
@@ -160,7 +160,7 @@ Pilot_Run <- 'Daily_Passage_By_Species_'
 Pilot_Var <- 'Daily_Variance_By_Species_'
 
 # Output EXCEL file name 
-sumxlsx <- paste0('Yukon_Pilot_Chum_MSA','.xlsx')
+sumxlsx <- paste0('Yukon_Pilot_Chum_MSA',Sys.Date(),'.xlsx')
 
 #-------------------------------------------------------------------------------
 #  1.2: Set Standard Stock Groups 
