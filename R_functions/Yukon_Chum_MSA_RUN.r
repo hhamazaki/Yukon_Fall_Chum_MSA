@@ -1,11 +1,21 @@
 ################################################################################
 #   Yukon River Fall Chum Salmon Pilot Station Stratified estimate 
-#
+#   Code name:  Yukon_Chum_MSA_RUN.R
 #   Author:  Toshihide "Hammachan" Hamazaki
 #   Date: 
 #   Description
-#   This program reads Pilot Station genetic and Run data and estimates 
-#   Run and stratified proportion by strata and run 
+#   This program reads Pilot Station Run and variance data, genetic composition 
+#   data and create stratified estimates 
+#   Model dependencies:
+#   Yukon_Chum_MSA_functions.R  # Function sets used for MSA analyses
+#   Yukon_Chum_MSA_ReadData.R'  # Function sets to Read data 
+#   ggplot_theme.R    # ggplot themes if using 
+#   
+#   Other dependency variables 
+#   this.year : 
+#   PostSeason :  whether analyses is postSeason
+#   ciOverwrite:  whether re 
+################################################################################
 #-------------------------------------------------------------------------------
 #   Group ID and description (P) indicates Primary group directly identified by 
 #   GSI
@@ -48,10 +58,10 @@
 # Output Strata
 # 1 - 10: Survey Sample strata
 # Strata 100 both summer and fall seasons (beware of stratum date differences in early years 1999-2007)
-# Strata 101 summer season only (thru July 18, data complete 2008 on)
+# Strata 101 summer season only (through July 18, data complete 2008 on)
 # Strata 102 fall season only (July 19 to end, data complete 2004 on)
 
-# Strata 103 proportions of only summer stocks in both seasons (Total summer stock passage/total passage)
+# Strata 103 proportions of summer stocks in both seasons (Total summer stock passage/total passage)
 # Strata 103 would be strata 100   
 # 1) grpID=4 for Lower summer divided by grpID=2 Total Summer.
 # 2) grpID=8 for Tanana summer divided by grpID=2 Total Summer.
@@ -103,8 +113,8 @@
 #   4. Daily_Passage_By_Species_yyyy.csv:  Daily Pilot Passage by species 
 #   5. Daily_Variance_By_Species_yyyy.csv:  Daily Pilot Passage Variance by species 
 #   Notes:
-#   Pilot passage and variance files are located in Pilot folder 
-#   Other files are located in main directory
+#   Pilot passage and variance files are located at data/Pilot_data folder 
+#   MSA Aand StockID files are Other files are located at data/MSA_data folder
 ################################################################################   
 #===============================================================================
 #  1.0: Clear Memory and Set Working Environment 
@@ -112,8 +122,8 @@
 # Add packages needed 
 library(openxlsx)   # Used to create EXCEL output file
 library(reshape2)   # Used to transpose data file 
-library(ggplot2)    # Used for ggplot graphics 
-library(lemon)      # Used for ggplot: better figures (facet_rep_wrap)
+#library(ggplot2)    # Used for ggplot graphics 
+#library(lemon)      # Used for ggplot: better figures (facet_rep_wrap)
 #palette('Okabe-Ito')  # Change color palette color blinds friendly
 options(scipen=999)   # Prevent R using scientific notation xxx e-yyy
 # Functions Source
@@ -156,10 +166,10 @@ stock_id_file <- 'StockID.csv'
 Pilot_Run <- 'Daily_Passage_By_Species_'
 # Pilot Station Var  
 Pilot_Var <- 'Daily_Variance_By_Species_'
-
 # Output EXCEL file name 
-sumxlsx <- paste0('Yukon_Pilot_Chum_MSA','.xlsx')
-
+sumxlsx <- paste0('Yukon_Pilot_Chum_MSA_',Sys.Date(),'.xlsx')
+# Output min_max file name 
+min_max <- paste0('Pilot_d_min_max_',this.year,'.csv')
 #-------------------------------------------------------------------------------
 #  1.2: Set Standard Stock Groups 
 #-------------------------------------------------------------------------------
@@ -179,15 +189,13 @@ stgrpIDn <- as.character(stgrpID)
 
 # Standard Output Stock figures 
 ststockID <- c(2,7,8,10,11,19)
-# ststocks needed to read as
-#ststocks <- as.character(ststockID)
+# ststocks needed to read as character
+ststocks <- as.character(ststockID)
 
 #-------------------------------------------------------------------------------
 #  1.3: Specify Simulation and outputs 
 #-------------------------------------------------------------------------------
-# Do you want to run simulation to get CI?  TRUE or FALSE 
-Sim <- TRUE
-# Set the number of simulation replilcates: default 100000
+# Set the number of simulation replicates: default 10000
 nrep <- 10000
 # % CI range
 ci <- 90
@@ -235,24 +243,24 @@ MSAL <- merge(MSAL,rstr[,c('Year','Strata','Sample_Size')],by=c('Year','Strata')
 #  2.3: Read Pilot Station Run, var, and stratum Info : 
 #       This creates Daily Pilot run and var with strata info
 #-------------------------------------------------------------------------------
-#  inSeason is TRUE
-if(inSeason==TRUE){ 
-  Pilot <- read.Pilot.data(rstr,this.year) 
-#  inSeason is FALSE 
- }else if(inSeason==FALSE){
-# Create list file
-   Pilot.list <- list()  
+#  If PostSeason is TRUE, then read all historical Pilot data. 
+if(PostSeason ==TRUE){ 
+  # Create list file
+  Pilot.list <- list()  
   for(i in 1:ny){
     Pilot.list[[i]] <- read.Pilot.data(rstr,years[i])  
   }
   # Convert list file to to data.frame
   Pilot <- as.data.frame(do.call(rbind,Pilot.list))
+#  Otherwise, default is read this.year's data 
+ }else{
+   Pilot <- read.Pilot.data(rstr,this.year) 
   }
 
 #===============================================================================
 #  3.0: Data Preparation  
 #===============================================================================
-# Sum Pilot Passage by each designated stratum 
+# Sum of Pilot Passage by each designated stratum 
 Pilot.st <- aggregate(cbind(Run, Var)~Year+Strata+stbreak+sf, FUN=sum,data=Pilot)
 #-------------------------------------------------------------------------------
 #  3.1 Pilot.d: Run by all strata by year:  PRIMARY GROUPS     
@@ -301,11 +309,20 @@ Pilot.sf <- aggregate(.~Year+sf, FUN=sum,data=temp)
 # Add additional stock groups
 Pilot.sf <- grpclean(Pilot.sf)
 Pilot.sf  <- add.sum(Pilot.sf)
-#------ Mean Proportion --------------------------------------------------------
+#------ Change to  Proportion --------------------------------------------------------
 Pilot.sfp <- Pilot.sf
-Pilot.sfp[,-c(1:2)] <- Pilot.sfp[,-c(1:2)]/Pilot.sf$Run
+Pilot.sfp[,-c(1:3)] <- Pilot.sfp[,-c(1:3)]/Pilot.sf$Run
+Pilot.sfp <- Pilot.sfp[,c('Year','sf','Run',as.character(c(1:23)))]
 #------ File output ------------------------------------------------------------
-if(inSeason==FALSE){
+if(PostSeason==TRUE){
+# Read existing file
+#  temp <- read.csv(paste0(wd_Sum,'Pilot_sfp.csv'),header=TRUE)
+# Remove this.year's data if existed=  
+#  temp <- temp[temp$Year<this.year,]
+# Rename column
+#  grpname <- names(temp)[-c(1:3)]
+#  names(temp)[-c(1:3)] <- substr(grpname,2,3)
+#  Pilot.sfp <- rbind(temp, Pilot.sfp)
   write.csv(Pilot.sfp,paste0(wd_Sum,'Pilot_sfp.csv'),na='',row.names=FALSE)
 }
 
@@ -320,23 +337,25 @@ Pilot.sft <- aggregate(.~Year+stbreak, FUN=sum,data=temp[,c('Year','stbreak','Ru
 names(Pilot.sft) <- c('Year','stbreak','Run','Summer','Fall')
 # Calculate stock proportion by standard strata
 Pilot.sft[,c('Summer','Fall')]  <- 100*Pilot.sft[,c('Summer','Fall')] /Pilot.sft$Run 
+# Reorder 
+Pilot.sft <- Pilot.sft[with(Pilot.sft,order(Year,stbreak)),]
 #------ File output ------------------------------------------------------------
-if(inSeason==FALSE){
+if(PostSeason==TRUE){
+#  temp <- read.csv(paste0(wd_Sum,'Pilot_sft.csv'),header=TRUE)
+  # Remove this.year's data if existed=  
+#  temp <- temp[temp$Year<this.year,]
+  # Add this year's data  
+#  Pilot.sft <- rbind(temp, Pilot.sft)
 write.csv(Pilot.sft,paste0(wd_Sum,'Pilot_sft.csv'),na='',row.names=FALSE)
 }
 
 #===============================================================================
 # 4.0 Calculate CI Range of passage and proportion by stock group and strata 
 #    Data used: MSAL, 
-#             Pilot.st
-#             Pilot.m Pilot.mp
-#             Pilot.t Pilot.tp
-#             Pilot.sf Pilot.sfp
-#             Pilot.ts 
-#             Pilot.sfs
-#             Pilot.tf
-#             Pilot.tff
-#             Pilot.sfs
+#             Pilot.st : Sum of Pilot Passage by each designated stratum
+#             Pilot.m Pilot.mp:  Total number and prop of fish by stock group by strata 
+#             Pilot.t Pilot.tp : Total number and prop of fish by stock: season total 
+#             Pilot.sf Pilot.sfp: Total number and prop of summer and fall fish: season total
 #             stgrpIDn
 #  Functions Used: grpclean, add.sum, ciout
 #===============================================================================
@@ -363,32 +382,41 @@ write.csv(Pilot.sft,paste0(wd_Sum,'Pilot_sft.csv'),na='',row.names=FALSE)
 # Create temporal  list file 
 
 #-------------------------------------------------------------------------------
-# 4.1  Summarize Pilot data by Sampling-summer-fall starata 
+# 4.1  Summarize Pilot data by Sampling-summer-fall strata 
 #-------------------------------------------------------------------------------
 # By Summer vs. fall
 Pilot.st.y <-  aggregate(cbind(Run,Var) ~ Year+Strata+sf, FUN=sum,data=Pilot.st)
+
 #-------------------------------------------------------------------------------
 #  Bootstrap Simulation by year and strata 
 #-------------------------------------------------------------------------------
-# Do you want to run for inseason ?
-if(inSeason==FALSE){
+MSA.y <- MSAL[MSAL$Year==this.year,]
+# Pilot st 
+Temp.st <- Pilot.st.y[Pilot.st.y$Year ==this.year,]
+temp.ci <- sim.ci(MSA.y,Temp.st,sgrpIDn,nrep,ci,this.year)
+#-------------------------------------------------------------------------------
+# ci update for all years for Postseason 
+#-------------------------------------------------------------------------------
+if(PostSeason==TRUE){
+  if(ciOverwrite==TRUE){
 temp.ci <- list()
 for(j in 1:ny){
-#-------------------------------------------------------------------------------
-# 4.1  Extract Stock prop and Pilot passage for each year 
-#-------------------------------------------------------------------------------
 # Stock prop
 MSA.y <- MSAL[MSAL$Year==years[j],]
 # Pilot st 
 Temp.st <- Pilot.st.y[Pilot.st.y$Year==years[j],]
 temp.ci[[j]] <- sim.ci(MSA.y,Temp.st,sgrpIDn,nrep,ci,years[j])
  } # End for Year [j]
-} else{
+  } else  #Postseason is TRUE but ciOverwrite 
+    {
   MSA.y <- MSAL[MSAL$Year==this.year,]
   # Pilot st 
-  Temp.st <- Pilot.st.y
+  Temp.st <- Pilot.st.y[Pilot.st.y$Year ==this.year,]
   temp.ci <- sim.ci(MSA.y,Temp.st,sgrpIDn,nrep,ci,this.year)
-}
+  }
+ } 
+
+
 
 #===============================================================================
 #  5.0: Data Output  
@@ -459,6 +487,7 @@ temp.sff <- melt(Pilot.sff,id.vars = c('Year','sf'), variable.name = "grpID", va
 temp.sff$mean <- NA
 temp.sff$sf <- temp.sff$sf+106
 names(temp.sff)[2] <- 'Strata'
+
 #-------------------------------------------------------------------------------
 #  temp.m: Combine ALL Summary DATA 
 #-------------------------------------------------------------------------------
@@ -468,7 +497,7 @@ temp.m <- rbind(temp.m, temp.t,temp.sf,temp.ts,temp.sfs,temp.tf,temp.sff)
 temp.m$grpID <- as.numeric(as.character(temp.m$grpID))
 
 #-------------------------------------------------------------------------------
-# Save Data 
+# Function sum data 
 #-------------------------------------------------------------------------------
 sumdata <- function(tempm,tempci){
 # combine per strata and annual data per year 
@@ -484,45 +513,38 @@ return(tempm)
 }
 
 #-------------------------------------------------------------------------------
-# Save Data inSeason only CSV
-#-------------------------------------------------------------------------------
-if(inSeason==TRUE){
-  mlist <- sumdata(temp.m,temp.ci)
-  write.csv(mlist,paste0(wd_Sum,'Pilot_MSA_Sum_',this.year,'.csv'),na='',row.names=FALSE)
-#-------------------------------------------------------------------------------
-# Save Data Postseason CSV, xlsx
+# mlist: this.year's summary data 
 #-------------------------------------------------------------------------------  
- } else if (inSeason == FALSE){
-# Save all into list file    
-mlist <- list()
-for(i in 1:ny){
-# Save to the list 
-mlist[[i]] <- sumdata(temp.m[temp.m$Year==year[i]],temp.ci[[i]])
-}
-# Put name Years 
-names(mlist) <- years
+mlist <- sumdata(temp.m,temp.ci)
 #-------------------------------------------------------------------------------
-#  Overwrite ALL CSV data 
-#-------------------------------------------------------------------------------
-if (ciOverwrite == TRUE){
-# Save all   
+# Save Data Postseason CSV, xlsx for PostSeason
+#-------------------------------------------------------------------------------  
+if(PostSeason==TRUE){
+  if(ciOverwrite == TRUE){
+  # Save all into list file    
+  mlist <- list()
+  for(i in 1:ny){
+    # Save to the list 
+    mlist[[i]] <- sumdata(temp.m[temp.m$Year==year[i]],temp.ci[[i]])
+   }
+  names(mlist) <- years
   for(i in 1:ny){
     write.csv(mlist[[i]],paste0(wd_Sum,'Pilot_MSA_Sum_',years[i],'.csv'),na='',row.names=FALSE)
+  } 
+  } else {
+  write.csv(sumdata(temp.m,temp.ci),paste0(wd_Sum,'Pilot_MSA_Sum_',this.year,'.csv'),na='',row.names=FALSE)
   }
-#-------------------------------------------------------------------------------
-#  DO NOT Overwrite ALL CSV data 
-#-------------------------------------------------------------------------------
-  } else if (ciOverwrite == FALSE){
-# Read historical csv data except the current year     
-  for(i in 1:(ny-1)){
-      mlist[[i]] <- read.csv(paste0(wd_Sum,'Pilot_MSA_Sum_',years[i],'.csv'),stringsAsFactors = FALSE)
-      }    
-  write.csv(mlist[[ny]],paste0(wd_Sum,'Pilot_MSA_Sum_',years[ny],'.csv'),na='',row.names=FALSE)
- }  
+ }
+
 #-------------------------------------------------------------------------------
 #  EXCEL table output
 #-------------------------------------------------------------------------------
-write.xlsx(mlist,sumxlsx,rowNames=FALSE) 
+if (PostSeason == TRUE){
+  EXlist <- list()   
+  for(i in 1:ny){
+      EXlist[[i]] <- read.csv(paste0(wd_Sum,'Pilot_MSA_Sum_',years[i],'.csv'),stringsAsFactors = FALSE)
+      }    
+  write.xlsx(EXlist,sumxlsx,rowNames=FALSE) 
 }
 
 #-------------------------------------------------------------------------------
@@ -546,17 +568,17 @@ Pilot.sd <- melt(Pilot.sd[,-3],
 # Change 0 percent to NA
 Pilot.sd$percent[Pilot.sd$percent==0]<-NA
 
+if(PostSeason==TRUE){
 #-------------------------------------------------------------------------------
 #  7.0 Pilot.sd.min.max:Estimate mean stock proportion by standard strata   
 #-------------------------------------------------------------------------------
-if(inSeason==FALSE){
-  Pilot.d.min.max <- aggregate(percent~group+stbreak, FUN=function(x) c(min=min(x),max=max(x),mean=mean(x)),data=Pilot.sd) 
+Pilot.d.min.max <- aggregate(percent~group+stbreak, FUN=function(x) c(min=min(x),max=max(x),mean=mean(x)),data=Pilot.sd) 
 # Change to dataframe
 Pilot.d.min.max <- do.call(data.frame,Pilot.d.min.max)
 # Rename Column
 names(Pilot.d.min.max)[3:5] <- c('Min','Max','Mean')
 Pilot.d.min.max<- merge(Pilot.d.min.max,stockID, by.x = 'group', by.y = 'grpID')
 #------ File output ------------------------------------------------------------
-  write.csv(Pilot.d.min.max,paste0(wd_Sum,'Pilot_d_min_max.csv'),na='',row.names=FALSE)
+  write.csv(Pilot.d.min.max,paste0(wd_Sum,min_max),na='',row.names=FALSE)
 }
 

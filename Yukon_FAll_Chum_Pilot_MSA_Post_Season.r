@@ -1,5 +1,5 @@
 ################################################################################
-#   Yukon River Fall Chum Salmon Pilot Station Post-Season Stratified estimate 
+#   Yukon River Fall Chum Salmon: Post-Season Stratified estimate 
 #
 #   Author:  Toshihide "Hammachan" Hamazaki
 #   Date: 
@@ -42,26 +42,17 @@ fdr <- './R_functions/'
 #  1.0 Run MSA Routine
 #       Check Yukon_Chum_MSA_RUN.R for details 
 #===============================================================================
-inSeason <- FALSE
-# Do you want to overwrite all years' CIs?
-ciOverwrite <- TRUE
-# ggplot ?
-gg <- FALSE
+# Set current year 
+this.year <- 2022
+# PostSeason 
+PostSeason <- TRUE
+# If you want to rewrite all historical estimates and ci 
+# (e.g. due to historical data update), set ciOverwrite to TRUE 
+ciOverwrite <- FALSE
 #-------------------------------------------------------------------------------
 #  1.1: Set MSA data directory and file names 
 #-------------------------------------------------------------------------------
 source(paste0(fdr,'Yukon_Chum_MSA_RUN.R'))  
-
-# Read MSA Strata data
-Pilot.d.min.max <- read.csv(paste0(wd_Sum,'Pilot_d_min_max.csv'),stringsAsFactors = FALSE)
-
-# Read MSA Strata data
-Pilot.hsft <- read.csv(paste0(wd_Sum,'Pilot_sft.csv'),stringsAsFactors = FALSE)
-# Find the number of years in the data 
-years <- unique(Pilot.hsft$Year)
-years <- years[order(years)]
-# number of years
-ny <- length(years)
 
 
 #===============================================================================

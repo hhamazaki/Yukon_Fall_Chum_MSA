@@ -7,7 +7,16 @@ output:
   word_document:
     reference_docx: defalult-style_01.docx
     toc: false
-#    highlight: zenburn
+#   This function will save output file with date. 
+knit: (function(input, ...) {
+    rmarkdown::render(
+      input,
+      output_file = paste0(
+        xfun::sans_ext(input), '-', Sys.Date(), '.docx'
+      ),
+      envir = globalenv()
+    )
+  })
 ---
 
 
@@ -29,7 +38,7 @@ fdr <- './R_functions/'
 #===============================================================================
 #  1.0: Run MSA
 #===============================================================================
-inSeason <- TRUE 
+PostSeason <- FALSE 
 # Set year 
 this.year <- 2022
 #-------------------------------------------------------------------------------
@@ -40,6 +49,7 @@ stbreak <- stb(this.year)
 Pilot.total <- mlist[mlist$Strata==100,]
 Pilot.summer <-mlist[mlist$Strata==101,]
 Pilot.fall <- mlist[mlist$Strata==102,]
+Pilot.fallinfall <- mlist[mlist$Strata==108,]
 
 # Set legend name and order 
 lgnames <- data.frame(t(stockID$GroupName))
@@ -54,7 +64,9 @@ names(lgnames) <- stockID$grpID
 #  2.1: Read Summer vs. Fall % data
 #-------------------------------------------------------------------------------
 # Read MSA Strata data
-Pilot.d.min.max <- read.csv(paste0(wd_Sum,'Pilot_d_min_max.csv'),stringsAsFactors = FALSE)
+#Pilot.d.min.max <- read.csv(paste0(wd_Sum,'Pilot_d_min_max.csv'),stringsAsFactors = FALSE)
+# Use Last years min max 
+Pilot.d.min.max <- read.csv(paste0(wd_Sum,'Pilot_d_min_max_',this.year-1,'.csv'),stringsAsFactors = FALSE)
 
 # Read MSA Strata data
 Pilot.hsft <- read.csv(paste0(wd_Sum,'Pilot_sft.csv'),stringsAsFactors = FALSE)
@@ -69,6 +81,11 @@ ny <- length(years)
 ############################################################################
 library(knitr)
 library(rmarkdown)
+ add_legend <- function(...) {
+   par(mar = c(0,0,4,0))
+   plot(0, 0, type='n', bty='n', xaxt='n', yaxt='n',xlab='',ylab='')
+   legend(...)
+  }
 ```
 
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
@@ -83,7 +100,7 @@ mtext(paste("Sampling Strata"), side = 3, line = 0, outer = TRUE,cex=1.5)
 mtext('Number of Salmon', side = 2, line = 1.5, las=0, outer = TRUE,cex=1.5)
 mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
 ```
-Figure 1.  Daily sonar counts attributed to chum salmon (bars) showing genetic sampling time frames (droplines), project operated near Pilot Station, Yukon Area, 2021.
+Figure 1.  Daily sonar counts attributed to chum salmon (bars) showing genetic sampling time frames (droplines), project operated near Pilot Station, Yukon Area, `r this.year`.
 
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
@@ -97,34 +114,34 @@ Pilot.stpl <- melt(Pilot.stp[,c('Year','Strata',ststocks)],
 Pilot.stpl <- Pilot.stpl[order(Pilot.stpl$Year,Pilot.stpl$Strata),]
 gname <- stockID[stockID$grpID %in%ststockID,c('GroupName')]      
 names(gname) <- ststockID
-# Base plot 			
-par(mfrow=c(1,1),mar=c(5.1, 4.1, 4.1, 4.1),yaxs='i',bty='l',las=1) 
+# Base plot 
+layout(matrix(1:2, ncol=2), widths=c(3,1))
+par(mar=c(4, 4, 4, 0),yaxs='i',bty='l',las=1) 
 temp1 <- Pilot.stpl[Pilot.stpl$group==ststockID[1],]
-plot(order(temp1$Strata),type='n', xlim=c(1,5),ylim=c(0,100), ylab='Stock Percent',xlab='Sample Strata Number')
+plot(order(temp1$Strata),type='n', xlim=c(1,7),ylim=c(0,100), ylab='Stock Percent',xlab='Sample Strata Number')
 for (i in 1:6){
   lines(percent~Strata, type ='o',lwd=2,col=i,pch=i,data=Pilot.stpl[Pilot.stpl$group==ststockID[i],])
 }
 title(main = this.year)
-par(xpd=TRUE)
-legend('topright',legend = gname, inset = c(- 0.2, 0),col = c(1:6), pch=c(1:6),lty=1,lwd=2,bty = 'n')
+add_legend('topleft',legend = gname,col = c(1:6), pch=c(1:6),lty=1,lwd=2,bty = 'n')
 mtext('Stock Percent', side = 2, line = 1,las=0, outer = TRUE)
 mtext("Sampling Strata", side = 1, line = 1, outer = TRUE)
 
 ```
-Figure 2.  Mean proportion of chum salmon stock groups by sampling strata, Yukon Area, 2021.
+Figure 2.  Mean proportion of chum salmon stock groups by sampling strata, Yukon Area, `r this.year`.
 
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
-Pilot.stn <- Pilot.m[,c('Year','Strata','Run', c('4','8','11','19','10'))]
-gname <- lgnames[c('4','8','11','19','10')]      
+#Pilot.stn <- Pilot.m[,c('Year','Strata','Run', c('4','8','11','19','10'))]
+#gname <- lgnames[c('4','8','11','19','10')]      
 
-par(mfrow=c(1,1),mar=c(4.1, 6.1, 4.1, 4.1),yaxs='i',bty='l',las=1) 
-barplot(t(Pilot.stn[,-c(1:3)]),beside=TRUE,col=c(2:6),
-        names.arg = rstr[which(rstr$Year==this.year), 'Time_Frames']
-        )
-title(main = this.year)
-legend('topright',legend = gname, fill = c(2:6),bty = 'n')
-mtext('Run size', side = 2, line = 4,las=0)
-mtext("Sampling Strata", side = 1, line = 2)
+#par(mfrow=c(1,1),mar=c(4.1, 6.1, 4.1, 4.1),yaxs='i',bty='l',las=1) 
+#barplot(t(Pilot.stn[,-c(1:3)]),beside=TRUE,col=c(2:6),
+#        names.arg = rstr[which(rstr$Year==this.year), 'Time_Frames']
+#        )
+#title(main = this.year)
+#legend('topright',legend = gname, fill = c(2:6),bty = 'n')
+#mtext('Run size', side = 2, line = 4,las=0)
+#mtext("Sampling Strata", side = 1, line = 2)
 ```
 
 
@@ -135,8 +152,8 @@ mtext("Sampling Strata", side = 1, line = 2)
 #-------------------------------------------------------------------------------
 gname <- stockID[stockID$grpID %in%ststockID,c('GroupName')]      
 names(gname) <- ststockID
-
-par(mfrow=c(1,1),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l',las=1)
+layout(matrix(1:2, ncol=2), widths=c(3,1))
+par(mar = c(4,4,4,0),yaxs='i',bty='l',las=1)
 temp1 <- with(Pilot.d.min.max, Pilot.d.min.max[group ==ststockID[1],])
 plot(order(temp1$stbreak),type='n', xlim=c(1,9),ylim=c(0,100), ylab='',xlab='',
      yaxt='n',xaxt='n')
@@ -148,13 +165,13 @@ for(i in 1:6){
   with(temp, lines(stbreak,Mean, type='o',lwd=2,col=i,pch=i))
 }
 txt <- c(gname)
-legend('topright',legend=txt,col=c(1:6),pch=c(1:6),lty=1,lwd=2,bty='n')
+add_legend('topleft',legend=txt,col=c(1:6),pch=c(1:6),lty=1,lwd=2,bty='n')
 mtext(paste(" "), side = 3, line = 0, outer = TRUE)
 mtext('Stock Percent', side = 2, line = 1,las=0, outer = TRUE)
 mtext("Dates", side = 1, line = 1, outer = TRUE)
 
 ```
-Figure 3.  Mean proportion of chum salmon stock groups by standard sampling strata, Yukon Area, 2004-2020.
+Figure 3.  Mean proportion of chum salmon stock groups by standard sampling strata, Yukon Area, 2004-`r this.year-1`.
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
 par(mfrow=c(4,2),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l')
 fig.stock.id <- c(4,7,8,11,10,19,16,3)
@@ -176,7 +193,7 @@ mtext('Stock Percent', side = 2, line = 1, outer = TRUE)
 mtext("Dates", side = 1, line = 1, outer = TRUE)
 
 ```
-Figure 4.  Minimum and maximum (2004-2020) and 2021 mean stock proportion by standard sampling strata, comparing the major chum salmon components, Yukon Area.
+Figure 4.  Minimum and maximum (2004-`r this.year-1`) and `r this.year` mean stock proportion by standard sampling strata, comparing the major chum salmon components, Yukon Area.
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
   par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
   for(i in 1:ny){
@@ -187,7 +204,7 @@ Figure 4.  Minimum and maximum (2004-2020) and 2021 mean stock proportion by sta
     axis(2, seq(0,100,20),las=2, labels=NA)
     if (years[i] %in% c(1999,2005, 2010,2015, 2020)) axis(2, seq(0,100,20),las=2, font=2)
     axis(1, seq(1,9,1),labels = NA,cex.axis = 0.9)
-    if (years[i] > 2016) axis(1, seq(1,9,1), labels = stbl,cex.axis = 0.9)
+    if (years[i] > 2017) axis(1, seq(1,9,1), labels = stbl,cex.axis = 0.9)
   }
 # This year 
  plot(Summer~stbreak, type ='o',col=4, xlim=c(1,9),ylim=c(0,100), 
@@ -200,7 +217,7 @@ Figure 4.  Minimum and maximum (2004-2020) and 2021 mean stock proportion by sta
   mtext('Stock Percent', side = 2, line = 1, outer = TRUE,cex=1.5)
   mtext("Dates ", side = 1, line = 1, outer = TRUE,cex=1.5)
 ```
-Figure 5.  Crossover of summer and fall chum salmon based on genetic stock analysis (standard sampling strata), Yukon Area, 1999-2002 using allozymes and 2004-2021 using microsatellites.
+Figure 5.  Crossover of summer and fall chum salmon based on genetic stock analysis (standard sampling strata), Yukon Area, 1999-2002 using allozymes and 2004-`r this.year` using microsatellites.
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
   par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
     for(i in 1:ny){
@@ -211,7 +228,7 @@ Figure 5.  Crossover of summer and fall chum salmon based on genetic stock analy
     axis(2, seq(0,100,20),las=2, labels=NA)
     if (years[i] %in% c(1999,2005, 2010,2015, 2020)) axis(2, seq(0,100,20),las=2, font=2)
     axis(1, seq(1,9,1),labels = NA,cex.axis = 0.9)
-    if (years[i] > 2016) axis(1, seq(1,9,1), labels = stbl,cex.axis = 0.9)
+    if (years[i] > 2017) axis(1, seq(1,9,1), labels = stbl,cex.axis = 0.9)
     }
 # This year 
   plot(Summer~stbreak, type ='o',col=4, xlim=c(4,6),ylim=c(0,100), 
@@ -225,16 +242,28 @@ Figure 5.  Crossover of summer and fall chum salmon based on genetic stock analy
   mtext("Dates", side = 1, line = 1, outer = TRUE,cex=1.5)
 
 ```
-Figure 6.  Crossover of summer and fall chum salmon (3 periods) based on genetic stock analysis (standard sampling strata), Yukon Area, 1999-2002 using allozymes and 2004-2021 using microsatellites.
+Figure 6.  Crossover of summer and fall chum salmon (3 periods) based on genetic stock analysis (standard sampling strata), Yukon Area, 1999-`r this.year` using allozymes and 2004-`r this.year` using microsatellites.
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
 if(dim(Pilot.fall)[1]>0){
   temp <- Pilot.fall[Pilot.fall$grpID %in% c(4,7,8,10,11,13,16),]
 temp$pct <- with(temp, paste0(round(100*p),'%'))
 par(mfrow=c(1,1),mar = c(4,4,4,7),oma = c(3,3,3,3))
 pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=c(2:8),main="Stock Proportion (July 19 to End of Season)")
-par(new=TRUE)
-pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))
-pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion (July 19 to End of Season)")
+#par(new=TRUE)
+#pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))
+#pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion (July 19 to End of Season)")
 }
 ```
-Figure 7. Contributions of chum salmon based on genetic analysis during the fall season (July 19 to end of season), sampled at the mainstem sonar operated near Pilot Station, Yukon Area, 2021.
+Figure 7. Contributions of chum salmon based on genetic analysis during the fall season (July 19 to end of season), sampled at the mainstem sonar operated near Pilot Station, Yukon Area, `r this.year`.
+```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
+if(dim(Pilot.fallinfall)[1]>0){
+  temp <- Pilot.fallinfall[Pilot.fallinfall$grpID %in% c(10,11,19),]
+temp$pct <- with(temp, paste0(round(100*p),'%'))
+par(mfrow=c(1,1),mar = c(4,4,4,7),oma = c(3,3,3,3))
+pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=c(2:8),main="Stock Proportion (July 19 to End of Season)")
+#par(new=TRUE)
+#pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))
+#pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion (July 19 to End of Season)")
+}
+```
+Figure 8. Contributions of Fall chum salmon based on genetic analysis during the fall season (July 19 to end of season), sampled at the mainstem sonar operated near Pilot Station, Yukon Area, `r this.year`.
