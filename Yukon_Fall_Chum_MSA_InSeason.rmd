@@ -1,5 +1,5 @@
 ---
-title: "Yukon River Fall Chum Salmon Mixed Stock Analysis"
+title: "Yukon River Fall Chum Salmon Inseason Mixed Stock Analysis"
 output:
 #  html_document:
 #    toc: true
@@ -34,17 +34,26 @@ rm(list = ls(all.names = TRUE))
 #-------------------------------------------------------------------------------
 # R projects 
 #-------------------------------------------------------------------------------
-fdr <- './R_functions/'
+fdr <- './R_functions'
 #===============================================================================
-#  1.0: Run MSA
+#  1.0: Set Environment 
 #===============================================================================
 inSeason <- TRUE 
 # Set year 
 this.year <- 2023
+# Inseason Data directory and file name 
+wd_Ins <- './data/Inseason'
+strata_file_Ins <- 'MSA_Strata_ins.csv'
+# Stock Prop info file name 
+stock_prop_file_Ins <- 'MSA_prop_ins.csv'  
+# Inseasopn Pilot Data 
+Pilot_Run_Ins <- 'Daily Passage By Species.csv'
+# Pilot Station Var  
+Pilot_Var_Ins <- 'Daily Variance By Species.csv'
 #-------------------------------------------------------------------------------
 #  1.1: Set MSA data directory and file names 
 #-------------------------------------------------------------------------------
-source(file.path(fdr,'Yukon_Chum_MSA_RUN_ins.R'))  
+source(file.path(fdr,'Yukon_Chum_MSA_STD.R'))  
 stbreak <- stb(this.year)
 Pilot.total <- mlist[mlist$Strata==100,]
 Pilot.summer <-mlist[mlist$Strata==101,]

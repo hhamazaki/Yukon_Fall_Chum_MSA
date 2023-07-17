@@ -39,9 +39,10 @@ fdr <- './R_functions/'
 #===============================================================================
 #  1.0: Run MSA
 #===============================================================================
-inSeason <- TRUE 
 # Set year 
-this.year <- 2022#Test
+this.year <- 2023
+last.year <- this.year -1
+
 #-------------------------------------------------------------------------------
 #  1.1: Set MSA data directory and file names 
 #-------------------------------------------------------------------------------
@@ -60,7 +61,7 @@ Pilot.fall <- mlist[mlist$Strata==102,]
 #  2.1: Read Summer vs. Fall % data
 #-------------------------------------------------------------------------------
 # Read MSA Strata data
-Pilot.d.min.max <- read.csv(paste0(wd_Sum,'Pilot_d_min_max.csv'),stringsAsFactors = FALSE)
+Pilot.d.min.max <- read.csv(file.path(wd_Sum,paste0('Pilot_d_min_max_',last.year,'.csv')),stringsAsFactors = FALSE)
 
 # Read MSA Strata data
 Pilot.hsft <- read.csv(paste0(wd_Sum,'Pilot_sft.csv'),stringsAsFactors = FALSE)
@@ -195,13 +196,15 @@ mtext("Dates ", side = 1, line = 1, outer = TRUE)
 #------------------------------------------------------------------------------- 
   # Base plot 
   par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
+# Calculate modulo
+   yax <- c(1,which(1:(ny+1)%%5==0)+1)
   for(i in 1:ny){
     temp <- with(Pilot.hsft, Pilot.hsft[Year==years[i],])
     plot(Summer~stbreak, type ='o',col=4, xlim=c(1,9),ylim=c(0,100), 
          yaxt='n',xaxt='n',lwd = 2, data=temp,main=years[i])
     lines(Fall~stbreak,type ='o',col=2,lwd = 2, data=temp)
     axis(2, seq(0,100,20),las=2, labels=NA)
-    if (years[i] %in% c(1999,2005, 2010,2015, 2020)) axis(2, seq(0,100,20),las=2, font=2)
+    if (years[i] %in% c(1999,2005, 2010,2015,2020)) axis(2, seq(0,100,20),las=2, font=2)
     axis(1, seq(1,9,1),labels = NA,cex.axis = 0.9)
     if (years[i] > 2015) axis(1, seq(1,9,1), labels = stbl,cex.axis = 0.9)
   }

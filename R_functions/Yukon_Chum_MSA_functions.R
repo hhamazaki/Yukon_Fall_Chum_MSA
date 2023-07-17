@@ -6,7 +6,7 @@
 #-------------------------------------------------------------------------------
 # Set standard strata dates 
 stb <- function(year){
-  stdates <- c('06/01/','06/22/','06/29/','07/10/','07/19/','07/28/','08/06/','08/15/','08/25/','09/15/')
+  stdates <- c('05/01/','06/22/','06/29/','07/10/','07/19/','07/28/','08/06/','08/15/','08/25/','09/15/')
   stdates <- paste0(stdates,year)
   stdates <- as.Date(stdates,'%m/%d/%Y')
   return(stdates) 
@@ -21,7 +21,7 @@ stbl <- c('6/1','6/22','6/29','7/10','7/19','7/28','8/6','8/15','8/25')
 #-------------------------------------------------------------------------------
 # Standard Summer vs. fall date: July 19 is the standard summer/fall separate date
 stsf <- function(year){
-  stdates <- paste0(c('06/01/','07/19/','9/30/'),year)
+  stdates <- paste0(c('05/01/','07/19/','9/30/'),year)
   stdates <- as.Date(stdates,'%m/%d/%Y')
   return(stdates) 
 } 
@@ -29,7 +29,7 @@ stsf <- function(year){
 #-------------------------------------------------------------------------------
 #  grpclean: 
 #  This function isolates primary stock group
-#  NA seocndary stock group data if present
+#  NA secondary stock group data if present
 #-------------------------------------------------------------------------------
 grpclean <- function(datM,Year=NA) {
   if(is.na(Year)){
@@ -341,6 +341,7 @@ sim.ci <- function(MSA.y,Temp.st,sgrpIDn,nrep,ci,this.year) {
   #  temp.103,temp.104,temp.105,temp.106,temp.107,temp.108) 
   out <- rbind(do.call(rbind, lapply(pilot.st.sim, as.data.frame)),temp.t,temp.st,temp.ft,
                temp.103,temp.104,temp.105,temp.106,temp.107,temp.108)
+  out <- data.frame(Year = this.year, out)
   return(out)
 } # End of the function 
 

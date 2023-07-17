@@ -1,4 +1,4 @@
-################################################################################
+#'##############################################################################
 #   Yukon River Fall Chum Salmon: Post-Season Stratified estimate 
 #
 #   Author:  Toshihide "Hammachan" Hamazaki
@@ -6,8 +6,8 @@
 #   Description
 #   This program reads Pilot Station genetic and Run data and estimates 
 #   Run and stratified proportion by strata and run 
-################################################################################
-################################################################################
+#'##############################################################################
+#'##############################################################################
 #   Model running and file Setting Instructions 
 #   Step 1  Update data in data folder
 #   MSA_data folder 
@@ -21,47 +21,60 @@
 #   Notes:
 #   Pilot passage and variance files are located in Pilot folder 
 #   Other files are located in main director
-################################################################################ 
-################################################################################ 
+#'############################################################################## 
+#'############################################################################## 
 #   BIG NOTE !!!!
 #   THIS PROGRAM OVERWRITE ALL YEARS' CI BOUNDS
 #   SET OVERWRITE FALSE IF YOU DON'T WANT TO UPDATE PREVIOUS YEARS
-################################################################################ 
+#'############################################################################### 
+#'------------------------------------------------------------------------------
+# Set Running environment-------
+#'------------------------------------------------------------------------------
 # Clear up existing files 
 rm(list = ls(all = TRUE))
-#-------------------------------------------------------------------------------
+#'------------------------------------------------------------------------------
 # Standard 
-#-------------------------------------------------------------------------------
+#'------------------------------------------------------------------------------
 # Main <- 'C:/Projects/Yukon_River/Fall_Chum/MSA/' 
 # fdr <- paste0(Main, 'R_functions/')  # R functions
-#-------------------------------------------------------------------------------
-# Rprojects 
-#-------------------------------------------------------------------------------
+#'------------------------------------------------------------------------------
+# Projects 
+#'------------------------------------------------------------------------------
 fdr <- './R_functions/'
-#===============================================================================
-#  1.0 Run MSA Routine
+#'==============================================================================
+#  1.0 Run MSA Routine ----
 #       Check Yukon_Chum_MSA_RUN.R for details 
-#===============================================================================
-# Set current year 
-this.year <- 2022
-# PostSeason 
+#'==============================================================================
+# Is this PostSeason? 
 PostSeason <- TRUE
-# If you want to rewrite all historical estimates and ci 
-# (e.g. due to historical data update), set ciOverwrite to TRUE 
+# Overwrite historical data 
+# This is necessary when you updated historical data (e.g., Pilot numbers, MSAs)
 ciOverwrite <- FALSE
-#-------------------------------------------------------------------------------
-#  1.1: Set MSA data directory and file names 
-#-------------------------------------------------------------------------------
-source(paste0(fdr,'Yukon_Chum_MSA_RUN.R'))  
+# ggplot ?
+gg <- FALSE
+# Set year 
+this.year <- 2022
+#'------------------------------------------------------------------------------
+##  1.1: Set MSA data directory and file names ----
+#'------------------------------------------------------------------------------
+# Postseason data update 
+source(paste0(fdr,'Yukon_Chum_MSA_STD.R'))  
 
+EXlist <- list()   
+for(i in 1:ny){
+  EXlist[[i]] <- read.csv(paste0(wd_Sum,'Pilot_MSA_Sum_',years[i],'.csv'),stringsAsFactors = FALSE)
+}  
+test <- as.data.frame(do.call(rbind,EXlist))
+st108 <- test[test$Strata==108,]
+st108.w <- dcast(st108, Year~GroupName,value.var='p')
 
-#===============================================================================
-#  Graphics 
-#===============================================================================
+#'==============================================================================
+#  2.0 Graphics---- 
+#'==============================================================================
 windows(record=TRUE)
-#-------------------------------------------------------------------------------
-#  Pilot Run vs Sampling Strata 
-#------------------------------------------------------------------------------- 
+#'------------------------------------------------------------------------------
+##  2.1: Pilot Run vs Sampling Strata ----
+#'------------------------------------------------------------------------------ 
   if(gg==TRUE){
     ## ggplot version 
     ggplot() + theme_simple() + 
@@ -86,15 +99,21 @@ windows(record=TRUE)
     mtext("Dates ", side = 1, line = 1, outer = TRUE,cex=1.5)
   }
 
-#-------------------------------------------------------------------------------
-#  Plot mean stock proportion by sampling strata 
-#-------------------------------------------------------------------------------
+#'------------------------------------------------------------------------------
+##  2.2: Plot mean stock proportion by sampling strata 
+#'------------------------------------------------------------------------------
+# Read Pilot Stock proportion data 
 Pilot.stp <- Pilot.m[,c('Year','Strata','Run', ststocks)]
+# Change to Percentage 
 Pilot.stp[,ststocks] <- 100*Pilot.stp[,ststocks] /Pilot.stp$Run
+# Change wide to long format 
 Pilot.stpl <- melt(Pilot.stp[,c('Year','Strata',ststocks)], 
                    id.vars = c('Year','Strata'), variable.name = "group", value.name = "percent") 
+# Reorder by Year and stock 
 Pilot.stpl <- Pilot.stpl[order(Pilot.stpl$Year,Pilot.stpl$Strata),]
-gname <- stockID[stockID$grpID %in%ststockID,c('GroupName')]      
+# Extract stock group name  
+gname <- stockID[stockID$grpID %in%ststockID,c('GroupName')] 
+# Assign the name
 names(gname) <- ststockID
 
 # Base plot only: Have not created ggplot version  			
@@ -110,9 +129,9 @@ mtext('Stock %', side = 2, line = 1,las=0, outer = TRUE)
 mtext("Sampling Strata", side = 1, line = 1, outer = TRUE)
 
 
-#-------------------------------------------------------------------------------
-#  Plot mean stock proportion by Standard Strata
-#-------------------------------------------------------------------------------
+#'------------------------------------------------------------------------------
+## 2.3  Plot mean stock proportion by Standard Strata----
+#'------------------------------------------------------------------------------
 gname <- stockID[stockID$grpID %in%ststockID,c('GroupName')]      
 names(gname) <- ststockID
 
@@ -133,9 +152,9 @@ mtext(paste("Run stock proportion "), side = 3, line = 0, outer = TRUE)
 mtext('Stock %', side = 2, line = 1,las=0, outer = TRUE)
 mtext("Dates ", side = 1, line = 1, outer = TRUE)
 
-#-------------------------------------------------------------------------------
-#  Plot stock proportion by standard Strata min-max
-#-------------------------------------------------------------------------------
+#'------------------------------------------------------------------------------
+##  2.4 Plot stock proportion by standard Strata min-max ----
+#'------------------------------------------------------------------------------
 windows()
 par(mfrow=c(3,3),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l')
 fig.stock.id <- c(4,8,11,7,10,19,16,3)
@@ -156,9 +175,9 @@ mtext(paste("Run stock proportion "), side = 3, line = 0, outer = TRUE)
 mtext('Stock %', side = 2, line = 1, outer = TRUE)
 mtext("Dates ", side = 1, line = 1, outer = TRUE)
 
-#-------------------------------------------------------------------------------
-#  3.2 Summer vs. Fall
-#------------------------------------------------------------------------------- 
+#'------------------------------------------------------------------------------
+##  2.5 Summer vs. Fall --------
+#'------------------------------------------------------------------------------ 
   # Base plot 
   par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
   for(i in 1:ny){
@@ -207,9 +226,9 @@ mtext("Dates ", side = 1, line = 1, outer = TRUE)
   mtext("Dates ", side = 1, line = 1, outer = TRUE,cex=1.5)
   
 
-#-------------------------------------------------------------------------------
-#  3.2 Pie Chart 
-#------------------------------------------------------------------------------- 
+#'------------------------------------------------------------------------------
+##  2.6 Pie Chart ---- 
+#'------------------------------------------------------------------------------ 
 temp <- Pilot.fall[Pilot.fall$grpID %in% c(4,7,8,10,11,13,16),]
 temp$pct <- with(temp, paste0(round(100*p),'%'))
 par(mfrow=c(1,1))
