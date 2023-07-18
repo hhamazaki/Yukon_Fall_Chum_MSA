@@ -186,9 +186,9 @@ ci <- 90
 ###  2.1: Read Strata Data: This creates file: rstr ----
 #'-------------------------------------------------------------------------------
 # Read MSA Strata data
-# Read MSA prop table 
 if(exists('inSeason')){
-rstr <- read.csv(file.path(wd_Ins,strata_file_Ins),stringsAsFactors = FALSE)} else {
+rstr <- read.csv(file.path(wd_Ins,strata_file_Ins),stringsAsFactors = FALSE)
+  } else {
 rstr <- read.csv(file.path(wd_MSA,strata_file),stringsAsFactors = FALSE)
 }
 # Convert Date to Date format 
@@ -450,7 +450,7 @@ names(temp.sff)[2] <- 'Strata'
 #'-------------------------------------------------------------------------------
 ##  temp.m: Combine ALL Summary DATA ---- 
 #'-------------------------------------------------------------------------------
-# combine 
+# combine all data a
 temp.m <- rbind(temp.m.ysg, temp.t.yg,temp.sf.y,temp.ts,temp.sfs,temp.tf,temp.sff)
 # Add group ID
 temp.m$grpID <- as.numeric(as.character(temp.m$grpID))
@@ -493,7 +493,6 @@ if (exists('PostSeason')){
 #  CI update for overwrite 
 #'------------------------------------------------------------------------------
   if(isTRUE(ciOverwrite)){
-# Postseason and overwrite historical data  
   temp.ci <- list()
   mlist <- list()
   for(j in 1:ny){
@@ -519,7 +518,7 @@ if (exists('PostSeason')){
   write.xlsx(EXlist,sumxlsx,rowNames=FALSE)
   
 #'------------------------------------------------------------------------------
-### Summer-Fall Porportion, Summer-Fall Proportion by Standard strata ----
+### Summer-Fall Proportion total, Summer-Fall Proportion by Standard strata ----
 #'------------------------------------------------------------------------------
 #  Output Pilot Summer and Fall Proportion: Pilot_sfp 
   write.csv(Pilot.sfp,file.path(wd_Sum,'Pilot_sfp.csv'),na='',row.names=FALSE)
