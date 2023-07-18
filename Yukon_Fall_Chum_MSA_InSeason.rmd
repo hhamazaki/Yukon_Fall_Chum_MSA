@@ -55,10 +55,20 @@ Pilot_Var_Ins <- 'Daily Variance By Species.csv'
 #-------------------------------------------------------------------------------
 source(file.path(fdr,'Yukon_Chum_MSA_STD.R'))  
 # Standard Output Stock figures 
-ststockID <- c(2,7,8,10,11,19)
+ststockID <- c(4,7,8,10,11,19)
+#	4 (P) Lower 
+#	7 (P) UppKoy+Main
+#	8 (P) Tanana Summer
+#	10 (P) Tanana Fall  
+#	11 (P) Border US
+#	19 Total Canada (2004-present)
 # ststocks needed to read as character
 ststocks <- as.character(ststockID)
+# Standard break date 
+# '05/01','06/22','06/29','07/10','07/19','07/28','08/06','08/15','08/25','09/15'
 stbreak <- stb(this.year)
+# Pilot 
+
 Pilot.total <- mlist[mlist$Strata==100,]
 Pilot.summer <-mlist[mlist$Strata==101,]
 Pilot.fall <- mlist[mlist$Strata==102,]
@@ -76,11 +86,9 @@ names(lgnames) <- stockID$grpID
 #-------------------------------------------------------------------------------
 #  2.1: Read Summer vs. Fall % data
 #-------------------------------------------------------------------------------
-# Read MSA Strata data
-Pilot.d.min.max <- read.csv(file.path(wd_Sum,'Pilot_d_min_max_2022.csv'),stringsAsFactors = FALSE)
-#Pilot.d.min.max <- read.csv(paste0(wd_Sum,'Pilot_d_min_max_',this.year-1,'.csv'),stringsAsFactors = FALSE)
-
-# Read MSA Strata data
+# Read MSA minimum and max of the last year 
+Pilot.d.min.max <- read.csv(file.path(wd_Sum,paste0(wd_Sum,'Pilot_d_min_max_',this.year-1,'.csv')),stringsAsFactors = FALSE)
+# Read MSA Summer vs. Fall last year
 Pilot.hsft <- read.csv(file.path(wd_Sum,'Pilot_sft.csv'),stringsAsFactors = FALSE)
 # Find the number of years in the data 
 years <- unique(Pilot.hsft$Year)
@@ -101,7 +109,9 @@ library(rmarkdown)
 ```
 
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
-# Pilot Station timing 
+#-------------------------------------------------------------------------------
+#  Plot Pilot Station Passage and the strata break 
+#-------------------------------------------------------------------------------
 par(mfrow=c(1,1),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l',las=1)
   rstr.y <- rstr[rstr$Year==this.year,]
   xlims<-c(min(stbreak),max(stbreak))
@@ -144,6 +154,9 @@ mtext("Sampling Strata", side = 1, line = 1, outer = TRUE)
 Figure 2.  Mean proportion of chum salmon stock groups by sampling strata, Yukon Area, `r this.year`.
 
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
+#-------------------------------------------------------------------------------
+#  Plot passage by stock and strata 
+#-------------------------------------------------------------------------------
 Pilot.stn <- Pilot.m[,c('Year','Strata','Run', c('4','7','8','11','19','10'))]
 gname <- lgnames[c('4','7','8','11','19','10')]      
 
@@ -161,7 +174,7 @@ Figure 2.5  Mean proportion of chum salmon stock groups by sampling strata, Yuko
 
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
-#  Plot mean stock proportion by Standard Strata
+#  Plot stock proportion by Standard Strata
 #-------------------------------------------------------------------------------
 gname <- stockID[stockID$grpID %in%ststockID,c('GroupName')]      
 names(gname) <- ststockID
@@ -186,9 +199,13 @@ mtext("Dates", side = 1, line = 1, outer = TRUE)
 ```
 Figure 3.  Mean proportion of chum salmon stock groups by standard sampling strata, Yukon Area, 2004-`r this.year-1`.
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
+#-------------------------------------------------------------------------------
+#  Plot mean stock prop overlapped by historical min-max
+#-------------------------------------------------------------------------------
 par(mfrow=c(4,2),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l')
 fig.stock.id <- c(4,7,8,10,11,19,16,3)
-for(j in 1:8){
+n <- length(fig.stock.id)
+for(j in 1:n){
   temp1 <- with(Pilot.d.min.max, Pilot.d.min.max[group ==fig.stock.id[j],])
   temp1 <- temp1[order(temp1$stbreak),]
   plot(Mean~stbreak,data=temp1, type='n',xlim=c(1,9),ylim=c(0,100), 
@@ -200,7 +217,6 @@ for(j in 1:8){
   with(temp1,polygon(c(stbreak,rev(stbreak)),c(Min,rev(Max)),col=tcol('gray',0),border=NA))
   lines(percent~stbreak,lwd=2,col=2, data=Pilot.sd[Pilot.sd$ group ==fig.stock.id[j],])
   }
-
 mtext(paste("Stock Proportion thru Run"), side = 3, line = 0, outer = TRUE)
 mtext('Stock Percent', side = 2, line = 1, outer = TRUE)
 mtext("Dates", side = 1, line = 1, outer = TRUE)
@@ -208,8 +224,14 @@ mtext("Dates", side = 1, line = 1, outer = TRUE)
 ```
 Figure 4.  Minimum and maximum (2004-`r this.year-1`) and `r this.year` mean stock proportion by standard sampling strata, comparing the major chum salmon components, Yukon Area.
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
+#-------------------------------------------------------------------------------
+# Plot Summer vs. Fall cross over all years and strata
+#-------------------------------------------------------------------------------
   par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
-  yax <- c(1,which(1:(ny+1)%%5==0)+1)
+# yax: Index determining vertical axis needs to be labeled 
+  yax <- c(1,which(1:(ny+1)%%5==0)+1) 
+# sax: Index determining horizontal axis needs to be labeled  
+  xax <- ny-(ny+1)%%5
   for(i in 1:ny){
     temp <- with(Pilot.hsft, Pilot.hsft[Year==years[i],])
     plot(Summer~stbreak, type ='o',col=4, xlim=c(1,9),ylim=c(0,100), 
@@ -218,7 +240,7 @@ Figure 4.  Minimum and maximum (2004-`r this.year-1`) and `r this.year` mean sto
     axis(2, seq(0,100,20),las=2, labels=NA)
     if (i %in% yax) axis(2, seq(0,100,20),las=2, font=2)
     axis(1, seq(1,9,1),labels = NA,cex.axis = 0.9)
-    if (i > ny-(ny+1)%%5) axis(1, seq(1,9,1), labels = stbl,cex.axis = 0.9)
+    if (i > xax) axis(1, seq(1,9,1), labels = stbl,cex.axis = 0.9)
   }
 # This year 
  plot(Summer~stbreak, type ='o',col=4, xlim=c(1,9),ylim=c(0,100), 
@@ -233,7 +255,10 @@ Figure 4.  Minimum and maximum (2004-`r this.year-1`) and `r this.year` mean sto
 ```
 Figure 5.  Crossover of summer and fall chum salmon based on genetic stock analysis (standard sampling strata), Yukon Area, 1999-2002 using allozymes and 2004-`r this.year` using microsatellites.
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
-  par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
+#-------------------------------------------------------------------------------
+# Plot Summer vs. Fall cross over all years and strata
+#-------------------------------------------------------------------------------
+ par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
     for(i in 1:ny){
     temp <- with(Pilot.hsft, Pilot.hsft[Year==years[i],])
     plot(Summer~stbreak, type ='o',col=4, xlim=c(4,6),ylim=c(0,100), 
@@ -242,7 +267,7 @@ Figure 5.  Crossover of summer and fall chum salmon based on genetic stock analy
     axis(2, seq(0,100,20),las=2, labels=NA)
     if (i %in% yax) axis(2, seq(0,100,20),las=2, font=2)
     axis(1, seq(1,9,1),labels = NA,cex.axis = 0.9)
-    if (i > ny-(ny+1)%%5) axis(1, seq(1,9,1), labels = stbl,cex.axis = 0.9)
+    if (i >xax) axis(1, seq(1,9,1), labels = stbl,cex.axis = 0.9)
     }
 # This year 
   plot(Summer~stbreak, type ='o',col=4, xlim=c(4,6),ylim=c(0,100), 
