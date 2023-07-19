@@ -137,19 +137,8 @@ source(file.path(fdr,'Yukon_Chum_MSA_ReadData.R'))  # Function sets used for MSA
 ##  1.4: Set MSA and Pilot data file names ---- 
 #'------------------------------------------------------------------------------
 # Strata info file name 
-strata_file <- 'MSA_Strata.csv'
-# Stock Prop info file name 
-stock_prop_file <- 'MSA_prop.csv'
 # Stock ID file name 
 stock_id_file <- 'StockID.csv'
-# Pilot Station Run  
-Pilot_Run <- 'Daily_Passage_By_Species_'
-# Pilot Station Var  
-Pilot_Var <- 'Daily_Variance_By_Species_'
-# Output EXCEL file name 
-sumxlsx <- paste0('Yukon_Pilot_Chum_MSA_',Sys.Date(),'.xlsx')
-# Output min_max file name 
-min_max <- paste0('Pilot_d_min_max_',this.year,'.csv')
 #'------------------------------------------------------------------------------
 
 #'------------------------------------------------------------------------------
@@ -521,9 +510,9 @@ if (exists('PostSeason')){
 ### Summer-Fall Proportion total, Summer-Fall Proportion by Standard strata ----
 #'------------------------------------------------------------------------------
 #  Output Pilot Summer and Fall Proportion: Pilot_sfp 
-  write.csv(Pilot.sfp,file.path(wd_Sum,'Pilot_sfp.csv'),na='',row.names=FALSE)
+  write.csv(Pilot.sfp,file.path(wd_Sum,sf_p),na='',row.names=FALSE)
 #  Output Pilot Summer and Fall Standard time frame : Pilot_sft
-  write.csv(Pilot.sft,file.path(wd_Sum,'Pilot_sft.csv'),na='',row.names=FALSE)
+  write.csv(Pilot.sft,file.path(wd_Sum,sf_t),na='',row.names=FALSE)
   
 #'-------------------------------------------------------------------------------
 ###   Pilot.sd.min.max:Estimate mean stock proportion by standard strata ----  

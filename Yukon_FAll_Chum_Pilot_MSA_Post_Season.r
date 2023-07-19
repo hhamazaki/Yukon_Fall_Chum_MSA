@@ -55,6 +55,34 @@ gg <- FALSE
 # Set year 
 this.year <- 2022
 #'------------------------------------------------------------------------------
+##  1.0 : Set MSA and Pilot data file names ---- 
+#'------------------------------------------------------------------------------
+# Strata info file name 
+strata_file <- 'MSA_Strata.csv'
+# Stock Prop info file name 
+stock_prop_file <- 'MSA_prop.csv'
+# Stock ID file name 
+stock_id_file <- 'StockID.csv'
+# Pilot Station Run  
+Pilot_Run <- 'Daily_Passage_By_Species_'
+# Pilot Station Var  
+Pilot_Var <- 'Daily_Variance_By_Species_'
+#'------------------------------------------------------------------------------
+#' Output file names 
+#'------------------------------------------------------------------------------ 
+# Output EXCEL file name 
+sumxlsx <- paste0('Yukon_Pilot_Chum_MSA_',Sys.Date(),'.xlsx')
+# Output Annual Stock proportions by summer and fall:
+sf_p <- 'Pilot_sfp.csv'
+# Output Annual Summer vs. Fall Stock proportions by standard break:
+sf_t <- 'Pilot_sft.csv'
+# Output min_max file name 
+min_max <- paste0('Pilot_d_min_max_',this.year,'.csv')
+
+#'------------------------------------------------------------------------------
+
+
+#'------------------------------------------------------------------------------
 ##  1.1: Set MSA data directory and file names ----
 #'------------------------------------------------------------------------------
 # Postseason data update 
