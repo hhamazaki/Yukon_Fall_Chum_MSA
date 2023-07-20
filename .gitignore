@@ -26,4 +26,8 @@ vignettes/*.pdf
 *.knit.md
 # R Environment Variables
 .Renviron
-Yukon_Pilot_Chum_MSA_2023-07-17.xlsx
+# Folders
+Output/
+data/
+
+

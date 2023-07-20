@@ -463,17 +463,16 @@ if (exists('PostSeason')){
 #  CI update for overwrite 
 #'------------------------------------------------------------------------------
   if(isTRUE(ciOverwrite)){
-  temp.ci <- list()
-  mlist <- list()
+#  temp.ci <- list()
+#  mlist <- list()
   for(j in 1:ny){
   # Stock prop
   MSA.y <- MSAL[MSAL$Year==years[j],]
   # Pilot st 
   Temp.st <- Pilot.st.y[Pilot.st.y$Year==years[j],]
-  temp.ci[[j]] <- sim.ci(MSA.y,Temp.st,sgrpIDn,nrep,ci,years[j])
-  mlist[[j]] <- sumdata(temp.m[temp.m$Year==years[j],],temp.ci[[j]])
-  names(mlist[[j]]) <- years[j]
-  write.csv(mlist[[j]],file.path(wd_Sum,paste0('Pilot_MSA_Sum_',years[j],'.csv')),
+  temp.ci <- sim.ci(MSA.y,Temp.st,sgrpIDn,nrep,ci,years[j])
+  mlist <- sumdata(temp.m[temp.m$Year==years[j],],temp.ci)
+  write.csv(mlist,file.path(wd_Sum,paste0('Pilot_MSA_Sum_',years[j],'.csv')),
                                  na='',row.names=FALSE)
       } # End for Year [j]
    } 
@@ -485,7 +484,7 @@ if (exists('PostSeason')){
       EXlist[[i]] <- read.csv(file.path(wd_Sum,paste0('Pilot_MSA_Sum_',years[i],'.csv')),stringsAsFactors =  FALSE)
       }  
   names(EXlist) <- years	  
-  write.xlsx(EXlist,sumxlsx,rowNames=FALSE)
+  write.xlsx(EXlist,file.path(wd_Out,sumxlsx),rowNames=FALSE)
   
 #'------------------------------------------------------------------------------
 ### Summer-Fall Proportion total, Summer-Fall Proportion by Standard strata ----

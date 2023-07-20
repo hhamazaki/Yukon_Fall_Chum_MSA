@@ -40,7 +40,8 @@ rm(list = ls(all = TRUE))
 #'------------------------------------------------------------------------------
 # Projects 
 #'------------------------------------------------------------------------------
-fdr <- './R_functions/'
+fdr <- './R_functions'
+wd_Out <- './Output'
 #'==============================================================================
 #  1.0 Run MSA Routine ----
 #       Check Yukon_Chum_MSA_RUN.R for details 
@@ -49,7 +50,7 @@ fdr <- './R_functions/'
 PostSeason <- TRUE
 # Overwrite historical data 
 # This is necessary when you updated historical data (e.g., Pilot numbers, MSAs)
-ciOverwrite <- FALSE
+ciOverwrite <- TRUE
 # ggplot ?
 gg <- FALSE
 # Set year 
