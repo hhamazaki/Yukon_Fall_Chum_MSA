@@ -127,6 +127,7 @@ fdr <- './R_functions'
 wd_MSA <- './data/MSA_data'
 wd_Plt <- './data/Pilot_data'
 wd_Sum <- './data/Summary_data'
+#wd_Ins <- './data/Inseason'
 #'------------------------------------------------------------------------------
 ## 1.3 Import Source files ---- 
 #'------------------------------------------------------------------------------
@@ -334,26 +335,6 @@ Pilot.sd$percent[Pilot.sd$percent==0]<-NA
 #             stgrpIDn
 #  Functions Used: grpclean, add.sum, ciout
 #'==============================================================================
-#'------------------------------------------------------------------------------
-##  Function: ciout:  CI Summary function ---- 
-#'------------------------------------------------------------------------------
- ciout <- function(datM,ci,year=NA,season=NA){
-  datM <- grpclean(datM,year)
-  # Add additional stocks   
-  datM <- add.sum(datM,year)
-  if(is.na(season)){
-  } else if(season=='s'){
-  datM <- summer.p(datM)
-  } else if(season=='f'){
-  datM <- fall.p(datM)
-  }   
-# Calculate CI 
-  temp <-  data.frame(s.functions(datM,ci))
-# Add stock group id
-  temp$grpID <- as.numeric(rownames(temp))
-  return(temp)
-  }
-
 #'------------------------------------------------------------------------------
 ## 4.1  Summarize Pilot data by Sampling-summer-fall strata ----
 #'------------------------------------------------------------------------------
