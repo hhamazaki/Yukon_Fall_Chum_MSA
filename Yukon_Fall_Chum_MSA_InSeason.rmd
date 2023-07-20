@@ -14,6 +14,7 @@ knit: (function(input, ...) {
       output_file = paste0(
         xfun::sans_ext(input), '-', Sys.Date(), '.docx'
       ),
+      output_dir = file.path('./Output'),
       envir = globalenv()
     )
   })
@@ -87,7 +88,7 @@ names(lgnames) <- stockID$grpID
 #  2.1: Read Summer vs. Fall % data
 #-------------------------------------------------------------------------------
 # Read MSA minimum and max of the last year 
-Pilot.d.min.max <- read.csv(file.path(wd_Sum,paste0(wd_Sum,'Pilot_d_min_max_',this.year-1,'.csv')),stringsAsFactors = FALSE)
+Pilot.d.min.max <- read.csv(file.path(wd_Sum,paste0('Pilot_d_min_max_',this.year-1,'.csv')),stringsAsFactors = FALSE)
 # Read MSA Summer vs. Fall last year
 Pilot.hsft <- read.csv(file.path(wd_Sum,'Pilot_sft.csv'),stringsAsFactors = FALSE)
 # Find the number of years in the data 
