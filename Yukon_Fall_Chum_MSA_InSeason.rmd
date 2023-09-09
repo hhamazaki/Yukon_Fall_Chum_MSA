@@ -119,7 +119,7 @@ par(mfrow=c(1,1),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l',las=1)
   plot(Run~Date, type='h',lwd=4,col='gray',data=Pilot,xlim=xlims,xaxt='n')
   axis.Date(1, at = stbreak,format= "%b%d",cex=0.6)
   abline(v=c(rstr.y$Strata_Start_Date),col=4,lwd=2)
-  abline(v=max(rstr.y$Strata_End_Date),col=2,lwd=2)
+  abline(v=max(rstr.y$Strata_End_Date,na.rm=TRUE),col=2,lwd=2)
 mtext(paste("Sampling Strata"), side = 3, line = 0, outer = TRUE,cex=1.5)
 mtext('Number of Salmon', side = 2, line = 1.5, las=0, outer = TRUE,cex=1.5)
 mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
@@ -288,18 +288,18 @@ if(dim(Pilot.fall)[1]>0){
 temp$pct <- with(temp, paste0(round(100*p),'%'))
 par(mfrow=c(1,1),mar = c(4,4,4,7),oma = c(3,3,3,3))
 pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=c(2:8),main="Stock Proportion (July 19 to End of Season)")
-#par(new=TRUE)
-#pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))
-#pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion (July 19 to End of Season)")
+par(new=TRUE)
+pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))
+pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion (July 19 to End of Season)")
 }
 ```
 Figure 7. Contributions of chum salmon based on genetic analysis during the fall season (July 19 to end of season), sampled at the mainstem sonar operated near Pilot Station, Yukon Area, `r this.year`.
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
 if(dim(Pilot.fallinfall)[1]>0){
-  temp <- Pilot.fallinfall[Pilot.fallinfall$grpID %in% c(10,11,19),]
-temp$pct <- with(temp, paste0(round(100*p),'%'))
-par(mfrow=c(1,1),mar = c(4,4,4,7),oma = c(3,3,3,3))
-pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=c(2:8),main="Stock Proportion (July 19 to End of Season)")
+#  temp <- Pilot.fallinfall[Pilot.fallinfall$grpID %in% c(10,11,19),]
+#temp$pct <- with(temp, paste0(round(100*p),'%'))
+#par(mfrow=c(1,1),mar = c(4,4,4,7),oma = c(3,3,3,3))
+#pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=c(2:8),main="Stock Proportion (July 19 to End of Season)")
 #par(new=TRUE)
 #pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))
 #pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion (July 19 to End of Season)")

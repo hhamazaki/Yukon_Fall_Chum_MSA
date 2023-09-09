@@ -487,6 +487,48 @@ if (exists('PostSeason')){
   write.xlsx(EXlist,file.path(wd_Out,sumxlsx),rowNames=FALSE)
   
 #'------------------------------------------------------------------------------
+###  EXCEL Annual table output ------------
+#'------------------------------------------------------------------------------
+# Change Pilot Data from list to data.frame 
+Pilot.df <- as.data.frame(do.call(rbind,EXlist))
+# Extract necessary data from Starata 102 
+st102.s <- Pilot.df[with(Pilot.d,which(Strata==102 & grpID %in% c(10,11,13,2,9,15,16,19))), ]
+
+### JTC Table A7 (Prop) ---------------
+# Change long to wide 
+JTC.A7.p <-dcast(st102.s, Year~GroupName,value.var='p') 
+# Extract and arrange columns 
+JTC.A7.p <- JTC.A7.p[,c(1,9,8,6,2,4,7)]
+names(JTC.A7.p)[-1] <- c('Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.','Canada')
+### JTC Table A7 (Number) ---------------
+JTC.A7.n <-dcast(st102.s, Year~GroupName,value.var='mean') 
+JTC.A7.n <- JTC.A7.n[,c(1,9,8,6,2,4,7)]
+names(JTC.A7.n)[-1] <- c('Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.','Canada')
+
+### Table 108 ----------------
+# Extract strata  108
+st108 <- Pilot.df[Pilot.df$Strata==108,]
+# Change long to wide
+st108.w <- dcast(st108, Year~GroupName,value.var='p')
+# Add CA main
+st108.w$camain <- with(st102.s,st102.s[grpID==16,'mean']/st102.s[grpID==9,'mean'])
+# Add Porcupine
+st108.w$caporc <- with(st102.s,st102.s[grpID==13,'mean']/st102.s[grpID==9,'mean'])
+# Arrange Column order
+st108.w <- st108.w[,c(1,3,2,4,5,6)]
+# Change name: 
+names(st108.w)[-1] <- c('Tanana Fall','Border U.S.','Total Canada','Mainstem Canada','Porcupine')
+st108.wm <- st108.w
+st108.wm[,-1] <- st108.wm[,-1]*st102.s[st102.s$grpID==9,'mean']
+
+out.excel <- list()
+out.excel$JTC.A7.p <- JTC.A7.p
+out.excel$JTC.A7.n <- JTC.A7.n
+out.excel$St108.p <- st108.w
+out.excel$St108.n <- st108.wm
+write.xlsx(out.excel,file.path(wd_Out,'out_table.xlsx'),rowNames=FALSE)
+    
+#'------------------------------------------------------------------------------
 ### Summer-Fall Proportion total, Summer-Fall Proportion by Standard strata ----
 #'------------------------------------------------------------------------------
 #  Output Pilot Summer and Fall Proportion: Pilot_sfp 

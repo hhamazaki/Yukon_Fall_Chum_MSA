@@ -50,7 +50,7 @@ wd_Out <- './Output'
 PostSeason <- TRUE
 # Overwrite historical data 
 # This is necessary when you updated historical data (e.g., Pilot numbers, MSAs)
-ciOverwrite <- TRUE
+ciOverwrite <- FALSE
 # ggplot ?
 gg <- FALSE
 # Set year 
@@ -87,15 +87,13 @@ min_max <- paste0('Pilot_d_min_max_',this.year,'.csv')
 ##  1.1: Set MSA data directory and file names ----
 #'------------------------------------------------------------------------------
 # Postseason data update 
-source(paste0(fdr,'Yukon_Chum_MSA_STD.R'))  
+source(file.path(fdr,'Yukon_Chum_MSA_STD.R'))  
 
 EXlist <- list()   
 for(i in 1:ny){
-  EXlist[[i]] <- read.csv(paste0(wd_Sum,'Pilot_MSA_Sum_',years[i],'.csv'),stringsAsFactors = FALSE)
+  EXlist[[i]] <- read.csv(file.path(wd_Sum,paste0('Pilot_MSA_Sum_',years[i],'.csv')),stringsAsFactors = FALSE)
 }  
-test <- as.data.frame(do.call(rbind,EXlist))
-st108 <- test[test$Strata==108,]
-st108.w <- dcast(st108, Year~GroupName,value.var='p')
+
 
 #'==============================================================================
 #  2.0 Graphics---- 
@@ -265,3 +263,5 @@ pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=c(2:8),main="Stock Propo
 par(new=TRUE)
 pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))
 pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion")
+
+

@@ -19,11 +19,11 @@ read.Pilot.data <- function(rstr,year,inSeason=FALSE){
  # Remove the last 6 lines
   run <- run[1:(dim(run)[1]-6),]
 # If fall chum column does not exist, add fall chum  
-   if(is.na(names(run)['FCHUM'])){run$FCHUM<-0} 
+   if(isFALSE('FCHUM'%in%names(run))){run$FCHUM<-0} 
   # Remove the last 6 lines
   rvar <- rvar[1:(dim(rvar)[1]-2),]
 # If fall chum column does not exist, add fall chum  
-  if(is.na(names(rvar)['FCHUM'])){rvar$FCHUM<-0}
+  if(isFALSE('FCHUM'%in%names(rvar))){rvar$FCHUM<-0}
   } else{
   run <- read.csv(file.path(wd_Plt,paste0(Pilot_Run,year,'.csv')),stringsAsFactors = FALSE)
   rvar <- read.csv(file.path(wd_Plt,paste0(Pilot_Var,year,'.csv')),stringsAsFactors = FALSE)
