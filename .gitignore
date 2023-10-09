@@ -29,5 +29,9 @@ vignettes/*.pdf
 # Folders
 Output/
 data/
+# Files 
+*.csv 
+*.docx
+*.xlsx
 
 
