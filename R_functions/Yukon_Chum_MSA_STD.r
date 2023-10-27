@@ -492,7 +492,7 @@ if (exists('PostSeason')){
 # Change Pilot Data from list to data.frame 
 Pilot.df <- as.data.frame(do.call(rbind,EXlist))
 # Extract necessary data from Starata 102 
-st102.s <- Pilot.df[with(Pilot.d,which(Strata==102 & grpID %in% c(10,11,13,2,9,15,16,19))), ]
+st102.s <- Pilot.df[with(Pilot.df,which(Strata==102 & grpID %in% c(10,11,13,2,9,15,16,19))), ]
 
 ### JTC Table A7 (Prop) ---------------
 # Change long to wide 

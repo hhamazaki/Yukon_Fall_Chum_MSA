@@ -138,7 +138,7 @@ add.sum <- function(datM,Year=NA) {
 #-------------------------------------------------------------------------------
 #  summer.p, fall.p  proporion of individual stock among summer/fall groups
 #  NA if component stocks are missing
-#  cn: number of colums that has Year and strata info 
+#  cn: number of columns that has Year and strata info 
 #-------------------------------------------------------------------------------
 summer.p <-function(datM,cn=NA){
   if(is.na(cn)){
@@ -163,8 +163,6 @@ fall.p <- function(datM,cn=NA){
   }
   return(mp)
 }
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -203,7 +201,25 @@ s.functions <- function(datamatrix,ci){
   return(m)  
 }
 
-
+#'------------------------------------------------------------------------------
+##  Function: Wilson.ci Interval  
+#'------------------------------------------------------------------------------
+wilson.ci <- function(p,sn,z){
+   d1 <- 1/(1+z^2/sn)
+   d2 <- p+(z^2)/(2*sn)
+   d3 <- p*(1-p)/sn -(z^2)/(4*sn^2)
+   cil <- d1*(d2 - z*sqrt(d3))
+   ciu <- d1*(d2 + z*sqrt(d3))
+   out <- c(cil,ciu)
+   return(out)
+ }
+#'------------------------------------------------------------------------------
+##  Goodman's variance multiplication   
+#'------------------------------------------------------------------------------
+goodman <- function(x,x.var,y,y.var){
+  out <- y.var*x^2+x.var*y^2-x.var*y.var
+  retun(out)
+}
 #'------------------------------------------------------------------------------
 ##  Function: ciout:  CI Summary function ---- 
 #'------------------------------------------------------------------------------
