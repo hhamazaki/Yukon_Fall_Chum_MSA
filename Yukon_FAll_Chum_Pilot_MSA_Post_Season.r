@@ -47,14 +47,14 @@ wd_Out <- './Output'
 #       Check Yukon_Chum_MSA_RUN.R for details 
 #'==============================================================================
 # Is this PostSeason? 
-PostSeason <- TRUE
+postSeason <- TRUE
 # Overwrite historical data 
 # This is necessary when you updated historical data (e.g., Pilot numbers, MSAs)
 ciOverwrite <- FALSE
 # ggplot ?
 gg <- FALSE
 # Set year 
-this.year <- 2022
+this.year <- 2023
 #'------------------------------------------------------------------------------
 ##  1.0 : Set MSA and Pilot data file names ---- 
 #'------------------------------------------------------------------------------
@@ -88,11 +88,6 @@ min_max <- paste0('Pilot_d_min_max_',this.year,'.csv')
 #'------------------------------------------------------------------------------
 # Postseason data update 
 source(file.path(fdr,'Yukon_Chum_MSA_STD.R'))  
-
-EXlist <- list()   
-for(i in 1:ny){
-  EXlist[[i]] <- read.csv(file.path(wd_Sum,paste0('Pilot_MSA_Sum_',years[i],'.csv')),stringsAsFactors = FALSE)
-}  
 
 
 #'==============================================================================

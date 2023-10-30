@@ -127,7 +127,8 @@ fdr <- './R_functions'
 wd_MSA <- './data/MSA_data'
 wd_Plt <- './data/Pilot_data'
 wd_Sum <- './data/Summary_data'
-#wd_Ins <- './data/Inseason'
+wd_Ins <- './data/Inseason'
+
 #'------------------------------------------------------------------------------
 ## 1.3 Import Source files ---- 
 #'------------------------------------------------------------------------------
@@ -176,12 +177,14 @@ ci <- 90
 ###  2.1: Read Strata Data: This creates file: rstr ----
 #'-------------------------------------------------------------------------------
 # Read MSA Strata data
+if(exists('postSeason')){
+  rstr <- read.dir.files(file.path(wd_MSA,'MSA_Strata'))
+  }
 if(exists('inSeason')){
 rstr <- read.csv(file.path(wd_Ins,strata_file_Ins),stringsAsFactors = FALSE)
-  } else {
-rstr <- read.csv(file.path(wd_MSA,strata_file),stringsAsFactors = FALSE)
-}
+ }
 # Convert Date to Date format 
+
 rstr$Strata_Start_Date <- as.Date(rstr$Strata_Start_Date,'%m/%d/%Y')
 rstr$Strata_End_Date <- as.Date(rstr$Strata_End_Date,'%m/%d/%Y')
 # sort data by Start date
@@ -199,10 +202,10 @@ stockID <-  read.csv(file.path(wd_MSA,stock_id_file),stringsAsFactors = FALSE)
 # Read MSA prop table 
 if(exists('inSeason')){
 MSA <- read.csv(file.path(wd_Ins,stock_prop_file_Ins),stringsAsFactors = FALSE)
-} else {
-MSA <- read.csv(file.path(wd_MSA,stock_prop_file),stringsAsFactors = FALSE)
 }
-
+if(exists('postSeason')){
+  MSA <- read.dir.files(file.path(wd_MSA,'MSA_prop'))
+  }
 # Extract primary groupID
 MSAs <- MSA[MSA$grpID %in% stgrpID,]
 # Change Long to Wide format
@@ -219,7 +222,7 @@ MSAL <- merge(MSAL,rstr[,c('Year','Strata','Sample_Size')],by=c('Year','Strata')
 #       This creates Daily Pilot run and var with strata info
 #'------------------------------------------------------------------------------
 #  If PostSeason is TRUE, then read all historical Pilot data. 
-if(exists('PostSeason')){ 
+if(exists('postSeason')){ 
   # Create list file
   Pilot.list <- list()  
   for(i in 1:ny){
@@ -458,7 +461,7 @@ return(tempm)
 #'------------------------------------------------------------------------------
 ##  Post season Output ----
 #'------------------------------------------------------------------------------
-if (exists('PostSeason')){
+if (exists('postSeason')){
 #'------------------------------------------------------------------------------
 #  CI update for overwrite 
 #'------------------------------------------------------------------------------

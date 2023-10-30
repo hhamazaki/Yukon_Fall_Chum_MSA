@@ -1,0 +1,133 @@
+"Year","Strata","Report_Group","grpID","Mean","SD","95CIL","95CIU"
+2001,1,"Total Summer",2,0.9934,,0.9377,1
+2001,1,"Lower Summer",4,0.9934,,0.7951,1
+2001,1,"Middle Summer",5,0,,0,0.1855
+2001,1,"UppKoy+Main",7,,,,
+2001,1,"Tanana Summer",8,,,,
+2001,1,"Total Fall",9,0.0066,,0,0.0623
+2001,1,"Tanana Fall",10,0,,,
+2001,1,"Border US",11,,,,
+2001,1,"Border CA",12,,,,
+2001,1,"Porcupine CA",13,,,,
+2001,1,"Mainstem CA",14,,,,
+2001,1,"Upper Canada",1,,,,
+2001,1,"White UC",3,0,,0,0
+2001,1,"Teslin UC",6,0.0066,,0,0.0485
+2001,1,"Fall US",15,,,,
+2001,1,"Mainstem+Upper CA",16,,,,
+2001,1,"Border US+Canada",17,0.0066,,,
+2001,1,"Total USA",18,,,,
+2001,1,"Total Canada",19,,,,
+2001,1,"Toklat",20,0,,0,0
+2001,1,"Upper Tanana",21,0,,0,0
+2001,1,"Border US+Border CA",22,0,,0,0.0222
+2001,2,"Total Summer",2,0.9757,,0.8109,1
+2001,2,"Lower Summer",4,0.6867,,0.5215,0.856
+2001,2,"Middle Summer",5,0.289,,0.0371,0.4319
+2001,2,"UppKoy+Main",7,,,,
+2001,2,"Tanana Summer",8,,,,
+2001,2,"Total Fall",9,0.0243,,0,0.1891
+2001,2,"Tanana Fall",10,0,,,
+2001,2,"Border US",11,,,,
+2001,2,"Border CA",12,,,,
+2001,2,"Porcupine CA",13,,,,
+2001,2,"Mainstem CA",14,,,,
+2001,2,"Upper Canada",1,,,,
+2001,2,"White UC",3,0.0243,,0,0.0696
+2001,2,"Teslin UC",6,0,,0,0.0446
+2001,2,"Fall US",15,,,,
+2001,2,"Mainstem+Upper CA",16,,,,
+2001,2,"Border US+Canada",17,0.0243,,,
+2001,2,"Total USA",18,,,,
+2001,2,"Total Canada",19,,,,
+2001,2,"Toklat",20,0,,0,0.0644
+2001,2,"Upper Tanana",21,0,,0,0.0505
+2001,2,"Border US+Border CA",22,0,,0,0.1448
+2001,3,"Total Summer",2,0.8403,,0.7023,0.9999
+2001,3,"Lower Summer",4,0.7557,,0.5789,0.9449
+2001,3,"Middle Summer",5,0.0847,,0,0.3256
+2001,3,"UppKoy+Main",7,,,,
+2001,3,"Tanana Summer",8,,,,
+2001,3,"Total Fall",9,0.1597,,0.0001,0.2977
+2001,3,"Tanana Fall",10,0.1214,,,
+2001,3,"Border US",11,,,,
+2001,3,"Border CA",12,,,,
+2001,3,"Porcupine CA",13,,,,
+2001,3,"Mainstem CA",14,,,,
+2001,3,"Upper Canada",1,,,,
+2001,3,"White UC",3,0,,0,0.0335
+2001,3,"Teslin UC",6,0,,0,0
+2001,3,"Fall US",15,,,,
+2001,3,"Mainstem+Upper CA",16,,,,
+2001,3,"Border US+Canada",17,0.0382,,,
+2001,3,"Total USA",18,,,,
+2001,3,"Total Canada",19,,,,
+2001,3,"Toklat",20,0.1214,,0,0.2251
+2001,3,"Upper Tanana",21,0,,0,0.031
+2001,3,"Border US+Border CA",22,0.0382,,0,0.2078
+2001,4,"Total Summer",2,0.3044,,0.1772,0.4734
+2001,4,"Lower Summer",4,0.1365,,0.0593,0.276
+2001,4,"Middle Summer",5,0.1679,,0.0047,0.3423
+2001,4,"UppKoy+Main",7,,,,
+2001,4,"Tanana Summer",8,,,,
+2001,4,"Total Fall",9,0.6856,,0.5365,0.8258
+2001,4,"Tanana Fall",10,0,,,
+2001,4,"Border US",11,,,,
+2001,4,"Border CA",12,,,,
+2001,4,"Porcupine CA",13,,,,
+2001,4,"Mainstem CA",14,,,,
+2001,4,"Upper Canada",1,,,,
+2001,4,"White UC",3,0.0057,,0,0.1091
+2001,4,"Teslin UC",6,0,,0,0
+2001,4,"Fall US",15,,,,
+2001,4,"Mainstem+Upper CA",16,,,,
+2001,4,"Border US+Canada",17,0.6856,,,
+2001,4,"Total USA",18,,,,
+2001,4,"Total Canada",19,,,,
+2001,4,"Toklat",20,0,,0,0.005
+2001,4,"Upper Tanana",21,0,,0,0
+2001,4,"Border US+Border CA",22,0.6799,,0.4781,0.8034
+2001,5,"Total Summer",2,0.1241,,0.0705,0.3156
+2001,5,"Lower Summer",4,0.1241,,0.0294,0.2171
+2001,5,"Middle Summer",5,0.0001,,0,0.2078
+2001,5,"UppKoy+Main",7,,,,
+2001,5,"Tanana Summer",8,,,,
+2001,5,"Total Fall",9,0.8759,,0.6844,0.9295
+2001,5,"Tanana Fall",10,0.0818,,,
+2001,5,"Border US",11,,,,
+2001,5,"Border CA",12,,,,
+2001,5,"Porcupine CA",13,,,,
+2001,5,"Mainstem CA",14,,,,
+2001,5,"Upper Canada",1,,,,
+2001,5,"White UC",3,0.1514,,0.0055,0.2432
+2001,5,"Teslin UC",6,0.0584,,0,0.1494
+2001,5,"Fall US",15,,,,
+2001,5,"Mainstem+Upper CA",16,,,,
+2001,5,"Border US+Canada",17,0.794,,,
+2001,5,"Total USA",18,,,,
+2001,5,"Total Canada",19,,,,
+2001,5,"Toklat",20,0.0778,,0,0.1707
+2001,5,"Upper Tanana",21,0.004,,0,0.1714
+2001,5,"Border US+Border CA",22,0.5842,,0.3432,0.7685
+2001,6,"Total Summer",2,0.1012,,0.0383,0.306
+2001,6,"Lower Summer",4,0.0787,,0,0.1874
+2001,6,"Middle Summer",5,0.0225,,0,0.2278
+2001,6,"UppKoy+Main",7,,,,
+2001,6,"Tanana Summer",8,,,,
+2001,6,"Total Fall",9,0.8988,,0.694,0.9619
+2001,6,"Tanana Fall",10,0.7035,,,
+2001,6,"Border US",11,,,,
+2001,6,"Border CA",12,,,,
+2001,6,"Porcupine CA",13,,,,
+2001,6,"Mainstem CA",14,,,,
+2001,6,"Upper Canada",1,,,,
+2001,6,"White UC",3,0.2222,,0.0711,0.3247
+2001,6,"Teslin UC",6,0.0383,,0,0.1231
+2001,6,"Fall US",15,,,,
+2001,6,"Mainstem+Upper CA",16,,,,
+2001,6,"Border US+Canada",17,0.7035,,,
+2001,6,"Total USA",18,,,,
+2001,6,"Total Canada",19,,,,
+2001,6,"Toklat",20,0.1188,,0,0.232
+2001,6,"Upper Tanana",21,0.0765,,0,0.2497
+2001,6,"Border US+Border CA",22,0.443,,0.2274,0.6489

@@ -27,10 +27,7 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 # Folders
-Output/
-data/
 # Files 
-*.csv 
 *.docx
 *.xlsx
 

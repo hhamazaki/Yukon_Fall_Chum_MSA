@@ -4,6 +4,22 @@
 #  Toshihide "Hamachan" Hamazaki
 #  This includes Data reading function sets 
 #===============================================================================
+#-------------------------------------------------------------------------------
+# function: read.dir.files 
+# Read files in a directory, combine, and output
+#-------------------------------------------------------------------------------
+read.dir.files <- function(dir){
+  file.name <- list.files(dir)
+  # Create list file
+  file.list <- list()
+  for(i in file.name){
+    file.list[[i]] <- read.csv(file.path(dir,i))  
+  }
+  # Convert list file to to data.frame
+  out <- as.data.frame(do.call(rbind,file.list))
+  row.names(out) <-NULL
+  return(out)
+}
 
 #-------------------------------------------------------------------------------
 # function: read.Pilot.data 
