@@ -22,23 +22,22 @@
 #   Pilot passage and variance files are located in Pilot folder 
 #   Other files are located in main director
 #'############################################################################## 
+
 #'############################################################################## 
 #   BIG NOTE !!!!
 #   THIS PROGRAM OVERWRITE ALL YEARS' CI BOUNDS
 #   SET OVERWRITE FALSE IF YOU DON'T WANT TO UPDATE PREVIOUS YEARS
 #'############################################################################### 
+
 #'------------------------------------------------------------------------------
 # Set Running environment-------
 #'------------------------------------------------------------------------------
 # Clear up existing files 
 rm(list = ls(all = TRUE))
 #'------------------------------------------------------------------------------
-# Standard 
+
 #'------------------------------------------------------------------------------
-# Main <- 'C:/Projects/Yukon_River/Fall_Chum/MSA/' 
-# fdr <- paste0(Main, 'R_functions/')  # R functions
-#'------------------------------------------------------------------------------
-# Projects 
+# Projects  Directories 
 #'------------------------------------------------------------------------------
 fdr <- './R_functions'
 wd_Out <- './Output'
@@ -55,6 +54,7 @@ ciOverwrite <- FALSE
 gg <- FALSE
 # Set year 
 this.year <- 2023
+
 #'------------------------------------------------------------------------------
 ##  1.0 : Set MSA and Pilot data file names ---- 
 #'------------------------------------------------------------------------------
@@ -68,11 +68,15 @@ stock_id_file <- 'StockID.csv'
 Pilot_Run <- 'Daily_Passage_By_Species_'
 # Pilot Station Var  
 Pilot_Var <- 'Daily_Variance_By_Species_'
+
 #'------------------------------------------------------------------------------
 #' Output file names 
 #'------------------------------------------------------------------------------ 
-# Output EXCEL file name 
+# Output Summary EXCEL file name 
 sumxlsx <- paste0('Yukon_Pilot_Chum_MSA_',Sys.Date(),'.xlsx')
+# Output JTC EXCEL file name 
+jtcxlsx <- paste0('JTC_MSA_',Sys.Date(),'.xlsx')
+
 # Output Annual Stock proportions by summer and fall:
 sf_p <- 'Pilot_sfp.csv'
 # Output Annual Summer vs. Fall Stock proportions by standard break:
@@ -80,14 +84,111 @@ sf_t <- 'Pilot_sft.csv'
 # Output min_max file name 
 min_max <- paste0('Pilot_d_min_max_',this.year,'.csv')
 
+
 #'------------------------------------------------------------------------------
-
-
 #'------------------------------------------------------------------------------
 ##  1.1: Set MSA data directory and file names ----
 #'------------------------------------------------------------------------------
 # Postseason data update 
 source(file.path(fdr,'Yukon_Chum_MSA_STD.R'))  
+
+#'------------------------------------------------------------------------------
+##  Post season Output ----
+#'------------------------------------------------------------------------------
+if (exists('postSeason')){
+#'------------------------------------------------------------------------------
+#  CI update for overwrite 
+#'------------------------------------------------------------------------------
+  if(isTRUE(ciOverwrite)){
+#  temp.ci <- list()
+#  mlist <- list()
+  for(j in 1:ny){
+  # Stock prop
+  MSA.y <- MSAL[MSAL$Year==years[j],]
+  # Pilot st 
+  Temp.st <- Pilot.st.y[Pilot.st.y$Year==years[j],]
+  temp.ci <- sim.ci(MSA.y,Temp.st,sgrpIDn,nrep,ci,years[j])
+  mlist <- sumdata(temp.m[temp.m$Year==years[j],],temp.ci)
+  write.csv(mlist,file.path(wd_Sum,paste0('Pilot_MSA_Sum_',years[j],'.csv')),
+                                 na='',row.names=FALSE)
+      } # End for Year [j]
+   } 
+#'------------------------------------------------------------------------------
+###  EXCEL table output ----
+#'------------------------------------------------------------------------------
+  EXlist <- list()   
+  for(i in 1:ny){
+      EXlist[[i]] <- read.csv(file.path(wd_Sum,paste0('Pilot_MSA_Sum_',years[i],'.csv')),stringsAsFactors =  FALSE)
+      }  
+  names(EXlist) <- years	  
+  write.xlsx(EXlist,file.path(wd_Out,sumxlsx),rowNames=FALSE)
+  
+#'------------------------------------------------------------------------------
+###  EXCEL Annual JTC MSA table output ------------
+#'------------------------------------------------------------------------------
+# Change Pilot Data from list to data.frame 
+Pilot.df <- as.data.frame(do.call(rbind,EXlist))
+# Extract necessary data from Starata 102 
+st102.s <- Pilot.df[with(Pilot.df,which(Strata==102 & grpID %in% c(10,11,13,2,9,15,16,19))), ]
+
+### JTC Table A7 (Prop) ---------------
+# Change long to wide 
+JTC.A7.p <-dcast(st102.s, Year~GroupName,value.var='p') 
+# Extract and arrange columns 
+JTC.A7.p <- JTC.A7.p[,c(1,9,8,6,2,4,7)]
+names(JTC.A7.p)[-1] <- c('Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.','Canada')
+### JTC Table A7 (Number) ---------------
+JTC.A7.n <-dcast(st102.s, Year~GroupName,value.var='mean') 
+JTC.A7.n <- JTC.A7.n[,c(1,9,8,6,2,4,7)]
+names(JTC.A7.n)[-1] <- c('Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.','Canada')
+
+### Table 108 ----------------
+# Extract strata  108
+st108 <- Pilot.df[Pilot.df$Strata==108,]
+# Change long to wide
+st108.w <- dcast(st108, Year~GroupName,value.var='p')
+# Add CA main
+st108.w$camain <- with(st102.s,st102.s[grpID==16,'mean']/st102.s[grpID==9,'mean'])
+# Add Porcupine
+st108.w$caporc <- with(st102.s,st102.s[grpID==13,'mean']/st102.s[grpID==9,'mean'])
+# Arrange Column order
+st108.w <- st108.w[,c(1,3,2,4,5,6)]
+# Change name: 
+names(st108.w)[-1] <- c('Tanana Fall','Border U.S.','Total Canada','Mainstem Canada','Porcupine')
+st108.wm <- st108.w
+st108.wm[,-1] <- st108.wm[,-1]*st102.s[st102.s$grpID==9,'mean']
+
+out.excel <- list()
+out.excel$JTC.A7.p <- JTC.A7.p
+out.excel$JTC.A7.n <- JTC.A7.n
+out.excel$St108.p <- st108.w
+out.excel$St108.n <- st108.wm
+write.xlsx(out.excel,file.path(wd_Out,jtcxlsx),rowNames=FALSE)
+    
+#'------------------------------------------------------------------------------
+### Summer-Fall Proportion total, Summer-Fall Proportion by Standard strata ----
+#'------------------------------------------------------------------------------
+#  Output Pilot Summer and Fall Proportion: Pilot_sfp 
+  write.csv(Pilot.sfp,file.path(wd_Sum,sf_p),na='',row.names=FALSE)
+#  Output Pilot Summer and Fall Standard time frame : Pilot_sft
+  write.csv(Pilot.sft,file.path(wd_Sum,sf_t),na='',row.names=FALSE)
+  
+#'-------------------------------------------------------------------------------
+###   Pilot.sd.min.max:Estimate mean stock proportion by standard strata ----  
+#'-------------------------------------------------------------------------------
+ Pilot.d.min.max <- aggregate(percent~group+stbreak, FUN=function(x) c(min=min(x),max=max(x),mean=mean(x)),data=Pilot.sd) 
+# Change to dataframe
+ Pilot.d.min.max <- do.call(data.frame,Pilot.d.min.max)
+# Rename Column
+ names(Pilot.d.min.max)[3:5] <- c('Min','Max','Mean')
+ Pilot.d.min.max<- merge(Pilot.d.min.max,stockID, by.x = 'group', by.y = 'grpID')
+#------ File output ------------------------------------------------------------
+  write.csv(Pilot.d.min.max,file.path(wd_Sum,min_max),na='',row.names=FALSE)
+}
+
+
+
+
 
 
 #'==============================================================================
