@@ -1,11 +1,11 @@
 ---
 title: "Yukon River Fall Chum Salmon Inseason Mixed Stock Analysis"
 output:
-#  html_document:
+  html_document:
 #    toc: true
 #    theme: united
-  word_document:
-    reference_docx: defalult-style_01.docx
+#  word_document:
+#   reference_docx: defalult-style_01.docx
     toc: false
 #    highlight: zenburn
 knit: (function(input, ...) {
@@ -41,7 +41,7 @@ fdr <- './R_functions'
 #===============================================================================
 inSeason <- TRUE 
 # Set year 
-this.year <- 2023
+this.year <- 2024
 # Inseason Data directory and file name 
 wd_Ins <- './data/Inseason'
 strata_file_Ins <- 'MSA_Strata_ins.csv'
