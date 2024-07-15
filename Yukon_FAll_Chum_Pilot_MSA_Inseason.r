@@ -46,7 +46,7 @@ last.year <- this.year -1
 #-------------------------------------------------------------------------------
 #  1.1: Set MSA data directory and file names 
 #-------------------------------------------------------------------------------
-source(paste0(fdr,'Yukon_Chum_MSA_RUN.R'))  
+source(paste0(fdr,'Yukon_Chum_MSA_STD.R'))  
 stbreak <- stb(this.year)
 Pilot.total <- mlist[mlist$Strata==100,]
 Pilot.summer <-mlist[mlist$Strata==101,]
