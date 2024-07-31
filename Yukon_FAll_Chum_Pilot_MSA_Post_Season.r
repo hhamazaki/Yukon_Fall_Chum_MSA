@@ -95,24 +95,23 @@ source(file.path(fdr,'Yukon_Chum_MSA_STD.R'))
 #'------------------------------------------------------------------------------
 ##  Post season Output ----
 #'------------------------------------------------------------------------------
-if (exists('postSeason')){
+#if (exists('postSeason')){
 #'------------------------------------------------------------------------------
 #  CI update for overwrite 
 #'------------------------------------------------------------------------------
   if(isTRUE(ciOverwrite)){
-#  temp.ci <- list()
-#  mlist <- list()
+  temp.ci <- list()
+  mlist <- list()
   for(j in 1:ny){
   # Stock prop
   MSA.y <- MSAL[MSAL$Year==years[j],]
   # Pilot st 
   Temp.st <- Pilot.st.y[Pilot.st.y$Year==years[j],]
   temp.ci <- sim.ci(MSA.y,Temp.st,sgrpIDn,nrep,ci,years[j])
-  mlist <- sumdata(temp.m[temp.m$Year==years[j],],temp.ci)
-  write.csv(mlist,file.path(wd_Sum,paste0('Pilot_MSA_Sum_',years[j],'.csv')),
-                                 na='',row.names=FALSE)
-      } # End for Year [j]
-   } 
+  mlist <- sumdata(temp.m[temp.m$Year==years[j],],temp.ci) 
+  write.csv(mlist,file.path(wd_Sum,paste0('Pilot_MSA_Sum_',years[j],'.csv')), na='',row.names=FALSE)
+   } # End for Year [j]
+ }
 #'------------------------------------------------------------------------------
 ###  EXCEL table output ----
 #'------------------------------------------------------------------------------
@@ -121,17 +120,22 @@ if (exists('postSeason')){
       EXlist[[i]] <- read.csv(file.path(wd_Sum,paste0('Pilot_MSA_Sum_',years[i],'.csv')),stringsAsFactors =  FALSE)
       }  
   names(EXlist) <- years	  
-  write.xlsx(EXlist,file.path(wd_Out,sumxlsx),rowNames=FALSE)
+#  write.xlsx(EXlist,file.path(wd_Out,sumxlsx),rowNames=FALSE)
   
 #'------------------------------------------------------------------------------
 ###  EXCEL Annual JTC MSA table output ------------
 #'------------------------------------------------------------------------------
 # Change Pilot Data from list to data.frame 
-Pilot.df <- as.data.frame(do.call(rbind,EXlist))
-# Extract necessary data from Starata 102 
+  Pilot.df <- as.data.frame(do.call(rbind,EXlist))
+ 
+# Extract necessary data from Strata 102 
+# Extracted groups are:
+# Tanana Fall, Border US, Porcupine CA, Total Summer, Total Fall, Fall US, CA Upper+Main, Total Canada)
+  
 st102.s <- Pilot.df[with(Pilot.df,which(Strata==102 & grpID %in% c(10,11,13,2,9,15,16,19))), ]
 
-### JTC Table A7 (Prop) ---------------
+### JTC Table A7  ---------------
+# Stock proportions and number: 'Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.','Canada'
 # Change long to wide 
 JTC.A7.p <-dcast(st102.s, Year~GroupName,value.var='p') 
 # Extract and arrange columns 
@@ -143,6 +147,7 @@ JTC.A7.n <- JTC.A7.n[,c(1,9,8,6,2,4,7)]
 names(JTC.A7.n)[-1] <- c('Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.','Canada')
 
 ### Table 108 ----------------
+# Stock proportions and number: Fall: Tanana,Border US, Canada, Mainstem Canada, Porcupine
 # Extract strata  108
 st108 <- Pilot.df[Pilot.df$Strata==108,]
 # Change long to wide
@@ -158,11 +163,24 @@ names(st108.w)[-1] <- c('Tanana Fall','Border U.S.','Total Canada','Mainstem Can
 st108.wm <- st108.w
 st108.wm[,-1] <- st108.wm[,-1]*st102.s[st102.s$grpID==9,'mean']
 
+### Table 103 ----------------
+# Stock proportions and number:Summer:  Lower, Middle, Tanana
+# Extract strata  103
+st103 <- Pilot.df[Pilot.df$Strata==103,]
+# Change long to wide
+st103 <- dcast(st103, Year~GroupName,value.var='p')
+# Extract toatal Summer and Merge 
+T.summer <-  Pilot.df[Pilot.df$Strata==100 & Pilot.df$grpID==2,]
+st103.n <- merge(st103,T.summer[,c('Year','mean')], by = 'Year')
+# Multiply to the numbers 
+st103.n[,c(2:4)] <-st103.n[,c(2:4)]*st103.n[,5] 
 out.excel <- list()
 out.excel$JTC.A7.p <- JTC.A7.p
 out.excel$JTC.A7.n <- JTC.A7.n
 out.excel$St108.p <- st108.w
 out.excel$St108.n <- st108.wm
+out.excel$St103.p <- st103
+out.excel$St103.n <- st103.n[,-5]
 write.xlsx(out.excel,file.path(wd_Out,jtcxlsx),rowNames=FALSE)
     
 #'------------------------------------------------------------------------------

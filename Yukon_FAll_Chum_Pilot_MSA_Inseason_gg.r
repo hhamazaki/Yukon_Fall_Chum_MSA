@@ -42,11 +42,6 @@ fdr <- './R_functions'
 inSeason <- TRUE 
 # Set year 
 this.year <- 2024
-<<<<<<< HEAD
-last.year <- this.year -1
-
-#-------------------------------------------------------------------------------
-=======
 # Inseason Data directory and file name 
 wd_Ins <- './data/Inseason'
 strata_file_Ins <- 'MSA_Strata_ins.csv'
@@ -56,11 +51,11 @@ stock_prop_file_Ins <- 'MSA_prop_ins.csv'
 Pilot_Run_Ins <- 'Daily Passage By Species.csv'
 # Pilot Station Var  
 Pilot_Var_Ins <- 'Daily Variance By Species.csv'#-------------------------------------------------------------------------------
->>>>>>> 6c5e4d1cce77dc6e1d28e6666bd6ab751ccea34a
 #  1.1: Set MSA data directory and file names 
 #-------------------------------------------------------------------------------
 source(file.path(fdr,'Yukon_Chum_MSA_STD.R')) 
 source(file.path(fdr,'ggplot_theme.R')) 
+
 # Standard Output Stock figures 
 ststockID <- c(4,7,8,10,11,19)
 #	4 (P) Lower 
@@ -113,18 +108,21 @@ ny <- length(years)
 #=------------------------------------------------------------------------------ 
 
 windows(record=TRUE)
+par(mfrow=c(1,1),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l',las=1)
   rstr.y <- rstr[rstr$Year==this.year,]
-  xlims<-c(min(stbreak),max(stbreak))  
-p1 <-   ggplot() + theme_simple() +
-      geom_bar(data = Pilot, aes(x=Date,y=Run), stat='identity',color='grey')+
-      scale_x_date(expand=c(0, 2),limits=as.Date(xlims),oob=oob_keep,date_labels="%b%d")+
-      scale_y_continuous(expand=expansion(mult = c(0, .25)), limits=c(0, NA))+
-      geom_vline(xintercept = c(rstr.y$Strata_Start_Date),color=4) + 
-      geom_vline(xintercept = max(rstr.y$Strata_End_Date,na.rm=TRUE),color=2)   
+  xlims<-c(min(stbreak),max(stbreak))
+  plot(Run~Date, type='h',lwd=4,col='gray',data=Pilot,xlim=xlims,xaxt='n')
+  axis.Date(1, at = stbreak,format= "%b%d",cex=0.6)
+  abline(v=c(rstr.y$Strata_Start_Date),col=4,lwd=2)
+mtext(paste("Sampling Strata"), side = 3, line = 0, outer = TRUE,cex=1.5)
+mtext('Pilot Station Run', side = 2, line = 1.5, las=0, outer = TRUE,cex=1.5)
+mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
+
 
 #-------------------------------------------------------------------------------
 #  Plot mean stock proportion by sampling strata 
 #-------------------------------------------------------------------------------
+ststocks <- as.character(ststockID)
 Pilot.stp <- Pilot.m[,c('Year','Strata','Run', ststocks)]
 Pilot.stp[,ststocks] <- 100*Pilot.stp[,ststocks] /Pilot.stp$Run
 Pilot.stpl <- melt(Pilot.stp[,c('Year','Strata',ststocks)], 
@@ -132,18 +130,19 @@ Pilot.stpl <- melt(Pilot.stp[,c('Year','Strata',ststocks)],
 Pilot.stpl <- Pilot.stpl[order(Pilot.stpl$Year,Pilot.stpl$Strata),]
 gname <- stockID[stockID$grpID %in%ststockID,c('GroupName')]      
 names(gname) <- ststockID
-# Base plot 
-#layout(matrix(1:2, ncol=2), widths=c(3,1))
-par(mar=c(4, 4, 4, 0),yaxs='i',bty='l',las=1) 
+# Base plot 			
+windows()
+par(mfrow=c(1,1),mar=c(5.1, 4.1, 4.1, 9.1),yaxs='i',bty='l',las=1) 
 temp1 <- Pilot.stpl[Pilot.stpl$group==ststockID[1],]
-plot(order(temp1$Strata),type='n', xlim=c(1,7),ylim=c(0,100), ylab='Stock Percent',xlab='Sample Strata Number')
+plot(order(temp1$Strata),type='n', xlim=c(1,9),ylim=c(0,100), ylab='',xlab='')
 for (i in 1:6){
   lines(percent~Strata, type ='o',lwd=2,col=i,pch=i,data=Pilot.stpl[Pilot.stpl$group==ststockID[i],])
 }
 title(main = this.year)
-legend('topright',legend = gname,col = c(1:6), pch=c(1:6),lty=1,lwd=2,bty = 'n')
-mtext('Stock Percent', side = 2, line = 1,las=0, outer = TRUE)
+legend('topright',legend = gname, col = c(1:6),  pch=c(1:6),lty=1,lwd=2, xpd = TRUE, cex = 1, seg.len=1, bty = 'n')
+mtext('Stock %', side = 2, line = 1,las=0, outer = TRUE)
 mtext("Sampling Strata", side = 1, line = 1, outer = TRUE)
+
 
 
 #-------------------------------------------------------------------------------
