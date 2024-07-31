@@ -1,23 +1,25 @@
 ---
 title: "Yukon River Fall Chum Salmon Inseason Mixed Stock Analysis"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+author: "Project Leads: Bonnie Borba (bonnie.borba@alaska.gov)"
 output:
-#  html_document:
+  html_document:
 #    toc: true
 #    theme: united
-  word_document:
-    reference_docx: defalult-style_01.docx
-    toc: false
+#  word_document:
+#    reference_docx: defalult-style_01.docx
+#    toc: false
 #    highlight: zenburn
-knit: (function(input, ...) {
-    rmarkdown::render(
-      input,
-      output_file = paste0(
-        xfun::sans_ext(input), '-', Sys.Date(), '.docx'
-      ),
-      output_dir = file.path('./Output'),
-      envir = globalenv()
-    )
-  })
+#knit: (function(input, ...) {
+#    rmarkdown::render(
+#      input,
+#      output_file = paste0(
+#        xfun::sans_ext(input), '-', Sys.Date(), '.docx'
+#      ),
+#      output_dir = file.path('./Output'),
+#      envir = globalenv()
+#    )
+#  })
 ---
 
 
@@ -55,6 +57,8 @@ Pilot_Var_Ins <- 'Daily Variance By Species.csv'
 #  1.1: Set MSA data directory and file names 
 #-------------------------------------------------------------------------------
 source(file.path(fdr,'Yukon_Chum_MSA_STD.R'))  
+source(file.path(fdr,'ggplot_theme.R'))  
+
 # Standard Output Stock figures 
 ststockID <- c(4,7,8,10,11,19)
 #	4 (P) Lower 
@@ -106,6 +110,7 @@ ny <- length(years)
 ############################################################################
 library(knitr)
 library(rmarkdown)
+library(kableExtra)
  add_legend <- function(...) {
    par(mar = c(0,0,4,0))
    plot(0, 0, type='n', bty='n', xaxt='n', yaxt='n',xlab='',ylab='')
@@ -113,20 +118,31 @@ library(rmarkdown)
   }
 ```
 
-```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
+```{r,fig.width=9, fig.height = 5,echo=FALSE,,warning=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
 #  Plot Pilot Station Passage and the strata break 
 #-------------------------------------------------------------------------------
-par(mfrow=c(1,1),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l',las=1)
   rstr.y <- rstr[rstr$Year==this.year,]
-  xlims<-c(min(stbreak),max(stbreak))
-  plot(Run~Date, type='h',lwd=4,col='gray',data=Pilot,xlim=xlims,xaxt='n')
-  axis.Date(1, at = stbreak,format= "%b%d",cex=0.6)
-  abline(v=c(rstr.y$Strata_Start_Date),col=4,lwd=2)
-  abline(v=max(rstr.y$Strata_End_Date,na.rm=TRUE),col=2,lwd=2)
-mtext(paste("Sampling Strata"), side = 3, line = 0, outer = TRUE,cex=1.5)
-mtext('Number of Salmon', side = 2, line = 1.5, las=0, outer = TRUE,cex=1.5)
-mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
+  xlims<-c(min(stbreak),max(stbreak))  
+p1 <-   ggplot() + theme_simple() +
+      geom_bar(data = Pilot, aes(x=Date,y=Run), stat='identity',color='grey')+
+      scale_x_date(expand=c(0, 2),limits=as.Date(xlims),oob=oob_keep,date_labels="%b%d")+
+      scale_y_continuous(expand=expansion(mult = c(0, .25)), limits=c(0, NA))+
+      geom_vline(xintercept = c(rstr.y$Strata_Start_Date),color=4) + 
+      geom_vline(xintercept = max(rstr.y$Strata_End_Date,na.rm=TRUE),color=2)
+print(p1)
+
+
+#par(mfrow=c(1,1),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l',las=1)
+#  rstr.y <- rstr[rstr$Year==this.year,]
+#  xlims<-c(min(stbreak),max(stbreak))
+#  plot(Run~Date, type='h',lwd=4,col='gray',data=Pilot,xlim=xlims,xaxt='n')
+#  axis.Date(1, at = stbreak,format= "%b%d",cex=0.6)
+#  abline(v=c(rstr.y$Strata_Start_Date),col=4,lwd=2)
+#  abline(v=max(rstr.y$Strata_End_Date,na.rm=TRUE),col=2,lwd=2)
+#mtext(paste("Sampling Strata"), side = 3, line = 0, outer = TRUE,cex=1.5)
+#mtext('Number of Salmon', side = 2, line = 1.5, las=0, outer = TRUE,cex=1.5)
+#mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
 ```
 Figure 1.  Daily sonar counts attributed to chum salmon (bars) showing genetic sampling time frames (droplines), project operated near Pilot Station, Yukon Area, `r this.year`.
 
@@ -236,7 +252,7 @@ Figure 4.  Minimum and maximum (2004-`r this.year-1`) and `r this.year` mean sto
 # yax: Index determining vertical axis needs to be labeled 
   yax <- c(1,which(1:(ny+1)%%5==0)+1) 
 # sax: Index determining horizontal axis needs to be labeled  
-  xax <- ny-(ny+1)%%5
+  xax <- ny-(ny)%%5
   for(i in 1:ny){
     temp <- with(Pilot.hsft, Pilot.hsft[Year==years[i],])
     plot(Summer~stbreak, type ='o',col=4, xlim=c(1,9),ylim=c(0,100), 
@@ -310,3 +326,29 @@ if(dim(Pilot.fallinfall)[1]>0){
 }
 ```
 Figure 8. Contributions of Fall chum salmon based on genetic analysis during the fall season (July 19 to end of season), sampled at the mainstem sonar operated near Pilot Station, Yukon Area, `r this.year`.
+
+
+
+```{r,echo=FALSE}
+table <- mlist[which(mlist$Strata<10 & mlist$SortID<20),]
+```
+
+```{r,echo=FALSE}
+table$p <- table$p*100
+Prop <- dcast(table,SortID+GroupName~Strata,value.var='p')
+s.names <- with(rstr,paste(paste('Strata',Strata),Time_Frames,paste('n=',Sample_Size),sep='<br/>'))
+t.names <-c('Stock',s.names)
+kable(Prop[,-1],digits=1,caption=paste("Genetic Proportions of chum salmon stock grouping used to converst Pilot Station passage estimates to numbers of fish","this.year"),format = "html",col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+```{r,echo=FALSE}
+n <- dcast(table,SortID+GroupName~Strata,value.var='mean')
+s.names <- with(rstr,paste(paste('Strata',Strata),Time_Frames,paste('n=',Sample_Size),sep='<br/>'))
+t.names <-c('Stock',s.names)
+kable(n[,-1],digits=0,caption=paste("Genetic Proportions of chum salmon stock grouping used to converst Pilot Station passage estimates to numbers of fish","this.year"),format = "html",, booktabs = T,longtable=T,col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped"))
+```
+
+
+
