@@ -5,19 +5,19 @@ output:
 #    toc: true
 #    theme: united
 #  word_document:
-#   reference_docx: defalult-style_01.docx
+ # reference_docx: defalult-style_01.docx
     toc: false
 #    highlight: zenburn
-knit: (function(input, ...) {
-    rmarkdown::render(
-      input,
-      output_file = paste0(
-        xfun::sans_ext(input), '-', Sys.Date(), '.docx'
-      ),
-      output_dir = file.path('./Output'),
-      envir = globalenv()
-    )
-  })
+#knit: (function(input, ...) {
+ #   rmarkdown::render(
+  #    input,
+   #   output_file = paste0(
+    #    xfun::sans_ext(input), '-', Sys.Date(), '.docx'
+     # ),
+      #output_dir = file.path('./Output'),
+    #  envir = globalenv()
+#    )
+#  })
 ---
 
 
@@ -92,6 +92,10 @@ Pilot.d.min.max <- read.csv(file.path(wd_Sum,paste0('Pilot_d_min_max_',this.year
 # Read MSA Summer vs. Fall last year
 Pilot.hsft <- read.csv(file.path(wd_Sum,'Pilot_sft.csv'),stringsAsFactors = FALSE)
 # Find the number of years in the data 
+unique(Pilot.hsft$Year) ->. 
+years <-  .[order(.)]
+ny <- length(.)
+
 years <- unique(Pilot.hsft$Year)
 years <- years[order(years)]
 # number of years
@@ -232,7 +236,7 @@ Figure 4.  Minimum and maximum (2004-`r this.year-1`) and `r this.year` mean sto
 # yax: Index determining vertical axis needs to be labeled 
   yax <- c(1,which(1:(ny+1)%%5==0)+1) 
 # sax: Index determining horizontal axis needs to be labeled  
-  xax <- ny-(ny+1)%%5
+  xax <- ny-(ny)%%5
   for(i in 1:ny){
     temp <- with(Pilot.hsft, Pilot.hsft[Year==years[i],])
     plot(Summer~stbreak, type ='o',col=4, xlim=c(1,9),ylim=c(0,100), 
