@@ -30,5 +30,6 @@ vignettes/*.pdf
 # Files 
 *.docx
 *.xlsx
-
+*.html
+*.csv
 
