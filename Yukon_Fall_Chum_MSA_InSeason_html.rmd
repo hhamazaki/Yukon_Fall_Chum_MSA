@@ -350,8 +350,9 @@ par(new=TRUE)
 pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))
 pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion (July 19 to End of Season)")
 }
+#**Figure 7. Contributions of chum salmon based on genetic analysis during the fall season (July 19 to end of season), sampled at the mainstem sonar operated near Pilot Station, Yukon Area, `r this.year`.**
 ```
-**Figure 7. Contributions of chum salmon based on genetic analysis during the fall season (July 19 to end of season), sampled at the mainstem sonar operated near Pilot Station, Yukon Area, `r this.year`.**
+
 
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
 if(dim(Pilot.fallinfall)[1]>0){
@@ -363,13 +364,14 @@ if(dim(Pilot.fallinfall)[1]>0){
 #pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))
 #pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion (July 19 to End of Season)")
 }
+#**Figure 8. Contributions of Fall chum salmon based on genetic analysis during the fall season (July 19 to end of season), sampled at the mainstem sonar operated near Pilot Station, Yukon Area, `r this.year`.**
 ```
-**Figure 8. Contributions of Fall chum salmon based on genetic analysis during the fall season (July 19 to end of season), sampled at the mainstem sonar operated near Pilot Station, Yukon Area, `r this.year`.**
+
 
 ```{r,echo=FALSE}
 table <- mlist[which(mlist$Strata<10 & mlist$SortID<20),]
 ```
-
+\newpage
 # Tables
 **The proportions of chum salmon by stock `r this.year`.**
 ```{r,echo=FALSE}
@@ -382,7 +384,7 @@ kable(Prop[,-1],digits=1,format = "html",col.names=t.names,format.args = list(bi
 ```
 
 
-
+\newpage
 **The number of chum salmon by stock `r this.year`.**
 ```{r,echo=FALSE}
 n <- dcast(table,SortID+GroupName~Strata,value.var='mean')
