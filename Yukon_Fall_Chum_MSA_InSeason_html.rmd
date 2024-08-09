@@ -150,6 +150,7 @@ mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
 
 **Figure 1.  Daily sonar counts attributed to chum salmon (bars) showing genetic sampling time frames (droplines), project operated near Pilot Station, Yukon Area, `r this.year`.**
 
+\newpage
 # Stock proportion by sampling strata
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
@@ -198,6 +199,7 @@ mtext("Sampling Strata", side = 1, line = 2)
 ```
 **Figure 2.5  Mean proportion of chum salmon stock groups by sampling strata, Yukon Area, `r this.year`.**
 
+\newpage
 # Historical mean stock proportion 
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
@@ -226,7 +228,7 @@ mtext("Dates", side = 1, line = 1, outer = TRUE)
 ```
 **Figure 3.  Mean proportion of chum salmon stock groups by standard sampling strata, Yukon Area, 2004-`r this.year-1`.**
 
-
+\newpage
 # Standard Stock Proportion 
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
@@ -254,7 +256,7 @@ mtext("Dates", side = 1, line = 1, outer = TRUE)
 ```
 **Figure 4.  Minimum and maximum (2004-`r this.year-1`) and `r this.year` mean stock proportion by standard sampling strata, comparing the major chum salmon components, Yukon Area.**
 
-
+\newpage
 # Summer vs. Fall:  All seasons
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
@@ -305,7 +307,7 @@ mtext("Dates", side = 1, line = 1, outer = TRUE)
 ```
 **Figure 5.  Crossover of summer and fall chum salmon based on genetic stock analysis (standard sampling strata), Yukon Area, 1999-2002 using allozymes and 2004-`r this.year` using microsatellites.**
 
-
+\newpage
 ## Summer vs. Fall:  During the transition periods
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
@@ -388,9 +390,11 @@ kable(Prop[,-1],digits=1,format = "html",col.names=t.names,format.args = list(bi
 **Table 2. Genetic estimates of chum salmon passage by stock groups applied to mainstem Yukon River (Pilot Station) sonar counts `r this.year`.**
 ```{r,echo=FALSE}
 n <- dcast(table,SortID+GroupName~Strata,value.var='mean')
+total <- rowSums(n[,-c(1,2)])
+n <- cbind(n,total)
 s.names <- with(rstr,paste(paste('Strata',Strata),Time_Frames,paste('n=',Sample_Size),sep='<br/>'))
-t.names <-c('Stock',s.names)
-kable(n[,-1],digits=0,format = "html",, booktabs = T,longtable=T,col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
+t.names <-c('Stock',s.names,'Total')
+kable(n[,-1],digits=0,format = "html", booktabs = T,longtable=T,col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped"))
 ```
 
