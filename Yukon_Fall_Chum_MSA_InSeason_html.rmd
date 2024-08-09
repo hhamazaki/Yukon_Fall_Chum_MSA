@@ -388,9 +388,11 @@ kable(Prop[,-1],digits=1,format = "html",col.names=t.names,format.args = list(bi
 **Table 2. Genetic estimates of chum salmon passage by stock groups applied to mainstem Yukon River (Pilot Station) sonar counts `r this.year`.**
 ```{r,echo=FALSE}
 n <- dcast(table,SortID+GroupName~Strata,value.var='mean')
+total <- rowSums(n[,-c(1,2)])
+n <- cbind(n,total)
 s.names <- with(rstr,paste(paste('Strata',Strata),Time_Frames,paste('n=',Sample_Size),sep='<br/>'))
-t.names <-c('Stock',s.names)
-kable(n[,-1],digits=0,format = "html",, booktabs = T,longtable=T,col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
+t.names <-c('Stock',s.names,'Total')
+kable(n[,-1],digits=0,format = "html", booktabs = T,longtable=T,col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped"))
 ```
 
