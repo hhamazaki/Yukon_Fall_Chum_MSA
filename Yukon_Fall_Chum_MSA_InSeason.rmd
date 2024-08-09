@@ -318,7 +318,7 @@ Figure 5.  Crossover of summer and fall chum salmon based on genetic stock analy
 Figure 6.  Crossover of summer and fall chum salmon (3 periods) based on genetic stock analysis (standard sampling strata), Yukon Area, 1999-2002 using allozymes and 2004-`r this.year` using microsatellites.
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
 if(dim(Pilot.fall)[1]>0){
-  temp <- Pilot.fall[Pilot.fall$grpID %in% c(4,7,8,10,11,13,16),]
+temp <- Pilot.fall[Pilot.fall$grpID %in% c(4,7,8,10,11,13,16),]
 temp$pct <- with(temp, paste0(round(100*p),'%'))
 par(mfrow=c(1,1),mar = c(4,4,4,7),oma = c(3,3,3,3))
 pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=c(2:8),main="Stock Proportion (July 19 to End of Season)")
@@ -328,6 +328,7 @@ pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Sto
 }
 ```
 Figure 7. Contributions of chum salmon based on genetic analysis during the fall season (July 19 to end of season), sampled at the mainstem sonar operated near Pilot Station, Yukon Area, `r this.year`.
+
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
 if(dim(Pilot.fallinfall)[1]>0){
 #  temp <- Pilot.fallinfall[Pilot.fallinfall$grpID %in% c(10,11,19),]

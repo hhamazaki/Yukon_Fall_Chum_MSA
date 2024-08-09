@@ -122,7 +122,7 @@ library(kableExtra)
  }
  
 ```
-
+\newpage
 # Pilot Station Passage 
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,,warning=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
@@ -150,7 +150,6 @@ mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
 
 **Figure 1.  Daily sonar counts attributed to chum salmon (bars) showing genetic sampling time frames (droplines), project operated near Pilot Station, Yukon Area, `r this.year`.**
 
-\newpage
 # Stock proportion by sampling strata
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
@@ -179,8 +178,8 @@ mtext("Sampling Strata", side = 1, line = 1, outer = TRUE)
 
 ```
 **Figure 2.  Mean proportion of chum salmon stock groups by sampling strata, Yukon Area, `r this.year`.**
-
-##  Stock proportion by starata (bar graph) 
+\newpage
+##  Stock proportion by strata (bar graph) 
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
 #  Plot passage by stock and strata 
@@ -199,7 +198,6 @@ mtext("Sampling Strata", side = 1, line = 2)
 ```
 **Figure 2.5  Mean proportion of chum salmon stock groups by sampling strata, Yukon Area, `r this.year`.**
 
-\newpage
 # Historical mean stock proportion 
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
@@ -307,7 +305,7 @@ mtext("Dates", side = 1, line = 1, outer = TRUE)
 ```
 **Figure 5.  Crossover of summer and fall chum salmon based on genetic stock analysis (standard sampling strata), Yukon Area, 1999-2002 using allozymes and 2004-`r this.year` using microsatellites.**
 
-\newpage
+
 ## Summer vs. Fall:  During the transition periods
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
@@ -348,25 +346,24 @@ if(dim(Pilot.fall)[1]>0){
 temp$pct <- with(temp, paste0(round(100*p),'%'))
 par(mfrow=c(1,1),mar = c(4,4,4,7),oma = c(3,3,3,3))
 pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=c(2:8),main="Stock Proportion (July 19 to End of Season)")
-par(new=TRUE)
-pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))
-pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion (July 19 to End of Season)")
+#par(new=TRUE)
+#pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))
+#pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion (July 19 to End of Season)")
 }
-#**Figure 7. Contributions of chum salmon based on genetic analysis during the fall season (July 19 to end of season), sampled at the mainstem sonar operated near Pilot Station, Yukon Area, `r this.year`.**
 ```
-
+**Figure 7. Contributions of chum salmon based on genetic analysis during the fall season (July 19 to end of season), sampled at the mainstem sonar operated near Pilot Station, Yukon Area, `r this.year`.**
 
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
-if(dim(Pilot.fallinfall)[1]>0){
+#if(dim(Pilot.fallinfall)[1]>0){
 #  temp <- Pilot.fallinfall[Pilot.fallinfall$grpID %in% c(10,11,19),]
 #temp$pct <- with(temp, paste0(round(100*p),'%'))
 #par(mfrow=c(1,1),mar = c(4,4,4,7),oma = c(3,3,3,3))
 #pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=c(2:8),main="Stock Proportion (July 19 to End of Season)")
 #par(new=TRUE)
 #pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))
-#pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion (July 19 to End of Season)")
-}
-#**Figure 8. Contributions of Fall chum salmon based on genetic analysis during the fall season (July 19 to end of season), sampled at the mainstem sonar operated near Pilot Station, Yukon Area, `r this.year`.**
+#pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock #Proportion (July 19 to End of Season)")
+#}
+#**Figure 8. Contributions of Fall chum salmon based on genetic analysis during the #fall season (July 19 to end of season), sampled at the mainstem sonar operated near #Pilot Station, Yukon Area, `r this.year`.**
 ```
 
 
