@@ -53,7 +53,7 @@ ciOverwrite <- FALSE
 # ggplot ?
 gg <- FALSE
 # Set year 
-this.year <- 2023
+this.year <- 2024
 
 #'------------------------------------------------------------------------------
 ##  1.0 : Set MSA and Pilot data file names ---- 
@@ -174,6 +174,8 @@ T.summer <-  Pilot.df[Pilot.df$Strata==100 & Pilot.df$grpID==2,]
 st103.n <- merge(st103,T.summer[,c('Year','mean')], by = 'Year')
 # Multiply to the numbers 
 st103.n[,c(2:4)] <-st103.n[,c(2:4)]*st103.n[,5] 
+
+### Table 103: summer ------
 out.excel <- list()
 out.excel$JTC.A7.p <- JTC.A7.p
 out.excel$JTC.A7.n <- JTC.A7.n
@@ -202,7 +204,7 @@ write.xlsx(out.excel,file.path(wd_Out,jtcxlsx),rowNames=FALSE)
  Pilot.d.min.max<- merge(Pilot.d.min.max,stockID, by.x = 'group', by.y = 'grpID')
 #------ File output ------------------------------------------------------------
   write.csv(Pilot.d.min.max,file.path(wd_Sum,min_max),na='',row.names=FALSE)
-}
+
 
 
 

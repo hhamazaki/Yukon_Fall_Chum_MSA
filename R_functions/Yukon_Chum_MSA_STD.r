@@ -191,6 +191,7 @@ rstr$Strata_End_Date <- as.Date(rstr$Strata_End_Date,'%m/%d/%Y')
 rstr <- rstr[order(rstr$Strata_Start_Date),]
 # Find the number of years in the data 
 years <- unique(rstr$Year)
+if(max(years)>this.year) years <- years[years <=this.year]
 # number of years
 ny <- length(years)
 #'------------------------------------------------------------------------------

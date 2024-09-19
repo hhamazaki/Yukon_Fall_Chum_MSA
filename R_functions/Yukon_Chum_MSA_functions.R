@@ -143,11 +143,11 @@ add.sum <- function(datM,Year=NA) {
 summer.p <-function(datM,cn=NA){
   if(is.na(cn)){
     #  Divide by total summer 
-    mp <- datM[,c('4','5','8')]/datM[,'2'] 
+    mp <- datM[,c('4','7','8')]/datM[,'2'] 
   } else{
     cl <- names(datM)[c(1:cn)]
-    mp <- cbind(datM[,cl],datM[,c('4','5','8')]/datM[,'2'])
-    names(mp) <- c(cl,'4','5','8')
+    mp <- cbind(datM[,cl],datM[,c('4','7','8')]/datM[,'2'])
+    names(mp) <- c(cl,'4','7','8')
   }
   return(mp)
 }

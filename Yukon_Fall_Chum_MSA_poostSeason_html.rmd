@@ -95,7 +95,7 @@ names(lgnames) <- stockID$grpID
 #  2.1: Read Summer vs. Fall % data
 #-------------------------------------------------------------------------------
 # Read MSA Strata data
-Pilot.d.min.max <- read.csv(file.path(wd_Sum,'Pilot_d_min_max_2022.csv'),stringsAsFactors = FALSE)
+Pilot.d.min.max <- read.csv(file.path(wd_Sum,'Pilot_d_min_max_2023.csv'),stringsAsFactors = FALSE)
 #Pilot.d.min.max <- read.csv(paste0(wd_Sum,'Pilot_d_min_max_',this.year-1,'.csv'),stringsAsFactors = FALSE)
 
 # Read MSA Strata data

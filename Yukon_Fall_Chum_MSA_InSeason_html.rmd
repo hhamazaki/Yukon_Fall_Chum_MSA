@@ -167,18 +167,20 @@ names(gname) <- ststockID
 #layout(matrix(1:2, ncol=2), widths=c(3,1))
 par(mar=c(4, 4, 4, 0),yaxs='i',bty='l',las=1) 
 temp1 <- Pilot.stpl[Pilot.stpl$group==ststockID[1],]
-plot(order(temp1$Strata),type='n', xlim=c(1,7),ylim=c(0,100), ylab='Stock Percent',xlab='Sample Strata Number')
+plot(order(temp1$Strata),type='n', xlim=c(1,8),ylim=c(0,100), ylab='Stock Percent',xlab='Sample Strata Number')
 for (i in 1:6){
   lines(percent~Strata, type ='o',lwd=2,col=i,pch=i,data=Pilot.stpl[Pilot.stpl$group==ststockID[i],])
 }
 title(main = this.year)
-legend('topright',legend = gname,col = c(1:6), pch=c(1:6),lty=1,lwd=2,bty = 'n')
+legend('top',legend = gname,col = c(1:6), pch=c(1:6),lty=1,lwd=2,bty = 'n')
 mtext('Stock Percent', side = 2, line = 1,las=0, outer = TRUE)
 mtext("Sampling Strata", side = 1, line = 1, outer = TRUE)
 
 ```
 **Figure 2.  Mean proportion of chum salmon stock groups by sampling strata, Yukon Area, `r this.year`.**
+
 \newpage
+
 ##  Stock proportion by strata (bar graph) 
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
@@ -343,9 +345,12 @@ mtext("Dates", side = 1, line = 1, outer = TRUE)
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
 if(dim(Pilot.fall)[1]>0){
   temp <- Pilot.fall[Pilot.fall$grpID %in% c(4,7,8,10,11,13,16),]
+  pieorder <- c(4,7,8,11,16,10,13)
+  temp <- temp [match(pieorder,temp$grpID),]  
 temp$pct <- with(temp, paste0(round(100*p),'%'))
-par(mfrow=c(1,1),mar = c(4,4,4,7),oma = c(3,3,3,3))
-pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=c(2:8),main="Stock Proportion (July 19 to End of Season)")
+par(mfrow=c(1,1),mar = c(4,4,4,4),oma = c(3,3,3,3))
+pie(temp$p, init.angle=90,labels = paste(temp$GroupName,temp$pct),col=c(2:8),main="Stock Proportion (July 19 to End of Season)")
+#legend("topright", paste(temp$GroupName,temp$pct),cex = 1,bty='n',fill =c(2:8))
 #par(new=TRUE)
 #pie(temp$p,density=10, labels='',angle=c(20,90,30,10,40,0))
 #pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=gray.colors(6),main="Stock Proportion (July 19 to End of Season)")
