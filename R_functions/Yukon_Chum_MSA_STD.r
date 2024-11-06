@@ -73,6 +73,7 @@
 # 1) grpID=4 for Lower summer divided by grpID=2 Total Summer.
 # 2) grpID=8 for Tanana summer divided by grpID=2 Total Summer.
 # 3) grpID=5 for Middle divided by grpID=2 Total Summer.
+# 4) grpID=7 for UpperKoy+Main  divided by grpID=2 Total Summer.
 
 # Strata 106 proportions of only fall stocks in both seasons
 # Strata 106 would be strata 100

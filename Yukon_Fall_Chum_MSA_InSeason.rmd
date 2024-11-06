@@ -31,7 +31,6 @@ output:
 #      ),
 #      output_dir = file.path('./Output'),
 #      envir = globalenv()
->>>>>>> 6c5e4d1cce77dc6e1d28e6666bd6ab751ccea34a
 #    )
 #  })
 ---

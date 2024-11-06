@@ -49,7 +49,7 @@ wd_Out <- './Output'
 postSeason <- TRUE
 # Overwrite historical data 
 # This is necessary when you updated historical data (e.g., Pilot numbers, MSAs)
-ciOverwrite <- FALSE
+ciOverwrite <- TRUE
 # ggplot ?
 gg <- FALSE
 # Set year 
@@ -120,7 +120,7 @@ source(file.path(fdr,'Yukon_Chum_MSA_STD.R'))
       EXlist[[i]] <- read.csv(file.path(wd_Sum,paste0('Pilot_MSA_Sum_',years[i],'.csv')),stringsAsFactors =  FALSE)
       }  
   names(EXlist) <- years	  
-#  write.xlsx(EXlist,file.path(wd_Out,sumxlsx),rowNames=FALSE)
+  write.xlsx(EXlist,file.path(wd_Out,sumxlsx),rowNames=FALSE)
   
 #'------------------------------------------------------------------------------
 ###  EXCEL Annual JTC MSA table output ------------

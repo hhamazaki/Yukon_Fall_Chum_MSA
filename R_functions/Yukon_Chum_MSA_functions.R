@@ -1,6 +1,22 @@
 #===============================================================================
 #  Function sets: 
 #===============================================================================
+t.col <- function(color, percent = 50, name = NULL) {
+#	  color = color name
+#	percent = % transparency
+#	   name = an optional name for the color
+## Get RGB values for named color
+  rgb.val <- col2rgb(color)
+
+## Make new color using input color as base and alpha set by transparency
+  t.col <- rgb(rgb.val[1], rgb.val[2], rgb.val[3],
+               max = 255,
+               alpha = (100-percent)*255/100,
+               names = name)
+## Save the color
+  invisible(t.col)
+  }
+
 #-------------------------------------------------------------------------------
 #  stb:  Set Standard Stock and Strata 
 #-------------------------------------------------------------------------------
@@ -143,11 +159,11 @@ add.sum <- function(datM,Year=NA) {
 summer.p <-function(datM,cn=NA){
   if(is.na(cn)){
     #  Divide by total summer 
-    mp <- datM[,c('4','7','8')]/datM[,'2'] 
+    mp <- datM[,c('4','8','7','5')]/datM[,'2'] 
   } else{
     cl <- names(datM)[c(1:cn)]
-    mp <- cbind(datM[,cl],datM[,c('4','7','8')]/datM[,'2'])
-    names(mp) <- c(cl,'4','7','8')
+    mp <- cbind(datM[,cl],datM[,c('4','8','7','5')]/datM[,'2'])
+    names(mp) <- c(cl,'4','8','7','5')
   }
   return(mp)
 }
