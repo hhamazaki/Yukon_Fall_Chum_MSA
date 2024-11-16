@@ -1,9 +1,14 @@
 ---
-title: "Yukon River Fall Chum Salmon Mixed Stock Analysis"
+title: "Yukon River Fall Chum Salmon Postseason Mixed Stock Analysis"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+author: "Project Leads: Bonnie Borba (bonnie.borba@alaska.gov)"
 output:
   html_document:
+    df_print: paged
+    fig_caption: true
     toc: true
-    theme: united
+    toc_depth: 2
+    toc_float: true
 #  word_document:
 #    reference_docx: defalult-style_01.docx
 #    toc: false
@@ -18,6 +23,16 @@ output:
 #    )
 #  })
 ---
+<style type="text/css">
+.caption {
+    font-size: large;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,warning = FALSE, message = FALSE)
+```
+
 
 
 ```{r get_data, message=FALSE,echo=FALSE,error=FALSE,warning=FALSE}
@@ -36,11 +51,14 @@ rm(list = ls(all.names = TRUE))
 #-------------------------------------------------------------------------------
 fdr <- './R_functions'
 wd_Out <- './Output'
+wd_MSA <- './data/MSA_data'
 #===============================================================================
 #  1.0: Run MSA
 #===============================================================================
 postSeason <- TRUE 
-ciOverwrite <- FALSE
+#  Overwrite CI: Do this when you updated historical data. 
+ciOverwrite <- TRUE
+
 # Set year 
 this.year <- 2024
 library(lubridate)
@@ -58,12 +76,36 @@ Pilot_Run <- 'Daily_Passage_By_Species_'
 # Pilot Station Var  
 Pilot_Var <- 'Daily_Variance_By_Species_'
 
-#'----
+#'------------------------------------------------------------------------------
+#' Output file names 
+#'------------------------------------------------------------------------------ 
+# Output Summary EXCEL file name 
+sumxlsx <- paste0('Yukon_Pilot_Chum_MSA_',Sys.Date(),'.xlsx')
+# Output JTC EXCEL file name 
+jtcxlsx <- paste0('JTC_MSA_',Sys.Date(),'.xlsx')
+
+# Output Annual Stock proportions by summer and fall:
+sf_p <- 'Pilot_sfp.csv'
+# Output Annual Summer vs. Fall Stock proportions by standard break:
+sf_t <- 'Pilot_sft.csv'
+# Output min_max file name 
+min_max <- paste0('Pilot_d_min_max_',this.year,'.csv')
+
 
 #-------------------------------------------------------------------------------
 #  1.1: Set MSA data directory and file names 
 #-------------------------------------------------------------------------------
+# Run postseason data processing routines 
 source(file.path(fdr,'Yukon_Chum_MSA_STD.R'))  
+# Run postseason summary routines 
+source(file.path(fdr,'Yukon_Fall_Chum_MSA_Post_Season.R'))  
+# This will create 
+# Summary EXCEL files,  EXCEL file for JTC output
+# MSA prop and strata csv (data/MSA_data folder)
+
+
+
+
 # Standard Output Stock figures 
 ststockID <- c(4,7,8,10,11,19)
 #	4 (P) Lower 
@@ -96,8 +138,7 @@ names(lgnames) <- stockID$grpID
 #  2.1: Read Summer vs. Fall % data
 #-------------------------------------------------------------------------------
 # Read MSA Strata data
-Pilot.d.min.max <- read.csv(file.path(wd_Sum,'Pilot_d_min_max_2023.csv'),stringsAsFactors = FALSE)
-#Pilot.d.min.max <- read.csv(paste0(wd_Sum,'Pilot_d_min_max_',this.year-1,'.csv'),stringsAsFactors = FALSE)
+Pilot.d.min.max <- read.csv(file.path(wd_Sum,paste0('Pilot_d_min_max_',this.year-1,'.csv')),stringsAsFactors = FALSE)
 
 # Read MSA Strata data
 Pilot.hsft <- read.csv(file.path(wd_Sum,'Pilot_sft.csv'),stringsAsFactors = FALSE)
@@ -120,6 +161,8 @@ library(kableExtra)
   }
 ```
 
+\newpage
+# Pilot Station Passage 
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
 # Pilot Station timing 
 par(mfrow=c(1,1),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l',las=1)
@@ -133,12 +176,11 @@ mtext(paste("Sampling Strata"), side = 3, line = 0, outer = TRUE,cex=1.5)
 mtext('Number of Salmon', side = 2, line = 1.5, las=0, outer = TRUE,cex=1.5)
 mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
 ```
-Figure 1.  Daily sonar counts attributed to chum salmon (bars) showing genetic sampling time frames (droplines), project operated near Pilot Station, Yukon Area, `r this.year`.
+**Figure 1.  Daily sonar counts attributed to chum salmon (bars) showing genetic sampling time frames (droplines), project operated near Pilot Station, Yukon Area, `r this.year`.**
 
+# Historical Pilot Station Passage 
 ```{r,fig.width=9, fig.height = 18,echo=FALSE,dpi=400}
 # Pilot Station timing 
-
-
 par(mfrow=c(1,1),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l',las=1)
   Pilot$Date2 <- Pilot$Date
   year(Pilot$Date2) <- this.year
@@ -164,24 +206,9 @@ mtext(paste("Sampling Strata"), side = 3, line = 0, outer = TRUE,cex=1.5)
 #mtext('Number of Salmon', side = 2, line = 1.5, las=0, outer = TRUE,cex=1.5)
 mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
 ```
+**Figure 1.a.  Daily sonar counts attributed to chum salmon across all years, project operated near Pilot Station, Yukon Area.**
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Stock proportion by sampling strata
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
 #  Plot mean stock proportion by sampling strata 
@@ -198,18 +225,21 @@ names(gname) <- ststockID
 #layout(matrix(1:2, ncol=2), widths=c(3,1))
 par(mar=c(4, 4, 4, 0),yaxs='i',bty='l',las=1) 
 temp1 <- Pilot.stpl[Pilot.stpl$group==ststockID[1],]
-plot(order(temp1$Strata),type='n', xlim=c(1,7),ylim=c(0,100), ylab='Stock Percent',xlab='Sample Strata Number')
+plot(order(temp1$Strata),type='n', xlim=c(1,8),ylim=c(0,100), ylab='Stock Percent',xlab='Sample Strata Number')
 for (i in 1:6){
   lines(percent~Strata, type ='o',lwd=2,col=i,pch=i,data=Pilot.stpl[Pilot.stpl$group==ststockID[i],])
 }
 title(main = this.year)
-legend('topright',legend = gname,col = c(1:6), pch=c(1:6),lty=1,lwd=2,bty = 'n')
+legend('top',legend = gname,col = c(1:6), pch=c(1:6),lty=1,lwd=2,bty = 'n')
 mtext('Stock Percent', side = 2, line = 1,las=0, outer = TRUE)
 mtext("Sampling Strata", side = 1, line = 1, outer = TRUE)
 
 ```
 **Figure 2.  Mean proportion of chum salmon stock groups by sampling strata, Yukon Area, `r this.year`.**
 
+\newpage
+
+##  Stock proportion by strata (bar graph) 
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
 Pilot.stn <- Pilot.m[Pilot.m$Year == this.year,c('Year','Strata','Run', c('4','7','8','11','19','10'))]
 gname <- lgnames[c('4','7','8','11','19','10')]      
@@ -225,6 +255,8 @@ mtext("Sampling Strata", side = 1, line = 2)
 ```
 **Figure 2.5  Mean proportion of chum salmon stock groups by sampling strata, Yukon Area, `r this.year`.**
 
+
+# Historical mean stock proportion  
 
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
 #-------------------------------------------------------------------------------
@@ -252,6 +284,9 @@ mtext("Dates", side = 1, line = 1, outer = TRUE)
 
 ```
 **Figure 3.  Mean proportion of chum salmon stock groups by standard sampling strata, Yukon Area, 2004-`r this.year-1`.**
+
+\newpage
+# Standard Stock Proportion 
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
 par(mfrow=c(4,2),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l')
 fig.stock.id <- c(4,7,8,10,11,19,16,3)
@@ -275,6 +310,9 @@ mtext("Dates", side = 1, line = 1, outer = TRUE)
 
 ```
 **Figure 4.  Minimum and maximum (2004-`r this.year-1`) and `r this.year` mean stock proportion by standard sampling strata, comparing the major chum salmon components, Yukon Area.**
+
+\newpage
+# Summer vs. Fall:  All seasons
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
   par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
   yax <- c(1,which(1:(ny+1)%%5==0)+1)
@@ -294,6 +332,8 @@ mtext("Dates", side = 1, line = 1, outer = TRUE)
   mtext("Dates ", side = 1, line = 1, outer = TRUE,cex=1.5)
 ```
 **Figure 5.  Crossover of summer and fall chum salmon based on genetic stock analysis (standard sampling strata), Yukon Area, 1999-2002 using allozymes and 2004-`r this.year` using microsatellites.**
+
+## Summer vs. Fall:  During the transition periods
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
   par(mfrow=c(5,5),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l') 
     for(i in 1:ny){
@@ -342,8 +382,9 @@ pie(temp$p, labels = paste(temp$GroupName,temp$pct),col=c(2:8),main="Stock Propo
 table <- mlist[which(mlist$Strata<10 & mlist$SortID<20),]
 ```
 
-
-Chum stock proportion `r this.year`. 
+\newpage
+# Tables
+**Table 1. Genetic proportions of chum salmon stock groupings from samples collected from mainstem Yukon River (Pilot Station) sonar test fishery `r this.year`.**
 
 ```{r,echo=FALSE}
 table$p <- table$p*100
@@ -354,15 +395,16 @@ kable(Prop[,-1],digits=1,caption=paste("Genetic Proportions of chum salmon stock
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
-
-# Table 
-Chum stock proportion `r this.year`. 
+\newpage
+**Table 2. Genetic estimates of chum salmon passage by stock groups applied to mainstem Yukon River (Pilot Station) sonar counts `r this.year`.**
 
 ```{r,echo=FALSE}
 n <- dcast(table,SortID+GroupName~Strata,value.var='mean')
+total <- rowSums(n[,-c(1,2)])
+n <- cbind(n,total)
 s.names <- with(rstr.y,paste(paste('Strata',Strata),Time_Frames,paste('n=',Sample_Size),sep='<br/>'))
-t.names <-c('Stock',s.names)
-kable(n[,-1],digits=0,format = "html",, booktabs = T,longtable=T,col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
+t.names <-c('Stock',s.names,'Total')
+kable(n[,-1],digits=0,format = "html", booktabs = T,longtable=T,col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped"))
 ```
 
