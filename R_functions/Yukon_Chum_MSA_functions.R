@@ -152,7 +152,7 @@ add.sum <- function(datM,Year=NA) {
 }
 
 #-------------------------------------------------------------------------------
-#  summer.p, fall.p  proporion of individual stock among summer/fall groups
+#  summer.p, fall.p  proportion of individual stock among summer/fall groups
 #  NA if component stocks are missing
 #  cn: number of columns that has Year and strata info 
 #-------------------------------------------------------------------------------

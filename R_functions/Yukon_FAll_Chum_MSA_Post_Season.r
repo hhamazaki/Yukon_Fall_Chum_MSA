@@ -101,11 +101,11 @@ st108.wm[,-1] <- st108.wm[,-1]*st102.s[st102.s$grpID==9,'mean']
 st103 <- Pilot.df[Pilot.df$Strata==103,]
 # Change long to wide
 st103 <- dcast(st103, Year~GroupName,value.var='p')
-# Extract toatal Summer and Merge 
+# Extract total Summer and Merge 
 T.summer <-  Pilot.df[Pilot.df$Strata==100 & Pilot.df$grpID==2,]
 st103.n <- merge(st103,T.summer[,c('Year','mean')], by = 'Year')
 # Multiply to the numbers 
-st103.n[,c(2:4)] <-st103.n[,c(2:4)]*st103.n[,5] 
+st103.n[,c(2:4)] <-st103.n[,c(2:4)]*st103.n[,6] 
 
 ### Table 103: summer ------
 out.excel <- list()

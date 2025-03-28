@@ -13,7 +13,7 @@
 #  Group ID and description ---- 
 #  (P) indicates Primary group directly identified by 
 #   GSI
-# 1 Upper Canada (1999-present): 3 White + 6 Teslin
+#   1 Upper Canada (1999-present): 3 White + 6 Teslin
 #	2 Total Summer (1999-present): 
 #		(1999-2002)  4 Lower Summer + 5 Middle Summer  
 #		(2004-2007)  23 Lower Summer+UpperKoy+Main + 8 Tanana Summer  
@@ -26,7 +26,7 @@
 #	6 (P) Teslin UC (1999- present)   
 #	7 (P) UppKoy+Main(2008- present)
 #	8 (P) Tanana Summer (2004- present)
-# 9 Total Fall (1999-present)
+#   9 Total Fall (1999-present)
 #		(1999-2002) 1 Upper Canada + 10 Tanana Fall + 22 Border US&CA
 #		(2004-present):  15 Fall US + 19 Total Canada  
 #	10 (P) Tanana Fall (2004-present):  
@@ -43,10 +43,10 @@
 #		 (2004-present) 11 Border US + 19 Total Canada
 #	18 Total USA (2004-present): 2 Total Summer + 15 Fall US
 #	19 Total Canada (2004-present): 1 Upper Canada + 12 Border CA 
-# 20 (P) Toklat (1999-2002):  
+#   20 (P) Toklat (1999-2002):  
 #	21 (P) Upper Tanana (1999-2002):   
 #	22 (P) Border US+ Border CA (1999-2002): 
-# 23 (P) Lower Summer+UpperKoy+Mai (2004-2007) moved from 4 
+#   23 (P) Lower Summer+UpperKoy+Mai (2004-2007) moved from 4 
 #		 (2008+present)  4 Lower Summer +7 UpperKoy+Mai  
 #'##############################################################################
 # Output Strata ----

@@ -57,7 +57,7 @@ wd_MSA <- './data/MSA_data'
 #===============================================================================
 postSeason <- TRUE 
 #  Overwrite CI: Do this when you updated historical data. 
-ciOverwrite <- TRUE
+ciOverwrite <- FALSE
 
 # Set year 
 this.year <- 2024
@@ -102,7 +102,6 @@ source(file.path(fdr,'Yukon_Fall_Chum_MSA_Post_Season.R'))
 # This will create 
 # Summary EXCEL files,  EXCEL file for JTC output
 # MSA prop and strata csv (data/MSA_data folder)
-
 
 
 
@@ -188,7 +187,7 @@ par(mfrow=c(1,1),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l',las=1)
   ry <-c(0,inc*ny)
   cl <- rainbow(ny)
   rstr.y <- rstr[rstr$Year==this.year,]
-  xlims<-c(min(stbreak),max(stbreak))
+  xlims<-c(min(Pilot$Date2),max(Pilot$Date2))
   plot(Run~Date, data=Pilot[Pilot$Year==this.year,],type = "n", ylim = ry,xlim=xlims,yaxt='n',xaxt='n', ylab='',xlab='')
   axis.Date(1, at = stbreak,format= "%b%d",cex=0.6)
     for(i in 1:ny){
@@ -196,7 +195,7 @@ par(mfrow=c(1,1),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l',las=1)
     axis(2, at = (i-1)*inc, labels = years[i])
     temp <- Pilot[Pilot$Year==years[i],]
     polygon(temp$Date2,
-            temp$Run + (ny - i)*inc,
+            temp$Run + (i-1)*inc,
             col = t.col(cl[i],50),border=NA)
   rstr.y <- rstr[rstr$Year==years[i],]
 #   lines(rstr.y$Strata_Start_Date,rep(inc,dim(rstr.y)[1]),col=4,lwd=2)
@@ -207,6 +206,45 @@ mtext(paste("Sampling Strata"), side = 3, line = 0, outer = TRUE,cex=1.5)
 mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
 ```
 **Figure 1.a.  Daily sonar counts attributed to chum salmon across all years, project operated near Pilot Station, Yukon Area.**
+
+
+# Historical Pilot Station Passage 
+```{r,fig.width=9, fig.height = 18,echo=FALSE,dpi=400}
+# Pilot Station timing 
+  pilot.dp <- merge(Pilot[,c('Year','Date','Run','Strata')], 
+                   Pilot.mp[,c('Year','Strata',c('4','7','8','11','19','10'))],by=c('Year','Strata'))
+gname <- lgnames[c('4','7','8','11','19','10')] 
+  pilot.dp[,-c(1:4)] <- pilot.dp[,-c(1:4)]*pilot.dp$Run
+  pilot.dp <- pilot.dp[order(pilot.dp$Year,pilot.dp$Date),]
+  pilot.dp$Date2 <- pilot.dp$Date
+  year(pilot.dp$Date2) <- this.year
+#  cl <- rainbow(ny)
+  rstr.y <- rstr[rstr$Year==this.year,]
+#  pilot.dp[is.na(pilot.dp)] <- 0
+  
+for(j in 1:6){
+  inc <- median(tapply(pilot.dp[,4+j],pilot.dp$Year,max),na.rm=TRUE)  
+  ry <-c(0,inc*ny)    
+par(mfrow=c(1,1),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l',las=1)
+    plot(Run~Date, data= pilot.dp[ pilot.dp$Year==this.year,],type = "n", ylim = ry,xlim=xlims,yaxt='n',xaxt='n', ylab='',xlab='')
+  axis.Date(1, at = stbreak,format= "%b%d",cex=0.6)
+    for(i in 1:ny){
+    abline(h = (i-1)*inc, col = "grey",lty=3,lwd=0.5)
+    axis(2, at = (i-1)*inc, labels = years[i])
+    temp <- pilot.dp[pilot.dp$Year==years[i],]
+#    polygon(temp$Date2,temp[,4+j] + (i-1)*inc,col = t.col(j,50),border=NA)
+    lines(temp$Date2,temp[,4+j] + (i-1)*inc,col = j)    
+    rstr.y <- rstr[rstr$Year==years[i],]
+#   lines(rstr.y$Strata_Start_Date,rep(inc,dim(rstr.y)[1]),col=4,lwd=2)
+#   line(v=max(rstr.y$Strata_End_Date),col=2,lwd=2)
+         }    
+mtext(paste("Stock:",gname[j]), side = 3, line = 0, outer = TRUE,cex=1.5)
+mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
+ } 
+```
+**Figure 1.a.  Daily sonar counts attributed to chum salmon across all years, project operated near Pilot Station, Yukon Area.**
+
+
 
 # Stock proportion by sampling strata
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
