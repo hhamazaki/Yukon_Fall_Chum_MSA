@@ -50,7 +50,8 @@ stock_prop_file_Ins <- 'MSA_prop_ins.csv'
 # Inseasopn Pilot Data 
 Pilot_Run_Ins <- 'Daily Passage By Species.csv'
 # Pilot Station Var  
-Pilot_Var_Ins <- 'Daily Variance By Species.csv'#-------------------------------------------------------------------------------
+Pilot_Var_Ins <- 'Daily Variance By Species.csv'
+#-------------------------------------------------------------------------------
 #  1.1: Set MSA data directory and file names 
 #-------------------------------------------------------------------------------
 source(file.path(fdr,'Yukon_Chum_MSA_STD.R')) 

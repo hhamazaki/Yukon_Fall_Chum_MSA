@@ -7,19 +7,6 @@ output:
 #    toc: true
 #    theme: united
 #  word_document:
-<<<<<<< HEAD
- # reference_docx: defalult-style_01.docx
-    toc: false
-#    highlight: zenburn
-#knit: (function(input, ...) {
- #   rmarkdown::render(
-  #    input,
-   #   output_file = paste0(
-    #    xfun::sans_ext(input), '-', Sys.Date(), '.docx'
-     # ),
-      #output_dir = file.path('./Output'),
-    #  envir = globalenv()
-=======
 #    reference_docx: defalult-style_01.docx
 #    toc: false
 #    highlight: zenburn

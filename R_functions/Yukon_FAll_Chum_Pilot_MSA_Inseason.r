@@ -42,11 +42,11 @@ fdr <- './R_functions'
 inSeason <- TRUE 
 # Set year 
 this.year <- 2024
-<<<<<<< HEAD
+
 last.year <- this.year -1
 
 #-------------------------------------------------------------------------------
-=======
+
 # Inseason Data directory and file name 
 wd_Ins <- './data/Inseason'
 strata_file_Ins <- 'MSA_Strata_ins.csv'
@@ -55,8 +55,8 @@ stock_prop_file_Ins <- 'MSA_prop_ins.csv'
 # Inseasopn Pilot Data 
 Pilot_Run_Ins <- 'Daily Passage By Species.csv'
 # Pilot Station Var  
-Pilot_Var_Ins <- 'Daily Variance By Species.csv'#-------------------------------------------------------------------------------
->>>>>>> 6c5e4d1cce77dc6e1d28e6666bd6ab751ccea34a
+Pilot_Var_Ins <- 'Daily Variance By Species.csv'
+#-------------------------------------------------------------------------------
 #  1.1: Set MSA data directory and file names 
 #-------------------------------------------------------------------------------
 source(file.path(fdr,'Yukon_Chum_MSA_STD.R')) 
