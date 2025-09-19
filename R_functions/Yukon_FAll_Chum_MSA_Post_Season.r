@@ -15,9 +15,9 @@ sumxlsx <- paste0('Yukon_Pilot_Chum_MSA_',Sys.Date(),'.xlsx')
 jtcxlsx <- paste0('JTC_MSA_',Sys.Date(),'.xlsx')
 
 # Output Annual Stock proportions by summer and fall:
-sf_p <- 'Pilot_sfp.csv'
+sf_p <- paste0('Pilot_sfp_',this.year,'.csv')
 # Output Annual Summer vs. Fall Stock proportions by standard break:
-sf_t <- 'Pilot_sft.csv'
+sf_t <- paste0('Pilot_sft_',this.year,'.csv')
 # Output min_max file name 
 min_max <- paste0('Pilot_d_min_max_',this.year,'.csv')
 
@@ -62,21 +62,20 @@ write.csv(MSA,file.path(wd_MSA,paste0('Pilot_MSA_strata_',min(years),'-',max(yea
 ###  Stratification Output  ------------
 #'------------------------------------------------------------------------------
 ### Strata 102 -----------------------------------------------------------------
-# Tanana Fall, Border US, Porcupine CA, Total Summer, Total Fall, Fall US, CA Upper+Main, Total Canada)
-
-st102.s <- Pilot.df[with(Pilot.df,which(Strata==102 & grpID %in% c(10,11,13,2,9,15,16,19))), ]
+# Group ID: 2,9
+st102.s <- Pilot.df[with(Pilot.df,which(Strata==102 & grpID %in% c(2,9,10,11,15,19,16,13))), ]
 
 ### JTC Table A7  ---------------
-# Stock proportions and number: 'Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.','Canada'
+# Stock proportions and number: 'Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.','Canada','Mainstem+ Upper Canada','Porcupine'
 # Change long to wide 
-JTC.A7.p <-dcast(st102.s, Year~GroupName,value.var='p') 
+JTC.A7.p <-dcast(st102.s, Year~grpID,value.var='p') 
 # Extract and arrange columns 
-JTC.A7.p <- JTC.A7.p[,c(1,9,8,6,2,4,7)]
-names(JTC.A7.p)[-1] <- c('Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.','Canada')
+JTC.A7.p <- JTC.A7.p[,c('Year','2','9','10','11','15','19','16','13')]
+names(JTC.A7.p)[-1] <- c('Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.','Canada','Mainstem+ Upper Canada','Porcupine')
 ### JTC Table A7 (Number) ---------------
-JTC.A7.n <-dcast(st102.s, Year~GroupName,value.var='mean') 
-JTC.A7.n <- JTC.A7.n[,c(1,9,8,6,2,4,7)]
-names(JTC.A7.n)[-1] <- c('Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.','Canada')
+JTC.A7.n <-dcast(st102.s, Year~grpID,value.var='mean') 
+JTC.A7.n <- JTC.A7.n[,c('Year','2','9','10','11','15','19','16','13')]
+names(JTC.A7.n)[-1] <- c('Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.','Canada','Mainstem+ Upper Canada','Porcupine')
 
 ### Table 108 ----------------
 # Stock proportions and number: Fall: Tanana,Border US, Canada, Mainstem Canada, Porcupine
@@ -109,8 +108,8 @@ st103.n[,c(2:4)] <-st103.n[,c(2:4)]*st103.n[,6]
 
 ### Table 103: summer ------
 out.excel <- list()
-out.excel$JTC.A7.p <- JTC.A7.p
-out.excel$JTC.A7.n <- JTC.A7.n
+out.excel$JTC.A7.p.St102 <- JTC.A7.p
+out.excel$JTC.A7.n.St102 <- JTC.A7.n
 out.excel$St108.p <- st108.w
 out.excel$St108.n <- st108.wm
 out.excel$St103.p <- st103

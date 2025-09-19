@@ -32,12 +32,9 @@ read.Pilot.data <- function(rstr,year,inSeason=FALSE){
   if(isTRUE(inSeason)){
     run <- read.csv(file.path(wd_Ins,Pilot_Run_Ins),stringsAsFactors = FALSE)  
     rvar <- read.csv(file.path(wd_Ins,Pilot_Var_Ins),stringsAsFactors = FALSE)
- # Remove the last 6 lines
-  run <- run[1:(dim(run)[1]-6),]
 # If fall chum column does not exist, add fall chum  
    if(isFALSE('FCHUM'%in%names(run))){run$FCHUM<-0} 
   # Remove the last 6 lines
-  rvar <- rvar[1:(dim(rvar)[1]-2),]
 # If fall chum column does not exist, add fall chum  
   if(isFALSE('FCHUM'%in%names(rvar))){rvar$FCHUM<-0}
   } else{
@@ -47,6 +44,8 @@ read.Pilot.data <- function(rstr,year,inSeason=FALSE){
 # change Date read as date 
   run$Date <- as.Date(run$Date,'%m/%d/%Y')
   rvar$Date <- as.Date(rvar$Date,'%m/%d/%Y')
+  run <- run[!is.na(run$Date),]
+  rvar <- rvar[!is.na(rvar$Date),]
 # Change NA to zero 
   run[is.na(run)] <- 0
   rvar[is.na(rvar)] <- 0
@@ -56,7 +55,9 @@ read.Pilot.data <- function(rstr,year,inSeason=FALSE){
   rvar$Var <- rvar$SCHUM+rvar$FCHUM
 # Combine run and variance by date 
   Pilot <- merge(run[,c('Date','Run')],rvar[,c('Date','Var')], by='Date',all=TRUE)
-# Add Year column
+#  Pilot <- merge(run,rvar, by='Date',all=TRUE)
+  
+  # Add Year column
   Pilot$Year <- year
 # Get strata data 
   rstr.y <- rstr[which(rstr$Year==year),]
@@ -100,3 +101,5 @@ read.Pilot.data <- function(rstr,year,inSeason=FALSE){
 # Output data 
   out <- Pilot
 }
+
+

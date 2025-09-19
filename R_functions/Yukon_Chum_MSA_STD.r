@@ -182,17 +182,17 @@ if(exists('postSeason')){
   rstr <- read.dir.files(file.path(wd_MSA,'MSA_Strata'))
   }
 if(exists('inSeason')){
-rstr <- read.csv(file.path(wd_Ins,strata_file_Ins),stringsAsFactors = FALSE)
+ rstr <- read.csv(file.path(wd_Ins,strata_file_Ins),stringsAsFactors = FALSE)
  }
 # Convert Date to Date format 
-
+rstr <- rstr[complete.cases(rstr),]
 rstr$Strata_Start_Date <- as.Date(rstr$Strata_Start_Date,'%m/%d/%Y')
 rstr$Strata_End_Date <- as.Date(rstr$Strata_End_Date,'%m/%d/%Y')
 # sort data by Start date
 rstr <- rstr[order(rstr$Strata_Start_Date),]
 # Find the number of years in the data 
 years <- unique(rstr$Year)
-if(max(years)>this.year) years <- years[years <=this.year]
+if(max(years)> this.year) years <- years[years <=this.year]
 # number of years
 ny <- length(years)
 #'------------------------------------------------------------------------------
@@ -203,7 +203,7 @@ ny <- length(years)
 stockID <-  read.csv(file.path(wd_MSA,stock_id_file),stringsAsFactors = FALSE)
 # Read MSA prop table 
 if(exists('inSeason')){
-MSA <- read.csv(file.path(wd_Ins,stock_prop_file_Ins),stringsAsFactors = FALSE)
+ MSA <- read.csv(file.path(wd_Ins,stock_prop_file_Ins),stringsAsFactors = FALSE)
 }
 if(exists('postSeason')){
   MSA <- read.dir.files(file.path(wd_MSA,'MSA_prop'))
