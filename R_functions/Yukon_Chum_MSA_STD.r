@@ -104,7 +104,6 @@
 #'==============================================================================
 # Add packages needed 
 library(openxlsx)   # Used to create EXCEL output file
-library(reshape2)   # Used to transpose data file 
 #library(ggplot2)    # Used for ggplot graphics 
 #library(lemon)      # Used for ggplot: better figures (facet_rep_wrap)
 #palette('Okabe-Ito')  # Change color palette color blinds friendly
@@ -349,12 +348,14 @@ Pilot.st.y <-  aggregate(cbind(Run,Var) ~ Year+Strata+sf, FUN=sum,data=Pilot.st)
 #'===============================================================================
 #  5.0: Data Output  ----
 #'===============================================================================
+
+
 #'-------------------------------------------------------------------------------
 ## 5.1 temp.m.ysg: mean run and proportion by Year and strata and group ----
 #'-------------------------------------------------------------------------------
 # Extract mean passage and proportion and combine with CI 
-temp.m <- melt(Pilot.m[,-3],id.vars = c('Year','Strata'), variable.name = "grpID", value.name = "mean")
-temp.mp <- melt(Pilot.mp[,-3],id.vars = c('Year','Strata'), variable.name = "grpID", value.name = "p")
+temp.m <- reshapeWL(Pilot.m[,-3],idvar=c('Year','Strata'),timevar='grpID',v.names='mean')
+temp.mp <- reshapeWL(Pilot.mp[,-3],idvar = c('Year','Strata'), timevar = "grpID", v.names = "p")
 temp.m.ysg <- merge(temp.m,temp.mp,by=c('Year','Strata','grpID'))
 
 #'------------------------------------------------------------------------------
@@ -362,8 +363,8 @@ temp.m.ysg <- merge(temp.m,temp.mp,by=c('Year','Strata','grpID'))
 #  temp.t.yg: mean run and proportion by Year group
 #'------------------------------------------------------------------------------
 # Extract total mean passage and proportion and combine with CI 
-temp.t <- melt(Pilot.t[,-2],id.vars = c('Year'), variable.name = "grpID", value.name = "mean")
-temp.tp <- melt(Pilot.tp[,-2],id.vars = c('Year'), variable.name = "grpID", value.name = "p")
+temp.t <- reshapeWL(Pilot.t[,-2],idvar=c('Year'),timevar='grpID',v.names='mean')
+temp.tp <- reshapeWL(Pilot.tp[,-2],idvar=c('Year'),timevar='grpID',v.names='p')
 temp.t.yg <- merge(temp.t,temp.tp,by=c('Year','grpID'))
 temp.t.yg$Strata <- 100
 
@@ -371,8 +372,8 @@ temp.t.yg$Strata <- 100
 ## 5.3  Strata 101,102 ----
 # temp.sf.y: mean run and proportion by Year and summer-fall group
 #'-------------------------------------------------------------------------------
-temp.sf <- melt(Pilot.sf[,-3],id.vars = c('Year','sf'), variable.name = "grpID", value.name = "mean")
-temp.sfp <- melt(Pilot.sfp[,-3],id.vars = c('Year','sf'), variable.name = "grpID", value.name = "p")
+temp.sf <- reshapeWL(Pilot.sf[,-3],idvar=c('Year','sf'),timevar='grpID',v.names='mean')
+temp.sfp <- reshapeWL(Pilot.sf[,-3],idvar=c('Year','sf'),timevar='grpID',v.names='p')
 temp.sf.y <- merge(temp.sf,temp.sfp,by=c('Year','sf','grpID'))
 temp.sf.y$sf<- temp.sf.y$sf+100
 names(temp.sf.y)[2] <- 'Strata'
@@ -383,7 +384,7 @@ names(temp.sf.y)[2] <- 'Strata'
 #'-------------------------------------------------------------------------------
 # Strata 103
 Pilot.ts <- summer.p(Pilot.t,1)
-temp.ts <- melt(Pilot.ts,id.vars = c('Year'), variable.name = "grpID", value.name = "p")
+temp.ts <- reshapeWL(Pilot.ts,idvar=c('Year'),timevar='grpID',v.names='p')
 temp.ts$mean <- NA
 temp.ts$Strata <- 103
 
@@ -394,7 +395,7 @@ temp.ts$Strata <- 103
 # Strata 104 105
 Pilot.sfs <- summer.p(Pilot.sf,2)
 # Strata 104 105
-temp.sfs <- melt(Pilot.sfs,id.vars = c('Year','sf'), variable.name = "grpID", value.name = "p")
+temp.sfs <- reshapeWL(Pilot.sfs,idvar=c('Year','sf'),timevar='grpID',v.names='p')
 temp.sfs$mean <- NA
 temp.sfs$sf <- temp.sfs$sf+103
 names(temp.sfs)[2] <- 'Strata'
@@ -406,7 +407,7 @@ names(temp.sfs)[2] <- 'Strata'
 # Strata 106
 Pilot.tf <- fall.p(Pilot.t,1)
 # Strata 106
-temp.tf <- melt(Pilot.tf,id.vars = c('Year'), variable.name = "grpID", value.name = "p")
+temp.tf <- reshapeWL(Pilot.tf,idvar=c('Year'),timevar='grpID',v.names='p')
 temp.tf$mean <- NA
 temp.tf$Strata <- 106
 
@@ -417,7 +418,7 @@ temp.tf$Strata <- 106
 # Strata 107 108
 Pilot.sff <- fall.p(Pilot.sf,2)
 # Strata 107 108
-temp.sff <- melt(Pilot.sff,id.vars = c('Year','sf'), variable.name = "grpID", value.name = "p")
+temp.sff <- reshapeWL(Pilot.sff,idvar=c('Year','sf'),timevar='grpID',v.names='p')
 temp.sff$mean <- NA
 temp.sff$sf <- temp.sff$sf+106
 names(temp.sff)[2] <- 'Strata'

@@ -17,6 +17,15 @@ t.col <- function(color, percent = 50, name = NULL) {
   invisible(t.col)
   }
 
+#'++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+##  1.6  reshapeWL: Reshape from wide to long  -----  
+#'++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
+reshapeWL <- function(df,idvar,timevar,v.names){
+  dfname <- names(df)[names(df)!=idvar]
+  out <- reshape(df,direction='long',idvar=idvar,varying=dfname,
+                 timevar = timevar,v.names=v.names,times=dfname)
+  return(out)}  
+
 #-------------------------------------------------------------------------------
 #  stb:  Set Standard Stock and Strata 
 #-------------------------------------------------------------------------------
