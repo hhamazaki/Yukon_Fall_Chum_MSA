@@ -250,7 +250,7 @@ pie(temp$p, labels = temp$GroupName, main="Stock Proportion")
     ggplot() + theme_simple() + 
       facet_rep_wrap( ~factor(Year)) +
       #   facet_wrap( ~factor(Year),scale='free') + 
-      scale_x_continuous( breaks=c( 1:9 ),labels=stbl) + 
+      scale_x_continuous(breaks=c( 1:9 ),labels=stbl) + 
 	  ylim(0, 100)+
       theme(axis.text.x = element_text(size=7))+
       labs(title = "Summer vs. Fall\n")+  xlab("Season Strata") +
