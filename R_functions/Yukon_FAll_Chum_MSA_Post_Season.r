@@ -20,11 +20,12 @@ sf_p <- paste0('Pilot_sfp_',this.year,'.csv')
 sf_t <- paste0('Pilot_sft_',this.year,'.csv')
 # Output min_max file name 
 min_max <- paste0('Pilot_d_min_max_',this.year,'.csv')
-
+if(filesave){
 # Save all MSA proportion data 
 write.csv(MSA,file.path(wd_MSA,paste0('Pilot_MSA_prop_',min(years),'-',max(years),'.csv')), na='',row.names=FALSE)
 # Save all MSA strata data 
 write.csv(MSA,file.path(wd_MSA,paste0('Pilot_MSA_strata_',min(years),'-',max(years),'.csv')), na='',row.names=FALSE)
+}
 
 #'------------------------------------------------------------------------------
 #  CI update for overwrite 
@@ -49,15 +50,17 @@ write.csv(MSA,file.path(wd_MSA,paste0('Pilot_MSA_strata_',min(years),'-',max(yea
   for(i in 1:ny){
       EXlist[[i]] <- read.csv(file.path(wd_Sum,paste0('Pilot_MSA_Sum_',years[i],'.csv')),stringsAsFactors =  FALSE)
       }  
-  names(EXlist) <- years	  
+  names(EXlist) <- years	
+  if(filesave){  
   write.xlsx(EXlist,file.path(wd_Out,sumxlsx),rowNames=FALSE)
-  
+  }
 #'------------------------------------------------------------------------------
 ###  EXCEL Annual JTC MSA table output ------------
 #'------------------------------------------------------------------------------
 # Change Pilot Data from list to data.frame 
   Pilot.df <- as.data.frame(do.call(rbind,EXlist))
 
+if(filesave){
 #'------------------------------------------------------------------------------
 ###  Stratification Output  ------------
 #'------------------------------------------------------------------------------
@@ -135,3 +138,4 @@ write.xlsx(out.excel,file.path(wd_Out,jtcxlsx),rowNames=FALSE)
  Pilot.d.min.max<- merge(Pilot.d.min.max,stockID, by.x = 'group', by.y = 'grpID')
 #------ File output ------------------------------------------------------------
   write.csv(Pilot.d.min.max,file.path(wd_Sum,min_max),na='',row.names=FALSE)
+}

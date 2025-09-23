@@ -398,4 +398,51 @@ sim.ci <- function(MSA.y,Temp.st,sgrpIDn,nrep,ci,this.year) {
   return(out)
 } # End of the function 
 
+plot_ridge <- function(S, ridge.dat, u, n) {
+  # Extract relevant parameters
+  rep <- nrow(ridge.dat)
+  inc <- median(apply(ridge.dat, 1, max, na.rm = TRUE))
+  rn <- sample(1:rep, n)  # Randomly sample n rows
+  # Scale S
+  S <- S
+  rx <- range(S)  # Range of S for x-axis
+  # Prepare the data for plotting
+  ridge_data <- data.frame()
+  # Prepare for each ridge (i) as a separate row
+  for (i in 1:n) {
+    ridge <- ridge.dat[rn[i], ]
+    ridge_data <- rbind(ridge_data, data.frame(
+      x = S,
+      y = ridge + (i - 1) * inc,
+      group = i  # Grouping for each ridge
+    ))
+  }
+  maxy <- max(ridge_data$y)
+  # Create the ggplot
+  p <- ggplot()+
+    #    ggplot(ridge_data, aes(x = x, y = y, group = group)) +
+    # Create polygons for each ridge
+    geom_polygon(data=ridge_data, aes(x = x, y = y, fill = factor(group)), color = NA, alpha = 0.3) +
+    # Add horizontal dashed lines
+    geom_hline(data = data.frame(y = (0:(n-1)) * inc), aes(yintercept = y), 
+               color = "grey", linetype = "solid", size = 0.25) +
+    # Set axis labels and title
+    labs(x = paste('Spawner', mult(u)), y = NULL) +
+    scale_fill_manual(values = rainbow(n)) +
+    #     scale_fill_viridis_c()+
+    theme(
+      #      axis.title = element_text(size = 14),
+      #      axis.text.y = element_blank(),
+      #      axis.text.x = element_text(size=14),
+      #      axis.line.y = element_blank(),
+      #      axis.ticks = element_blank(),
+      panel.grid = element_blank(),
+      legend.position = "none",
+      #      plot.margin = margin(0, 0, 0, 0)  # No extra space
+    ) +
+    scale_x_continuous(expand=c(0,0),limits=c(0,NA),labels = label_number(scale = 1/u),n.breaks = 10,oob=oob_keep)+
+    scale_y_continuous(expand=c(0,0),limits=c(0,maxy),labels = label_number(scale = 1/maxy),breaks = c(0,0.2,0.4,0.6,0.8,1.0)*maxy,oob=oob_keep)
+  # Print the plot
+  return(p)
+}
 
