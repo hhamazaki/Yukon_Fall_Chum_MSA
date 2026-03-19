@@ -180,10 +180,33 @@ library(kableExtra)
       scale_y_continuous(expand=expansion(mult = c(0, .25)), limits=c(0, NA))+
       geom_vline(xintercept = c(rstr.y$Strata_Start_Date),color=4) + 
       geom_vline(xintercept = max(rstr.y$Strata_End_Date,na.rm=TRUE),color=2)+
-      labs(title="Pilot Station Sampling Strata",x="Date",y="Number of Salmon")
+      labs(title="Pilot Station Sampling Strata",x="Date",y="Salmon Passage")
 
 ```
 **Figure 1.  Daily sonar counts attributed to chum salmon (bars) showing genetic sampling time frames (droplines), project operated near Pilot Station, Yukon Area, `r this.year`.**
+
+# Pilot Station Passage 
+```{r,fig.width=9, fig.height = 5,echo=FALSE,dpi=400}
+# Pilot Station timing 
+  Pilot$Date2 <- Pilot$Date
+  year(Pilot$Date2) <- this.year
+  rstr$Start2 <- rstr$Strata_Start_Date
+  year(rstr$Start2) <- this.year
+  rstr$End2 <- rstr$Strata_End_Date
+  year(rstr$End2) <- this.year
+    ggplot() +
+      geom_bar(data = Pilot, aes(x=Date2,y=Run), stat='identity',color='grey')+
+      scale_x_date(expand=c(0, 2),oob=oob_keep,date_labels="%b%d")+
+      scale_y_continuous(expand=expansion(mult = c(0, .25)), limits=c(0, NA),labels = function(x) x / 1000)+
+      geom_vline(data=rstr, aes(xintercept = (End2+1)),color=2)+
+      geom_vline(data=rstr, aes(xintercept = Start2),color=4) + 
+      facet_wrap(~Year,axes='all',axis.labels='margins',scales='free_y') +
+      theme(axis.text.y = element_text(size = 6))+
+      theme(axis.text.x = element_text(size = 5))+
+      labs(title="Pilot Station Sampling Strata",x="Date",y="Passage (x1000)")
+
+```
+**Figure 1.1  Daily sonar counts attributed to chum salmon (bars) showing genetic sampling time frames (droplines), project operated near Pilot Station, Yukon Area, `r this.year`.**
 
 \newpage
 ```{r,fig.width=9, fig.height = 12,echo=FALSE,dpi=400}
