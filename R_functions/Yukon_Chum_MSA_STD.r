@@ -210,7 +210,18 @@ if(exists('postSeason')){
 # Extract primary groupID
 MSAs <- MSA[MSA$grpID %in% stgrpID,]
 # Change Long to Wide format
-MSAL <- dcast(MSAs, Year+Strata~grpID, value.var='Mean')
+#MSAL <- dcast(MSAs, Year+Strata~grpID, value.var='Mean')
+reshapeLW <- function(df,idvar=idvar,v.names=v.names,timevar=timevar){
+  dfs <- df[c(idvar,timevar,v.names)]
+   w <- reshape(dfs,direction='wide',timevar=timevar,v.names=v.names,idvar=idvar)
+   wname <- names(w)[-c(1:length(idvar))]
+   vhead <-paste0(v.names,'.')
+   wname <- gsub(vhead,'',wname)
+   names(w)[-c(1:length(idvar))] <- wname
+   return(w)
+}
+MSAL <- reshapeLW(MSAs,idvar=c('Year','Strata'),v.names='Mean',timevar='grpID')
+ 
 # Clean data  
 MSAL <-grpclean(MSAL)
 # Standardize MSA proportion, so that total will be 1.0  
@@ -324,8 +335,9 @@ Pilot.sd  <- add.sum(Pilot.sd)
 # Calculate stock proportion by standard strata
 Pilot.sd[,-c(1:3)]  <- 100*Pilot.sd[,-c(1:3)] /Pilot.sd$Run 
 # Transpose from wide to long 
-Pilot.sd <- melt(Pilot.sd[,-3], 
-                 id.vars = c('Year','stbreak'), variable.name = "group", value.name = "percent")
+#Pilot.sd <- melt(Pilot.sd[,-3], 
+#                 id.vars = c('Year','stbreak'), variable.name = "group", value.name = "percent")
+Pilot.sd  <- reshapeWL(Pilot.sd[,-3], idvar = c('Year','stbreak'), timevar = "group", v.names = "percent") 
 # Change 0 percent to NA
 Pilot.sd$percent[Pilot.sd$percent==0]<-NA
 
@@ -373,7 +385,7 @@ temp.t.yg$Strata <- 100
 # temp.sf.y: mean run and proportion by Year and summer-fall group
 #'-------------------------------------------------------------------------------
 temp.sf <- reshapeWL(Pilot.sf[,-3],idvar=c('Year','sf'),timevar='grpID',v.names='mean')
-temp.sfp <- reshapeWL(Pilot.sf[,-3],idvar=c('Year','sf'),timevar='grpID',v.names='p')
+temp.sfp <- reshapeWL(Pilot.sfp[,-3],idvar=c('Year','sf'),timevar='grpID',v.names='p')
 temp.sf.y <- merge(temp.sf,temp.sfp,by=c('Year','sf','grpID'))
 temp.sf.y$sf<- temp.sf.y$sf+100
 names(temp.sf.y)[2] <- 'Strata'

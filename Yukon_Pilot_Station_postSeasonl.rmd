@@ -10,7 +10,7 @@ output:
   html_document:
     df_print: paged
     fig_caption: true
-    toc: true
+    toc: false
     toc_depth: 2
     toc_float: true
 #  word_document:
@@ -63,10 +63,13 @@ wd_Sum<- './data/Summary_data'
 postSeason <- TRUE 
 #  Overwrite CI: Do this when you updated historical data. 
 ciOverwrite <- FALSE
-
+# Save output files 
+filesave <- TRUE
 # Set year 
 this.year <- 2025
 library(lubridate)
+library(reshape2)
+#palette("Okabe-Ito")
 #'------------------------------------------------------------------------------
 ##  1.0 : Set MSA and Pilot data file names ---- 
 #'------------------------------------------------------------------------------
@@ -177,7 +180,7 @@ mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
 **Figure 1.  Daily sonar counts attributed to chum salmon (bars) showing genetic sampling time frames (droplines), project operated near Pilot Station, Yukon Area, `r this.year`.**
 
 # Historical Pilot Station Passage 
-```{r,fig.width=9, fig.height = 18,echo=FALSE,dpi=400}
+```{r,fig.width=9, fig.height = 12,echo=FALSE,dpi=400}
 # Pilot Station timing 
 par(mfrow=c(1,1),mar = c(2,2,2,2),oma = c(3,3,3,3),yaxs='i',bty='l',las=1)
   Pilot$Date2 <- Pilot$Date
@@ -208,7 +211,7 @@ mtext("Date", side = 1, line = 1, outer = TRUE,cex=1.5)
 
 
 # Historical Pilot Station Passage 
-```{r,fig.width=9, fig.height = 18,echo=FALSE,dpi=400}
+```{r,fig.width=9, fig.height = 12,echo=FALSE,dpi=400}
 # Pilot Station timing 
   pilot.dp <- merge(Pilot[,c('Year','Date','Run','Strata')], 
                    Pilot.mp[,c('Year','Strata',c('4','7','8','11','19','10'))],by=c('Year','Strata'))

@@ -24,7 +24,7 @@ if(filesave){
 # Save all MSA proportion data 
 write.csv(MSA,file.path(wd_MSA,paste0('Pilot_MSA_prop_',min(years),'-',max(years),'.csv')), na='',row.names=FALSE)
 # Save all MSA strata data 
-write.csv(MSA,file.path(wd_MSA,paste0('Pilot_MSA_strata_',min(years),'-',max(years),'.csv')), na='',row.names=FALSE)
+write.csv(rstr,file.path(wd_MSA,paste0('Pilot_MSA_strata_',min(years),'-',max(years),'.csv')), na='',row.names=FALSE)
 }
 
 #'------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ st103 <- dcast(st103, Year~GroupName,value.var='p')
 T.summer <-  Pilot.df[Pilot.df$Strata==100 & Pilot.df$grpID==2,]
 st103.n <- merge(st103,T.summer[,c('Year','mean')], by = 'Year')
 # Multiply to the numbers 
-st103.n[,c(2:4)] <-st103.n[,c(2:4)]*st103.n[,6] 
+st103.n[,c(2:5)] <-st103.n[,c(2:5)]*st103.n[,6] 
 
 ### Table 103: summer ------
 out.excel <- list()
@@ -116,7 +116,7 @@ out.excel$JTC.A7.n.St102 <- JTC.A7.n
 out.excel$St108.p <- st108.w
 out.excel$St108.n <- st108.wm
 out.excel$St103.p <- st103
-out.excel$St103.n <- st103.n[,-5]
+out.excel$St103.n <- st103.n[,-6]
 write.xlsx(out.excel,file.path(wd_Out,jtcxlsx),rowNames=FALSE)
     
 #'------------------------------------------------------------------------------

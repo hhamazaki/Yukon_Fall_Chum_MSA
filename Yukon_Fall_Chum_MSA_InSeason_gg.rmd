@@ -68,11 +68,12 @@ Pilot_Var_Ins <- 'Daily Variance By Species.csv'
 source(file.path(fdr,'Yukon_Chum_MSA_STD.R'))  
 source(file.path(fdr,'ggplot_theme.r'))  
 library(ggplot2)    # Used for ggplot graphics 
-library(reshape2)
+#library(reshape2)
 theme_set(theme_simple())
 #theme_set(theme_adfg_bbc())
-okabe <- c("#E69F00","#56B4E9", "#009E73","#F0E442","#0072B2","#D55E00","#CC79A7" )
-options(ggplot2.discrete.colour = okabe)
+okabe.1 <- c("#000000","#E69F00","#56B4E9", "#009E73","#F0E442","#0072B2","#D55E00","#CC79A7" )
+okabe <- c("#E69F00","#56B4E9", "#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#000000" )
+options(ggplot2.discrete.color = okabe)
 options(ggplot2.discrete.fill = list(okabe))
 # Standard Output Stock figures 
 ststockID <- c(4,7,8,10,11,19)
@@ -86,7 +87,13 @@ ststockID <- c(4,7,8,10,11,19)
 ststocks <- as.character(ststockID)
 # Standard break date 
 # '05/01','06/22','06/29','07/10','07/19','07/28','08/06','08/15','08/25','09/15'
-stbreak <- stb(this.year)
+stb2 <- function(year){
+  stdates <- c('05/28/','06/22/','06/29/','07/10/','07/19/','07/28/','08/06/','08/15/','08/25/','09/15/')
+  stdates <- paste0(stdates,year)
+  stdates <- as.Date(stdates,'%m/%d/%Y')
+  return(stdates) 
+}
+stbreak <- stb2(this.year)
 # Pilot 
 
 Pilot.total <- mlist[mlist$Strata==100,]
@@ -137,13 +144,13 @@ library(kableExtra)
 #-------------------------------------------------------------------------------
   rstr.y <- rstr[rstr$Year==this.year,]
   xlims<-c(min(stbreak),max(stbreak))  
-p1 <-   ggplot() +
+      ggplot() +
       geom_bar(data = Pilot, aes(x=Date,y=Run), stat='identity',color='grey')+
       scale_x_date(expand=c(0, 2),limits=as.Date(xlims),oob=oob_keep,date_labels="%b%d")+
       scale_y_continuous(expand=expansion(mult = c(0, .25)), limits=c(0, NA))+
       geom_vline(xintercept = c(rstr.y$Strata_Start_Date),color=4) + 
       geom_vline(xintercept = max(rstr.y$Strata_End_Date,na.rm=TRUE),color=2)
-print(p1)
+
 
 ```
 Figure 1.  Daily sonar counts attributed to chum salmon (bars) showing genetic sampling time frames (droplines), project operated near Pilot Station, Yukon Area, `r this.year`.
@@ -155,20 +162,21 @@ Figure 1.  Daily sonar counts attributed to chum salmon (bars) showing genetic s
 #  Plot mean stock proportion by sampling strata 
 #-------------------------------------------------------------------------------
 # Pilot Station timing 
-Pilot.stp <- Pilot.m[,c('Year','Strata','Run', ststocks)]
+Pilot.stp <- Pilot.m[Pilot.m$Year == this.year,c('Year','Strata','Run', ststocks)]
 Pilot.stp[,ststocks] <- 100*Pilot.stp[,ststocks] /Pilot.stp$Run
-Pilot.stpl <- melt(Pilot.stp[,c('Year','Strata',ststocks)], 
-                   id.vars = c('Year','Strata'), variable.name = "group", value.name = "percent") 
+Pilot.stpl  <- reshapeWL(Pilot.stp[,c('Year','Strata',ststocks)], idvar = c('Year','Strata'), timevar = "group", v.names = "percent") 
+Pilot.stpl$group <- factor(Pilot.stpl$group,levels = ststocks)
 Pilot.stpl <- Pilot.stpl[order(Pilot.stpl$Year,Pilot.stpl$Strata),]
 gname <- stockID[stockID$grpID %in%ststockID,c('GroupName')]      
 names(gname) <- ststockID
+nb <- length(unique(Pilot.stpl$Strata))
+    ggplot(data = Pilot.stpl, aes(x=(Strata),y=percent,group=group))+
+    geom_line(aes(colour=group))+geom_point(aes(shape=group,color=group))+ 
+    scale_color_manual(values = okabe.1,labels = gname)+scale_shape_manual(values = c(1:6),labels = gname)+
+    labs(x='Sampling Strata -standard dates',y='Stock Percent')+
+    scale_x_continuous(expand=expansion(add = c(.25,.25)),breaks=seq(1,nb),labels=rstr[which(rstr$Year==this.year), 'Time_Frames'], limits=c(1, NA))+
+        theme(axis.text.x = element_text(size = rel(0.75)))
 
-p1 <-   ggplot(data = Pilot.stpl, aes(x=Strata,y=percent,group=group))+
-        geom_line(aes(colour=group))+geom_point(aes(shape=group,color=group))+ 
-        scale_color_manual(values = c(1:6),labels = gname)+scale_shape_manual(values = c(1:6),labels = gname)+
-        labs(x='Sampling Strata',y='Stock Percent')+
-        scale_x_continuous(expand=expansion(add = c(.25, .25)),breaks=seq(1,10), limits=c(1, NA))
-  print(p1)
 
 ```
 Figure 2.  Mean proportion of chum salmon stock groups by sampling strata, Yukon Area, `r this.year`.
@@ -178,15 +186,17 @@ Figure 2.  Mean proportion of chum salmon stock groups by sampling strata, Yukon
 #-------------------------------------------------------------------------------
 #  Plot passage by stock and strata 
 #-------------------------------------------------------------------------------
-Pilot.stn <- Pilot.m[,c('Year','Strata',c('4','7','8','11','19','10'))]
-Pilot.stnl <- melt(Pilot.stn, 
-                   id.vars = c('Year','Strata'), variable.name = "group", value.name = "n") 
-gname <- lgnames[c('4','7','8','11','19','10')]      
-p1 <-   ggplot(data=Pilot.stnl,aes(x=as.factor(Strata),y=n,group=group))+ 
+Pilot.stn <- Pilot.m[Pilot.m$Year == this.year,c('Year','Strata', c('4','7','8','11','19','10'))]
+Pilot.stnl  <- reshapeWL(Pilot.stn, idvar = c('Year','Strata'), timevar = "group", v.names = "n")
+Pilot.stnl$group <- factor(Pilot.stnl$group,levels = c('4','7','8','11','19','10'))
+gname <- lgnames[c('4','7','8','11','19','10')]
+        ggplot(data=Pilot.stnl,aes(x=as.factor(Strata),y=n,group=group))+ 
         geom_bar(stat = "identity", position = "dodge",aes(fill=group))+
-        labs(x = "Sampling Strata", y = "Run size")+
-        scale_fill_manual(values = c(1:6),labels = gname)
-print(p1)
+        scale_fill_manual(values = okabe.1,labels = gname)+
+        scale_x_discrete(labels=rstr[which(rstr$Year==this.year), 'Time_Frames'])+
+        theme(axis.text.x = element_text(size = rel(0.75)))+
+        labs(x = "Sampling Strata -standard dates", y = "Run size")
+
 ```
 Figure 2.5  Mean proportion of chum salmon stock groups by sampling strata, Yukon Area, `r this.year`.
 
@@ -200,10 +210,10 @@ gname <- stockID[stockID$grpID %in%ststockID,c('GroupName')]
 names(gname) <- ststockID
 df <- Pilot.d.min.max[Pilot.d.min.max$group %in% ststockID,]
 df$group <- as.factor(df$group)
-p1 <- ggplot(data = df, aes(x=as.factor(stbreak),y=Mean,group=group))+
-      geom_line(aes(colour=group))+geom_point(aes(shape=group,colour=group))+                           scale_colour_manual(values = c(1:6),labels = gname)+scale_shape_manual(values = c(1:6),labels = gname)+
+ ggplot(data = df, aes(x=as.factor(stbreak),y=Mean,group=group))+
+      geom_line(aes(colour=group))+geom_point(aes(shape=group,colour=group))+                           scale_colour_manual(values = okabe.1,labels = gname)+scale_shape_manual(values = c(1:6),labels = gname)+
         scale_x_discrete(labels=stbl)+labs(x='Dates',y='Stock Percent')
-  print(p1)
+
 ```
 Figure 3.  Mean proportion of chum salmon stock groups by standard sampling strata, Yukon Area, 2004-`r this.year-1`.
 
@@ -220,14 +230,15 @@ gname$grpID <- as.character(gname$grpID)
 new_order_indices <- match(as.character(fig.stock.id), gname$grpID)
 name <- gname[new_order_indices,'GroupName']
 df <- Pilot.d.min.max[Pilot.d.min.max$group %in% fig.stock.id,]
-plt <- Pilot.sd[Pilot.sd$group %in% fig.stock.id,]
-plt$group <- as.numeric(as.character(plt$group))
-ggplot()+
-  geom_ribbon(data=df,aes(x=(stbreak),ymin = Min, ymax = Max), fill = "gray", alpha = 0.5) +
-  geom_line(data=plt,aes(x=stbreak, y=percent),colour=2)+
-  scale_x_continuous(expand=expansion(add = c(.25, .25)),breaks=seq(1,10), limits=c(1, NA))+
+plt <- Pilot.sd[(Pilot.sd$group %in% fig.stock.id)&(Pilot.sd$Year==this.year),]
+df <- merge(plt,df, by =c('stbreak','group'))
+ggplot(data=df,aes(x=(stbreak)))+
+  geom_ribbon(aes(ymin = Min, ymax = Max), fill = "gray", alpha = 0.5) +
+ geom_line(aes(y=percent),colour=2)+
+  scale_x_continuous(expand=expansion(add = c(.25, .25)),breaks=seq(1,9), labels=stbl, limits=c(1, NA))+
   facet_wrap( ~factor(group,labels=name,levels=as.character(fig.stock.id)),axes='all',axis.labels='margins',ncol=2)+
-  labs(title="Stock Proportion thru Run",x="Dates",y='Stock Percent')
+  labs(title="Stock Proportion thru Run",x="Dates",y='Stock Percent')+
+  theme(axis.text.x = element_text(size = rel(0.8)))
 ```
 Figure 4.  Minimum and maximum (2004-`r this.year-1`) and `r this.year` mean stock proportion by standard sampling strata, comparing the major chum salmon components, Yukon Area.
 
@@ -240,15 +251,16 @@ Figure 4.  Minimum and maximum (2004-`r this.year-1`) and `r this.year` mean sto
 # Get length
    tyears <- c(years,this.year)
    tny <- length(tyears)
-   df<- melt(hsft[,c(1,2,4,5)],id.vars=c('Year','stbreak'), 
-                       variable.name='SF', value.name='percent')
-   df<- reshape(hsft[,c(1,2,4,5)], idvar =c('Year','stbreak'),
-                varying =3:4,
-                v.names = 'percent',
-                timevar='SF',
-                times=names(hsft[,c(1,2,4,5)])[3:4],
-                direction = 'long'
-                )
+#   df<- melt(hsft[,c(1,2,4,5)],id.vars=c('Year','stbreak'), 
+#                       variable.name='SF', value.name='percent')
+   df <-reshapeWL(hsft[,c(1,2,4,5)],idvar=c('Year','stbreak'),timevar='SF', v.names='percent')
+#   df<- reshape(hsft[,c(1,2,4,5)], idvar =c('Year','stbreak'),
+#                varying =3:4,
+#                v.names = 'percent',
+#                timevar='SF',
+#                times=names(hsft[,c(1,2,4,5)])[3:4],
+#                direction = 'long'
+#                )
 ```
 
 
@@ -297,7 +309,7 @@ if(dim(Pilot.fall)[1]>0){
 temp <- Pilot.fall[Pilot.fall$grpID %in% c(4,7,8,10,11,13,16),]
 temp$pct <- with(temp, paste0(round(100*p),'%'))
 temp$lab.ypos = with(temp, cumsum(p) +0.2)
-ggplot(temp,aes(x='',y=pct,fill=GroupName))+
+ggplot(temp,aes(x='',y=p,fill=GroupName))+
 geom_col(color='black')+
 geom_text(aes(x=1.6,label=pct),position=position_stack(vjust=0.5))+
 coord_polar("y")+
@@ -315,7 +327,7 @@ Figure 7. Contributions of chum salmon based on genetic analysis during the fall
 if(dim(Pilot.fallinfall)[1]>0){
   temp <- Pilot.fallinfall[Pilot.fallinfall$grpID %in% c(10,11,19),]
 temp$pct <- with(temp, paste0(round(100*p),'%'))
-ggplot(temp,aes(x='',y=pct,fill=GroupName))+
+ggplot(temp,aes(x='',y=p,fill=GroupName))+
 #geom_bar(stat = "identity", color = "white") +  
 geom_col(color='black')+
 geom_text(aes(x=1.6, label=pct),position=position_stack(vjust=0.5))+
@@ -340,7 +352,8 @@ table <- mlist[which(mlist$Strata<10 & mlist$SortID<20),]
 **Table 1. Genetic proportions of chum salmon stock groupings from samples collected from mainstem Yukon River (Pilot Station) sonar test fishery `r this.year`.**
 ```{r,echo=FALSE}
 table$p <- table$p*100
-Prop <- dcast(table,SortID+GroupName~Strata,value.var='p')
+#Prop <- dcast(table,SortID+GroupName~Strata,value.var='p')
+Prop <- reshapeLW(table,idvar=c('SortID','GroupName'),timevar='Strata',v.names='p')
 s.names <- with(rstr,paste(paste('Strata',Strata),Time_Frames,paste('n=',Sample_Size),sep='<br/>'))
 t.names <-c('Stock',s.names)
 kable(Prop[,-1],digits=1,format = "html",col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
@@ -350,7 +363,9 @@ kable(Prop[,-1],digits=1,format = "html",col.names=t.names,format.args = list(bi
 \newpage
 **Table 2. Genetic estimates of chum salmon passage by stock groups applied to mainstem Yukon River (Pilot Station) sonar counts `r this.year`.**
 ```{r,echo=FALSE}
-n <- dcast(table,SortID+GroupName~Strata,value.var='mean')
+n <- reshapeLW(table,idvar=c('SortID','GroupName'),timevar='Strata',v.names='mean')
+
+#n <- dcast(table,SortID+GroupName~Strata,value.var='mean')
 total <- rowSums(n[,-c(1,2)])
 n <- cbind(n,total)
 s.names <- with(rstr.y,paste(paste('Strata',Strata),Time_Frames,paste('n=',Sample_Size),sep='<br/>'))
