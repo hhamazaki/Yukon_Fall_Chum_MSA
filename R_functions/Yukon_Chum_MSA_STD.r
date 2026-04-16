@@ -46,7 +46,7 @@
 #   20 (P) Toklat (1999-2002):  
 #	21 (P) Upper Tanana (1999-2002):   
 #	22 (P) Border US+ Border CA (1999-2002): 
-#   23 (P) Lower Summer+UpperKoy+Mai (2004-2007) moved from 4 
+# 23 (P) Lower Summer+UpperKoy+Mai (2004-2007) moved from 4 
 #		 (2008+present)  4 Lower Summer +7 UpperKoy+Mai  
 #'##############################################################################
 # Output Strata ----
@@ -207,6 +207,11 @@ if(exists('inSeason')){
 if(exists('postSeason')){
   MSA <- read.dir.files(file.path(wd_MSA,'MSA_prop'))
   }
+#'------------------------------------------------------------------------------
+# Fill 1999-2002 Empty SD:  As SD = (X95CIU-Mean)/2
+#'------------------------------------------------------------------------------
+MSA$SD <- ifelse(MSA$Year<2004 & (!is.na(MSA$Mean)),(MSA$X95CIU-MSA$Mean)/2,MSA$SD)
+
 # Extract primary groupID
 MSAs <- MSA[MSA$grpID %in% stgrpID,]
 # Change Long to Wide format
@@ -320,23 +325,21 @@ Pilot.sft[,c('Summer','Fall')]  <- 100*Pilot.sft[,c('Summer','Fall')] /Pilot.sft
 # Reorder 
 Pilot.sft <- Pilot.sft[with(Pilot.sft,order(Year,stbreak)),]
 
-#'-------------------------------------------------------------------------------
+#'------------------------------------------------------------------------------
 #  3.6 Pilot.sd:Estimate mean stock proportion by standard strata ----
-#'-------------------------------------------------------------------------------# Calculate sum by sample strata 	
+#'------------------------------------------------------------------------------
+#'# Calculate sum by sample strata 	
 temp <- Pilot.d[,c('Year','stbreak','Run',stgrpIDn)]
 temp[is.na(temp)] <- 0
-#'------ Mean Proportion --------------------------------------------------------
+#'------ Mean Proportion -------------------------------------------------------
 Pilot.sd <- aggregate(.~Year+stbreak, FUN=sum,data=temp) 
 Pilot.sd <- grpclean(Pilot.sd)
 # Add additional stock groups
 Pilot.sd  <- add.sum(Pilot.sd)
 # Reduce data to standard stocks 
-#Pilot.sd <- Pilot.sd[,c('Year','stbreak','Run',ststocks)]  
 # Calculate stock proportion by standard strata
 Pilot.sd[,-c(1:3)]  <- 100*Pilot.sd[,-c(1:3)] /Pilot.sd$Run 
 # Transpose from wide to long 
-#Pilot.sd <- melt(Pilot.sd[,-3], 
-#                 id.vars = c('Year','stbreak'), variable.name = "group", value.name = "percent")
 Pilot.sd  <- reshapeWL(Pilot.sd[,-3], idvar = c('Year','stbreak'), timevar = "group", v.names = "percent") 
 # Change 0 percent to NA
 Pilot.sd$percent[Pilot.sd$percent==0]<-NA
@@ -360,8 +363,6 @@ Pilot.st.y <-  aggregate(cbind(Run,Var) ~ Year+Strata+sf, FUN=sum,data=Pilot.st)
 #'===============================================================================
 #  5.0: Data Output  ----
 #'===============================================================================
-
-
 #'-------------------------------------------------------------------------------
 ## 5.1 temp.m.ysg: mean run and proportion by Year and strata and group ----
 #'-------------------------------------------------------------------------------

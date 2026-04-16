@@ -45,7 +45,6 @@ knitr::opts_chunk$set(echo = FALSE,warning = FALSE, message = FALSE)
 # Clear up existing files 
 rm(list = ls(all.names = TRUE))
 library(ggplot2)    # Used for ggplot graphics 
-library(reshape2)
 library(lubridate)
 okabe.1 <- c("#000000","#E69F00","#56B4E9", "#009E73","#F0E442","#0072B2","#D55E00","#CC79A7" )
 okabe <- c("#E69F00","#56B4E9", "#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#000000" )
@@ -107,7 +106,7 @@ min_max <- paste0('Pilot_d_min_max_',this.year,'.csv')
 # Run postseason data processing routines 
 source(file.path(fdr,'Yukon_Chum_MSA_STD.R'))  
 # Run postseason summary routines 
-source(file.path(fdr,'Yukon_Fall_Chum_MSA_Post_Season.R'))  
+#source(file.path(fdr,'Yukon_Fall_Chum_MSA_Post_Season.R'))  
 # This will create 
 # Summary EXCEL files,  EXCEL file for JTC output
 # MSA prop and strata csv (data/MSA_data folder)
@@ -180,7 +179,7 @@ library(kableExtra)
       scale_y_continuous(expand=expansion(mult = c(0, .25)), limits=c(0, NA))+
       geom_vline(xintercept = c(rstr.y$Strata_Start_Date),color=4) + 
       geom_vline(xintercept = max(rstr.y$Strata_End_Date,na.rm=TRUE),color=2)+
-      labs(title="Pilot Station Sampling Strata",x="Date",y="Salmon Passage")
+      labs(title=paste("Pilot Station Sampling Strata",this.year),x="Date",y="Salmon Passage")
 
 ```
 **Figure 1.  Daily sonar counts attributed to chum salmon (bars) showing genetic sampling time frames (droplines), project operated near Pilot Station, Yukon Area, `r this.year`.**
@@ -209,7 +208,7 @@ library(kableExtra)
 **Figure 1.1  Daily sonar counts attributed to chum salmon (bars) showing genetic sampling time frames (droplines), project operated near Pilot Station, Yukon Area, `r this.year`.**
 
 \newpage
-```{r,fig.width=9, fig.height = 12,echo=FALSE,dpi=400}
+```{r,fig.width=9, fig.height = 6,echo=FALSE,dpi=400}
 # Pilot Station timing 
   Pilot$Date2 <- Pilot$Date
   year(Pilot$Date2) <- this.year
@@ -230,11 +229,12 @@ ridge_data <- data.frame()
     geom_polygon(data=ridge_data, aes(x = x, y = y, fill = factor(Year)), color = NA, alpha = 0.3) +
     # Add horizontal dashed lines
     geom_hline(data = data.frame(y = (0:(ny-1)) * inc), aes(yintercept = y), 
-               color = "grey", linetype = "solid", size = 0.25) +
+               color = "grey", linetype = "solid", linewidth = 0.25) +
+    geom_vline(xintercept = as.Date(paste0(this.year,"-07-19")),linetype = "longdash",linewidth=0.5)+
     # Set axis labels and title
     labs(x = 'Date', y = NULL) +
     scale_fill_manual(values = rainbow(ny)) +
-    geom_text(data=tick,aes(x=x,y=y-0.1*inc,label=label),size=5,vjust=1.0,hjust=1.0)+
+    geom_text(data=tick,aes(x=x,y=y-0.1*inc,label=label),size=3,vjust=1.0,hjust=1.0)+
      scale_y_continuous(expand=c(0,0),limits=c(0,NA))+
         theme(
 #      axis.title = element_text(size = 14),
@@ -248,22 +248,22 @@ ridge_data <- data.frame()
      ) 
 
 ```
-**Figure 1.a.  Daily sonar counts attributed to chum salmon across all years, project operated near Pilot Station, Yukon Area.**
+**Figure 1.a.  Daily sonar counts attributed to chum salmon across all years, project operated near Pilot Station, Yukon Area. Vertical line indicate July 19: Summer vs. Fall Season**
 
 \newpage
-```{r,fig.width=9, fig.height = 12,echo=FALSE,dpi=400}
+```{r,fig.width=9, fig.height = 6,echo=FALSE,dpi=400}
 # Pilot Station timing 
   pilot.dp <- merge(Pilot[,c('Year','Date','Run','Strata')], 
-                   Pilot.mp[,c('Year','Strata',c('4','7','8','11','19','10'))],by=c('Year','Strata'))
-gname <- lgnames[c('4','7','8','11','19','10')] 
+                   Pilot.mp[,c('Year','Strata',c('4','7','8','11','19','10','13'))],by=c('Year','Strata'))
+gname <- lgnames[c('4','7','8','11','19','10','13')] 
   pilot.dp[,-c(1:4)] <- pilot.dp[,-c(1:4)]*pilot.dp$Run
   pilot.dp <- pilot.dp[order(pilot.dp$Year,pilot.dp$Date),]
   pilot.dp$Date2 <- pilot.dp$Date
   year(pilot.dp$Date2) <- this.year
   rstr.y <- rstr[rstr$Year==this.year,]
 
-for(j in 1:6){
-  temp <- pilot.dp[,c(1,11,4+j)]
+for(j in 1:length(gname)){
+  temp <- cbind(pilot.dp[,c('Year','Date2')],pilot.dp[,4+j])
   names(temp) <- c('Year','Date','Run')
   temp$Run[is.na(temp$Run)]<- 0
   inc <- median(tapply(temp$Run,temp$Year,max,na.rm=TRUE),na.rm=TRUE)  
@@ -275,14 +275,15 @@ for(j in 1:6){
    tick <- data.frame(x=min(pilot.dp$Date2),y=(1:ny) * inc,label=years)  
   p <- ggplot()+
     # Create polygons for each ridge
-    geom_line(data=temp, aes(x = Date, y = Run, fill = factor(Year)),color=j)+
+    geom_line(data=temp, aes(x = Date, y = Run, group = factor(Year)),linewidth=0.5,color=okabe.1[j])+
     # Add horizontal dashed lines
     geom_hline(data = data.frame(y = (0:(ny-1)) * inc), aes(yintercept = y), 
                color = "grey", linetype = "solid", size = 0.25) +
+    geom_vline(xintercept = as.Date(paste0(this.year,"-07-19")),linetype = "longdash",linewidth=0.5)+
     # Set axis labels and title
     labs(title=paste("Stock:",gname[j]),x = 'Date', y = NULL) +
     scale_fill_manual(values = rainbow(ny)) +
-    geom_text(data=tick,aes(x=x,y=y-0.1*inc,label=label),size=5,vjust=1.0,hjust=0)+
+    geom_text(data=tick,aes(x=x,y=y-0.1*inc,label=label),size=3,vjust=1.0,hjust=0)+
      scale_y_continuous(expand=c(0,0),limits=c(0,NA))+
         theme(
 #      axis.title = element_text(size = 14),
@@ -388,13 +389,14 @@ df <- merge(plt,df, by =c('stbreak','group'))
 # Summer vs. Fall:  All seasons
 ```{r,echo=FALSE}
 # Summer vs. Fall data preparation:Postseatson
-   df<- reshape(Pilot.sft[,c(1,2,4,5)], idvar =c('Year','stbreak'),
-                varying =3:4,
-                v.names = 'percent',
-                timevar='SF',
-                times=names(Pilot.sft[,c(1,2,4,5)])[3:4],
-                direction = 'long'
-                )
+   df <-reshapeWL(hsft[,c(1,2,4,5)],idvar=c('Year','stbreak'),timevar='SF', v.names='percent')
+#   df<- reshape(Pilot.sft[,c(1,2,4,5)], idvar =c('Year','stbreak'),
+#                varying =3:4,
+#                v.names = 'percent',
+#                timevar='SF',
+#                times=names(Pilot.sft[,c(1,2,4,5)])[3:4],
+#                direction = 'long'
+#                )
 ```
 
 ```{r,fig.width=9, fig.height = 9,echo=FALSE,dpi=400}
@@ -475,7 +477,8 @@ table <- mlist[which(mlist$Strata<10 & mlist$SortID<20),]
 
 ```{r,echo=FALSE}
 table$p <- table$p*100
-Prop <- dcast(table,SortID+GroupName~Strata,value.var='p')
+#Prop <- dcast(table,SortID+GroupName~Strata,value.var='p')
+Prop <- reshapeLW(table,idvar=c('SortID','GroupName'),timevar='Strata',v.names='p')
 s.names <- with(rstr.y,paste(paste('Strata',Strata),Time_Frames,paste('n=',Sample_Size),sep='<br/>'))
 t.names <-c('Stock',s.names)
 kable(Prop[,-1],digits=1,format = "html",col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
@@ -486,7 +489,8 @@ kable(Prop[,-1],digits=1,format = "html",col.names=t.names,format.args = list(bi
 **Table 2. Genetic estimates of chum salmon passage by stock groups applied to mainstem Yukon River (Pilot Station) sonar counts `r this.year`.**
 
 ```{r,echo=FALSE}
-n <- dcast(table,SortID+GroupName~Strata,value.var='mean')
+#n <- dcast(table,SortID+GroupName~Strata,value.var='mean')
+n <- reshapeLW(table,idvar=c('SortID','GroupName'),timevar='Strata',v.names='mean')
 total <- rowSums(n[,-c(1,2)])
 n <- cbind(n,total)
 s.names <- with(rstr.y,paste(paste('Strata',Strata),Time_Frames,paste('n=',Sample_Size),sep='<br/>'))

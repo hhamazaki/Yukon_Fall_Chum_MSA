@@ -24,6 +24,7 @@ reshapeWL <- function(df,idvar,timevar,v.names){
   dfname <- names(df)[names(df)!=idvar]
   out <- reshape(df,direction='long',idvar=idvar,varying=dfname,
                  timevar = timevar,v.names=v.names,times=dfname)
+  row.names(out) <- NULL
   return(out)}  
 
 #'++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -36,6 +37,7 @@ reshapeLW <- function(df,idvar=idvar,v.names=v.names,timevar=timevar){
    wname <- names(w)[-c(1:length(idvar))]
    wname <- gsub(vhead,'',wname)
    names(w)[-c(1:length(idvar))] <- wname
+   row.names(w) <- NULL
    return(w)
 }
   

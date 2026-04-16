@@ -71,12 +71,12 @@ st102.s <- Pilot.df[with(Pilot.df,which(Strata==102 & grpID %in% c(2,9,10,11,15,
 ### JTC Table A7  ---------------
 # Stock proportions and number: 'Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.','Canada','Mainstem+ Upper Canada','Porcupine'
 # Change long to wide 
-JTC.A7.p <-dcast(st102.s, Year~grpID,value.var='p') 
+JTC.A7.p <-reshapeLW(st102.s,idvar='Year',v.names='p',timevar='grpID')
 # Extract and arrange columns 
 JTC.A7.p <- JTC.A7.p[,c('Year','2','9','10','11','15','19','16','13')]
 names(JTC.A7.p)[-1] <- c('Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.','Canada','Mainstem+ Upper Canada','Porcupine')
 ### JTC Table A7 (Number) ---------------
-JTC.A7.n <-dcast(st102.s, Year~grpID,value.var='mean') 
+JTC.A7.n <-reshapeLW(st102.s,idvar='Year',v.names='mean',timevar='grpID')
 JTC.A7.n <- JTC.A7.n[,c('Year','2','9','10','11','15','19','16','13')]
 names(JTC.A7.n)[-1] <- c('Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.','Canada','Mainstem+ Upper Canada','Porcupine')
 
@@ -85,7 +85,8 @@ names(JTC.A7.n)[-1] <- c('Summer','Fall','Tanana Fall','Border U.S.','Fall U.S.'
 # Extract strata  108
 st108 <- Pilot.df[Pilot.df$Strata==108,]
 # Change long to wide
-st108.w <- dcast(st108, Year~GroupName,value.var='p')
+#st108.w <- dcast(st108, Year~GroupName,value.var='p')
+st108.w <-reshapeLW(st108,idvar='Year',v.names='p',timevar='grpID')
 # Add CA main
 st108.w$camain <- with(st102.s,st102.s[grpID==16,'mean']/st102.s[grpID==9,'mean'])
 # Add Porcupine
@@ -102,7 +103,8 @@ st108.wm[,-1] <- st108.wm[,-1]*st102.s[st102.s$grpID==9,'mean']
 # Extract strata  103
 st103 <- Pilot.df[Pilot.df$Strata==103,]
 # Change long to wide
-st103 <- dcast(st103, Year~GroupName,value.var='p')
+#st103 <- dcast(st103, Year~GroupName,value.var='p')
+st103 <-reshapeLW(st103,idvar='Year',v.names='p',timevar='grpID')
 # Extract total Summer and Merge 
 T.summer <-  Pilot.df[Pilot.df$Strata==100 & Pilot.df$grpID==2,]
 st103.n <- merge(st103,T.summer[,c('Year','mean')], by = 'Year')
