@@ -28,8 +28,12 @@ output:
 #      envir = globalenv()
 #    )
 #  })
+
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
 
 ```{r get_data, message=FALSE,echo=FALSE,error=FALSE,warning=FALSE}
 #-------------------------------------------------------------------------------
@@ -51,7 +55,7 @@ fdr <- './R_functions'
 #===============================================================================
 inSeason <- TRUE 
 # Set year 
-this.year <- 2025
+this.year <- 2026
 # Inseason Data directory and file name 
 wd_Ins <- './data/Inseason'
 wd_Sums <- './data/Summary_data'
@@ -124,7 +128,7 @@ years <- unique(Pilot.hsft$Year)
 years <- years[order(years)]
 # number of years
 ny <- length(years)
-
+last_date <- max(Pilot$Date)
 ############################################################################
 #  Add kniter and rmarkdown libraries
 ############################################################################
@@ -169,11 +173,13 @@ Pilot.stpl <- Pilot.stpl[order(Pilot.stpl$Year,Pilot.stpl$Strata),]
 gname <- stockID[stockID$grpID %in%ststockID,c('GroupName')]      
 names(gname) <- ststockID
 nb <- length(unique(Pilot.stpl$Strata))
+nb2 <- max(nb,6)
+st.label <- c(rstr[which(rstr$Year==this.year), 'Time_Frames'],rep("",nb2-nb))
     ggplot(data = Pilot.stpl, aes(x=(Strata),y=percent,group=group))+
     geom_line(aes(colour=group))+geom_point(aes(shape=group,color=group))+ 
     scale_color_manual(values = okabe.1,labels = gname)+scale_shape_manual(values = c(1:6),labels = gname)+
     labs(x='Sampling Strata -standard dates',y='Stock Percent')+
-    scale_x_continuous(expand=expansion(add = c(.25,.25)),breaks=seq(1,nb),labels=rstr[which(rstr$Year==this.year), 'Time_Frames'], limits=c(1, NA))+
+    scale_x_continuous(expand=expansion(add = c(.25,.25)),breaks=seq(1,nb2),labels=st.label, limits=c(1, nb2))+
         theme(axis.text.x = element_text(size = rel(0.75)))
 ```
 Figure 2.  Mean proportion of chum salmon stock groups by sampling strata, Yukon Area, `r this.year`.
@@ -229,11 +235,11 @@ name <- gname[new_order_indices,'GroupName']
 df <- Pilot.d.min.max[Pilot.d.min.max$group %in% fig.stock.id,]
 plt <- Pilot.sd[Pilot.sd$group %in% fig.stock.id,]
 plt$group <- as.numeric(as.character(plt$group))
-ggplot()+
-  geom_ribbon(data=df,aes(x=(stbreak),ymin = Min, ymax = Max), fill = "gray", alpha = 0.5) +
-  geom_line(data=plt,aes(x=stbreak, y=percent),colour=2)+
-  scale_x_continuous(expand=expansion(add = c(.25, .25)),breaks=seq(1,10), limits=c(1, NA))+
-df <- merge(plt,df, by =c('stbreak','group'))
+#ggplot()+
+#    geom_ribbon(data=df,aes(x=(stbreak),ymin = Min, ymax = Max), fill = "gray", alpha = 0.5) +
+#    geom_line(data=plt,aes(x=stbreak, y=percent),colour=2)+
+#  scale_x_continuous(expand=expansion(add = c(.25, .25)),breaks=seq(1,10), limits=c(1, NA))+
+df <- merge(plt,df, by =c('stbreak','group'),all = TRUE)
 ggplot(data=df,aes(x=stbreak))+
   geom_ribbon(aes(ymin = Min, ymax = Max), fill = "gray", alpha = 0.5) +
   geom_line(aes(y=percent),colour=2)+
@@ -358,23 +364,54 @@ table$p <- table$p*100
 Prop <- reshapeLW(table,idvar=c('SortID','GroupName'),timevar='Strata',v.names='p')
 s.names <- with(rstr,paste(paste('Strata',Strata),Time_Frames,paste('n=',Sample_Size),sep='<br/>'))
 t.names <-c('Stock',s.names)
-kable(Prop[,-1],digits=1,format = "html",col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
+kable(Prop[,-1],digits=1,format = "html",row.names=FALSE,col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
 \newpage
 **Table 2. Genetic estimates of chum salmon passage by stock groups applied to mainstem Yukon River (Pilot Station) sonar counts `r this.year`.**
 ```{r,echo=FALSE}
+sum <-  mlist[which(mlist$Strata==100 & mlist$SortID<20),]
 n <- reshapeLW(table,idvar=c('SortID','GroupName'),timevar='Strata',v.names='mean')
 
-#n <- dcast(table,SortID+GroupName~Strata,value.var='mean')
+if(dim(n)[2]==3){total <- rowSums(n[,3])} else {
 total <- rowSums(n[,-c(1,2)])
+}
 n <- cbind(n,total)
 s.names <- with(rstr.y,paste(paste('Strata',Strata),Time_Frames,paste('n=',Sample_Size),sep='<br/>'))
 t.names <-c('Stock',s.names,'Total')
-kable(n[,-1],digits=0,format = "html",, booktabs = T,longtable=T,col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
+kable(n[,-1],digits=0,format = "html",, booktabs = T,longtable=T,row.names=FALSE,col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped"))
 ```
 
+\newpage
+**Table 3. Genetic estimates of chum salmon passage by stock groups applied to mainstem Yukon River (Pilot Station) sonar counts up to `r last_date`.**
+```{r,echo=FALSE}
+sum <-  mlist[which(mlist$Strata==100 & mlist$SortID<20),-c(1:4)]
+sum[,c(5:7)]<- 100*sum[,c(5:7)]
+t.names <-c('Stock','Passage','LCI','UCI','Percent','LCI','UCI')
+kable(sum,digits=c(0,0,0,0,1,1,1),format = "html",, booktabs = T,longtable=T,row.names=FALSE,col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped"))
+```
+\newpage
+**Table 4. Genetic estimates of chum salmon passage by stock groups applied to mainstem Yukon River (Pilot Station) sonar counts up to `r format(min(last_date,as.Date(paste0('07/18/',this.year),'%m/%d/%Y')), "%B %d, %Y")`.**
+```{r,echo=FALSE}
+sum <-  mlist[which(mlist$Strata==101 & mlist$SortID<20),-c(1:4)]
+sum[,c(5:7)]<- 100*sum[,c(5:7)]
+t.names <-c('Stock','Passage','LCI','UCI','Percent','LCI','UCI')
+kable(sum,digits=c(0,0,0,0,1,1,1),format = "html",, booktabs = T,longtable=T,col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped"))
+```
+\newpage
+**Table 5. Genetic estimates of chum salmon passage by stock groups applied to mainstem Yukon River (Pilot Station) sonar counts from July 19 to `r format(last_date, "%B %d, %Y")`.**
+```{r,echo=FALSE}
+if(last_date > as.Date(paste0('07/19/',this.year),'%m/%d/%Y')){
+sum <-  mlist[which(mlist$Strata==102 & mlist$SortID<20),-c(1:4)]
+sum[,c(5:7)]<- 100*sum[,c(5:7)]
+t.names <-c('Stock','Passage','LCI','UCI','Percent','LCI','UCI')
+kable(sum,digits=c(0,0,0,0,1,1,1),format = "html",, booktabs = T,longtable=T,row.names=FALSE,col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped"))
+} 
+```
 
 
