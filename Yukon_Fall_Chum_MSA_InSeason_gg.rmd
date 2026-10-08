@@ -72,12 +72,11 @@ Pilot_Var_Ins <- 'Daily Variance By Species.csv'
 source(file.path(fdr,'Yukon_Chum_MSA_STD.R'))  
 source(file.path(fdr,'ggplot_theme.r'))  
 library(ggplot2)    # Used for ggplot graphics 
-#library(reshape2)
 theme_set(theme_simple())
-#theme_set(theme_adfg_bbc())
 okabe.1 <- c("#000000","#E69F00","#56B4E9", "#009E73","#F0E442","#0072B2","#D55E00","#CC79A7" )
 okabe <- c("#E69F00","#56B4E9", "#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#000000" )
-options(ggplot2.discrete.color = okabe)
+options(ggplot2.discrete.colour = okabe)
+options(ggplot2.discrete.fill = list(okabe))
 
 # Standard Output Stock figures 
 ststockID <- c(4,7,8,10,11,19)
@@ -135,11 +134,7 @@ last_date <- max(Pilot$Date)
 library(knitr)
 library(rmarkdown)
 library(kableExtra)
- add_legend <- function(...) {
-   par(mar = c(0,0,4,0))
-   plot(0, 0, type='n', bty='n', xaxt='n', yaxt='n',xlab='',ylab='')
-   legend(...)
-  }
+
 ```
 # Pilot Station Passage 
 ```{r,fig.width=9, fig.height = 5,echo=FALSE,,warning=FALSE,dpi=400}
@@ -261,13 +256,7 @@ Figure 4.  Minimum and maximum (2004-`r this.year-1`) and `r this.year` mean sto
    tny <- length(tyears)
 
    df <-reshapeWL(hsft[,c(1,2,4,5)],idvar=c('Year','stbreak'),timevar='SF', v.names='percent')
-#   df<- reshape(hsft[,c(1,2,4,5)], idvar =c('Year','stbreak'),
-#                varying =3:4,
-#                v.names = 'percent',
-#                timevar='SF',
-#                times=names(hsft[,c(1,2,4,5)])[3:4],
-#                direction = 'long'
-#                )
+
 ```
 
 
@@ -301,7 +290,7 @@ Figure 5.  Crossover of summer and fall chum salmon based on genetic stock analy
       geom_line(aes(color=SF ))+
       geom_point(aes(color=SF),size=2)+
       facet_wrap( ~Year,axes='all',axis.labels='margins',ncol=5) +
-      scale_x_discrete(labels=stbl,limit=factor(4:6),guide = guide_axis(check.overlap = TRUE)) + 
+      scale_x_discrete(labels=stbl[4:6],limit=factor(4:6),guide = guide_axis(check.overlap = TRUE)) + 
 	  ylim(0, 100)+
       theme(axis.text.x = element_text(size=7))+
       labs(title = "Summer vs. Fall")+  xlab("Dates")

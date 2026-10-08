@@ -68,7 +68,7 @@ ciOverwrite <- FALSE
 # Save output files 
 filesave <- TRUE
 # Set year 
-this.year <- 2025
+this.year <- 2026
 
 #'------------------------------------------------------------------------------
 ##  1.0 : Set MSA and Pilot data file names ---- 
@@ -160,11 +160,6 @@ ny <- length(years)
 library(knitr)
 library(rmarkdown)
 library(kableExtra)
- add_legend <- function(...) {
-   par(mar = c(0,0,4,0))
-   plot(0, 0, type='n', bty='n', xaxt='n', yaxt='n',xlab='',ylab='')
-   legend(...)
-  }
 ```
 
 \newpage
