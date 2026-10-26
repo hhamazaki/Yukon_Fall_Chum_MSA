@@ -29,7 +29,7 @@ vignettes/*.pdf
 # Folders
 # Files 
 *.docx
-*.xlsx
+#*.xlsx
 *.html
-*.csv
+#*.csv
 
