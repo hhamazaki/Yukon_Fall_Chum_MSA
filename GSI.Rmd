@@ -1,0 +1,81 @@
+# Methods
+
+## Sampling and Data
+
+At Pilot Station, chum tissue samples were collected daily from the Pilot Station test-fish and were mailed to the USFWS lab periodically when total samples reach around 200-300. The mailed samples were analyzed by the USAFWS lab and reported mean proportion, SD, and 95% CI. Pilot Station Sonar provides daily passage and variance by species.
+
+## Pilot Station Sonar stock-specific passage and proportion.
+
+Season total stock-specific passage $(N_{s,y})$ and proportion $(P_{s,y})$ were estimated by multiplying stratum-specific Chum (Summer and Fall) passage $n_{t,y}$ with stock proportion $p_{s,t,y}$ and summing across all strata, and dividing by total passage. Passage before the first stratum (sampling date) and after the last stratum (sampling date) were added to the first and last stratum, respectively.
+
+$$N_{s,y}=\sum_{t}^{}n_{t,y}p_{s,t,y}$$ Season total stock proportion was calculated by dividing stock-specific passage with total passage
+
+$$P_{s,y}=\frac{N_{s,y}}{\sum_{s}^{}N_{s,y}}$$
+
+Variance and 95% CI range of the passage and proportion were estimated from 1000 parametric bootstrap samples, where passage was assumed to be normally distributed
+
+$$n^{b}_{t,y} \sim N(n_{t,y},\sigma_{t,y} )$$ and stock proportion was assumed to be multinomial distributed with sample size of $S_{t,y}$.$$p^{b}_{s,t,y} \sim Mult(S_{t,y},p_{1,t,y},p_{2,t,y},...,p_{s,t,y},... )/S_{t,y}$$
+
+$S_{t,y}$ was set to 1/2 of actual GSI tissue samples. Reducing sample size by half would simulate uncertainties associated with sampling and stock identification.
+
+## GSI Stock Group Changes
+
+Due to changes in baseline samples and stock separation methodologies, stock grouping has changed over time.
+
++-------------+------------------------+----------------------+-----------------------------------------+
+| Group ID    | Group Name             | Years                | Grouping                                |
++=============+========================+======================+=========================================+
+| 1           | Upper Canada           | 1999-                | 3 + 6                                   |
++-------------+------------------------+----------------------+-----------------------------------------+
+| 2\*         | Total Summer           | 1999-                | 4+5 (1999-2002, 2008-) 8+23 (2004-2007) |
++-------------+------------------------+----------------------+-----------------------------------------+
+| **3**       | **White**              | **1999-**            |                                         |
++-------------+------------------------+----------------------+-----------------------------------------+
+| **4\***     | **Lower Summer**       | **1999-2002, 2008-** |                                         |
++-------------+------------------------+----------------------+-----------------------------------------+
+| **5\***     | **Middle Summer**      | **1999-2002**        |                                         |
++-------------+------------------------+----------------------+-----------------------------------------+
+| **6**       | **Teslin**             | **1999-**            |                                         |
++-------------+------------------------+----------------------+-----------------------------------------+
+| **7\***     | **Upper Koyukuk+Main** | **1999-**            |                                         |
++-------------+------------------------+----------------------+-----------------------------------------+
+| **8\***     | **Tanana Summer**      | **2008-**            |                                         |
++-------------+------------------------+----------------------+-----------------------------------------+
+| 9           | Total Fall             | 1999-                | 1+10+22 (1999-2002) 15+19 (2004-)       |
++-------------+------------------------+----------------------+-----------------------------------------+
+| **10**      | **Tanana Fall**        | **2004-**            | 20+21 (1999-2002)                       |
++-------------+------------------------+----------------------+-----------------------------------------+
+| **11**      | **Border US**          | **2004-**            |                                         |
++-------------+------------------------+----------------------+-----------------------------------------+
+| 12          | Border Canada          | 2004-                | 13+14                                   |
++-------------+------------------------+----------------------+-----------------------------------------+
+| **13**      | **Porcupine**          | **2004-**            |                                         |
++-------------+------------------------+----------------------+-----------------------------------------+
+| **14**      | **Mainstem Canada**    | **2004-**            |                                         |
++-------------+------------------------+----------------------+-----------------------------------------+
+| 15          | Fall US                | 2004-                | 10+11                                   |
++-------------+------------------------+----------------------+-----------------------------------------+
+| 16          | Mainstem+Upper Canada  | 2004-                | 1+14                                    |
++-------------+------------------------+----------------------+-----------------------------------------+
+| 17          | Border US +CA          | 1999-                | 1+22 (1999-2002) 11+19 (2004- )         |
++-------------+------------------------+----------------------+-----------------------------------------+
+| 18          | Total US               | 2004-                | 2+15                                    |
++-------------+------------------------+----------------------+-----------------------------------------+
+| 19          | Total Canada           | 2004-                | 1+12                                    |
++-------------+------------------------+----------------------+-----------------------------------------+
+| **20**      | **Toklat**             | **1999-2002**        |                                         |
++-------------+------------------------+----------------------+-----------------------------------------+
+| **21**      | **Upper Tanana**       | **1999-2002**        |                                         |
++-------------+------------------------+----------------------+-----------------------------------------+
+| **22**      | **Border (US+CA)**     | **1999-2002**        |                                         |
++-------------+------------------------+----------------------+-----------------------------------------+
+| **23\***    | **Lower Summer+**      | **2004-2007**        | 4+7 (2008- )                            |
+|             |                        |                      |                                         |
+|             | **Upper Koyukuk+Main** |                      |                                         |
++-------------+------------------------+----------------------+-----------------------------------------+
+
+: **Bold** indicates the primary stock group \*: Summer stock
+
+### GSI Group historical Change
+
+![GSI stock group historical change](Fall%20chum%20GSI.png)

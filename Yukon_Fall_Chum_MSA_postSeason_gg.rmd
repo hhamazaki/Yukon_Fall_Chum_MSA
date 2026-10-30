@@ -384,7 +384,7 @@ df <- merge(plt,df, by =c('stbreak','group'))
 # Summer vs. Fall:  All seasons
 ```{r,echo=FALSE}
 # Summer vs. Fall data preparation:Postseatson
-   df <-reshapeWL(hsft[,c(1,2,4,5)],idvar=c('Year','stbreak'),timevar='SF', v.names='percent')
+   df <-reshapeWL(Pilot.sft[,c(1,2,4,5)],idvar=c('Year','stbreak'),timevar='SF', v.names='percent')
 #   df<- reshape(Pilot.sft[,c(1,2,4,5)], idvar =c('Year','stbreak'),
 #                varying =3:4,
 #                v.names = 'percent',
@@ -492,5 +492,9 @@ s.names <- with(rstr.y,paste(paste('Strata',Strata),Time_Frames,paste('n=',Sampl
 t.names <-c('Stock',s.names,'Total')
 kable(n[,-1],digits=0,format = "html", booktabs = T,longtable=T,col.names=t.names,format.args = list(big.mark = ",",scientific = F),escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped"))
+```
+
+\newpage
+```{r, child='GSI.Rmd'}
 ```
 

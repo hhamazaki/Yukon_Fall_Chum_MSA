@@ -281,7 +281,7 @@ goodman <- function(x,x.var,y,y.var){
   }
 
 #-------------------------------------------------------------------------------
-#  sim.ci:  This function calculate ci
+#  sim.ci:  This function calculate ci using bootstrap method
 #  MSA.y: Strata 
 #  Temp.st: Pilot Station strata run and var
 #  sgrpIDn: primary stock group
